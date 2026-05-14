@@ -1,0 +1,96 @@
+import React from 'react';
+import { X, Printer, Download, MapPin, Phone, QrCode } from 'lucide-react';
+
+const PosterGenerator = ({ isOpen, onClose, item }) => {
+    if (!isOpen || !item) return null;
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200 overflow-y-auto">
+            <div className="relative w-full max-w-2xl">
+                {/* Actions Bar */}
+                <div className="absolute -top-12 left-0 right-0 flex justify-between items-center text-white print:hidden">
+                    <h3 className="font-bold text-lg">Poster Preview</h3>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handlePrint}
+                            className="bg-white text-black px-4 py-2 rounded-full font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors"
+                        >
+                            <Printer size={18} /> Print
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="bg-white/20 text-white p-2 rounded-full hover:bg-white/40 transition-colors"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Poster Layout */}
+                <div className="bg-white p-8 rounded-none shadow-2xl print:shadow-none print:w-full print:h-screen print:absolute print:top-0 print:left-0 print:m-0">
+                    {/* Header */}
+                    <div className="bg-red-600 text-white text-center py-6 mb-6">
+                        <h1 className="text-6xl font-black uppercase tracking-tighter mb-2">LOST</h1>
+                        <p className="text-xl font-bold uppercase tracking-widest">Have you seen this?</p>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex flex-col items-center text-center mb-8">
+                        {item.image ? (
+                            <div className="w-full h-80 mb-6 border-4 border-gray-900">
+                                <img src={item.image} alt={item.item} className="w-full h-full object-cover" />
+                            </div>
+                        ) : (
+                            <div className="w-full h-64 mb-6 bg-gray-200 flex items-center justify-center border-4 border-gray-900">
+                                <span className="text-2xl font-bold text-gray-500">No Photo Available</span>
+                            </div>
+                        )}
+
+                        <h2 className="text-4xl font-bold text-gray-900 mb-2">{item.item}</h2>
+
+                        {item.reward && (
+                            <div className="bg-yellow-400 text-black px-6 py-2 rounded-full font-black text-xl mb-4 transform -rotate-2 inline-block shadow-lg border-2 border-black">
+                                REWARD: {item.reward}
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-2 text-gray-600 font-bold text-xl mb-6">
+                            <MapPin size={24} /> Last seen at: {item.location}
+                        </div>
+
+                        <p className="text-xl text-gray-800 leading-relaxed max-w-xl mb-8 border-t border-b border-gray-200 py-4">
+                            {item.description}
+                        </p>
+
+                        {/* Contact & QR */}
+                        <div className="flex flex-col md:flex-row items-center justify-between w-full bg-gray-100 p-6 rounded-xl border-2 border-gray-200">
+                            <div className="text-left mb-4 md:mb-0">
+                                <p className="text-sm font-bold text-gray-500 uppercase mb-1">If found, please contact:</p>
+                                <div className="flex items-center gap-3 text-3xl font-black text-gray-900">
+                                    <Phone size={32} /> {item.contact}
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-gray-200">
+                                <QrCode size={64} />
+                                <div className="text-left">
+                                    <p className="text-xs font-bold text-gray-500">Scan to Report</p>
+                                    <p className="text-sm font-bold text-primary">Travel Tracer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="text-center text-gray-400 text-sm font-medium">
+                        Generated by Travel Tracer - The Ultimate Travel Companion
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default PosterGenerator;

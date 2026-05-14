@@ -1,0 +1,172 @@
+export const agencies = [
+    {
+        id: "AGENCY_01",
+        name: "Wanderlust Adventures",
+        verified: true,
+        rating: 4.8,
+        logo: "https://ui-avatars.com/api/?name=Wanderlust+Adventures&background=0D8ABC&color=fff"
+    },
+    {
+        id: "AGENCY_02",
+        name: "Hill Tracts Explorers",
+        verified: true,
+        rating: 4.9,
+        logo: "https://ui-avatars.com/api/?name=Hill+Tracts&background=1B5E20&color=fff"
+    },
+    {
+        id: "AGENCY_03",
+        name: "Beach Vibes Tours",
+        verified: false,
+        rating: 4.5,
+        logo: "https://ui-avatars.com/api/?name=Beach+Vibes&background=FF5722&color=fff"
+    }
+];
+
+export const tourEvents = [
+    {
+        id: "EVT-2025-001",
+        agencyId: "AGENCY_02",
+        title: "Mysterious Marayon Tong Camping",
+        destination: "Bandarban",
+        dates: { start: "2025-12-10", end: "2025-12-12" },
+        duration: "2 Days, 3 Nights",
+        price: 4500,
+        bookingMoney: 1020,
+        capacity: 30,
+        booked: 25,
+        status: "filling_fast", // open, filling_fast, housefull, completed
+        category: "Adventure", // Relax, Adventure, Trekking
+        images: [
+            "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?auto=format&fit=crop&q=80&w=800",
+            "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&q=80&w=800"
+        ],
+        itinerary: [
+            { day: 1, title: "Journey to Bandarban", description: "Night bus from Dhaka to Bandarban." },
+            { day: 2, title: "Trek to Marayon Tong", description: "Morning breakfast and start trekking. Night stay at camp." },
+            { day: 3, title: "Return", description: "Sunrise view, breakfast, and return journey." }
+        ],
+        includes: ["Bus Ticket", "All Meals", "Tents", "Guide"],
+        excludes: ["Personal Expenses", "Medicine"]
+    },
+    {
+        id: "EVT-2025-002",
+        agencyId: "AGENCY_01",
+        title: "Sajek Valley Cloud Hunting",
+        destination: "Sajek",
+        dates: { start: "2025-12-15", end: "2025-12-17" },
+        duration: "2 Days, 3 Nights",
+        price: 6500,
+        bookingMoney: 2000,
+        capacity: 25,
+        booked: 12,
+        status: "open",
+        category: "Relax",
+        images: [
+            "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&q=80&w=800",
+            "https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?auto=format&fit=crop&q=80&w=800"
+        ],
+        itinerary: [
+            { day: 1, title: "Dhaka to Khagrachari", description: "Overnight journey." },
+            { day: 2, title: "Khagrachari to Sajek", description: "Jeep ride to Sajek. Sunset at Helipad." },
+            { day: 3, title: "Alutila Cave & Return", description: "Visit Alutila Cave and Risang Waterfall." }
+        ],
+        includes: ["Jeep", "Resort", "6 Meals", "Entry Fees"],
+        excludes: ["BBQ"]
+    },
+    {
+        id: "EVT-2025-003",
+        agencyId: "AGENCY_03",
+        title: "Saint Martin's Island Retreat",
+        destination: "Saint Martin",
+        dates: { start: "2025-12-20", end: "2025-12-23" },
+        duration: "3 Days, 4 Nights",
+        price: 8500,
+        bookingMoney: 3000,
+        capacity: 40,
+        booked: 38,
+        status: "few_seats_left",
+        category: "Relax",
+        images: [
+            "https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?auto=format&fit=crop&q=80&w=800"
+        ],
+        itinerary: [
+            { day: 1, title: "Dhaka to Teknaf", description: "Bus journey." },
+            { day: 2, title: "Ship to Island", description: "Cruise to St. Martin. Beach time." },
+            { day: 3, title: "Chera Dwip", description: "Visit Chera Dwip." },
+            { day: 4, title: "Return", description: "Back to Dhaka." }
+        ],
+        includes: ["Ship Ticket", "Resort", "All Meals"],
+        excludes: ["Water Sports"]
+    },
+    {
+        id: "EVT-2025-004",
+        agencyId: "AGENCY_02",
+        title: "Nafakhum Waterfall Expedition",
+        destination: "Bandarban",
+        dates: { start: "2025-12-25", end: "2025-12-28" },
+        duration: "3 Days, 4 Nights",
+        price: 5500,
+        bookingMoney: 1500,
+        capacity: 20,
+        booked: 5,
+        status: "open",
+        category: "Waterfall",
+        images: [
+            "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=800"
+        ],
+        itinerary: [
+            { day: 1, title: "Dhaka to Thanchi", description: "Bus journey." },
+            { day: 2, title: "Thanchi to Remakri", description: "Boat ride and trek." },
+            { day: 3, title: "Nafakhum", description: "Visit the waterfall." },
+            { day: 4, title: "Return", description: "Back to Dhaka." }
+        ],
+        includes: ["Bus", "Boat", "Guide", "Meals"],
+        excludes: ["Personal Expenses"]
+    },
+    {
+        id: "EVT-2025-005",
+        agencyId: "AGENCY_01",
+        title: "Haunted Villa Night Stay",
+        destination: "Sylhet",
+        dates: { start: "2025-12-31", end: "2026-01-01" },
+        duration: "1 Night, 2 Days",
+        price: 3000,
+        bookingMoney: 1000,
+        capacity: 10,
+        booked: 2,
+        status: "open",
+        category: "Horror",
+        images: [
+            "https://images.unsplash.com/photo-1505567745926-ba89000d255a?auto=format&fit=crop&q=80&w=800"
+        ],
+        itinerary: [
+            { day: 1, title: "Arrival", description: "Check in to the villa." },
+            { day: 2, title: "Departure", description: "Breakfast and leave." }
+        ],
+        includes: ["Villa Stay", "Dinner", "Ghost Stories"],
+        excludes: ["Exorcism"]
+    }
+];
+
+export const bookings = [
+    {
+        id: "BK-101",
+        eventId: "EVT-2025-001",
+        user: "Rahim Ahmed",
+        seats: 2,
+        totalAmount: 9000,
+        paidAmount: 2040,
+        status: "partial_paid", // paid, partial_paid, unpaid
+        date: "2025-12-01"
+    },
+    {
+        id: "BK-102",
+        eventId: "EVT-2025-001",
+        user: "Karim Uddin",
+        seats: 1,
+        totalAmount: 4500,
+        paidAmount: 4500,
+        status: "paid",
+        date: "2025-12-02"
+    }
+];

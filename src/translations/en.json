@@ -1,0 +1,27 @@
+{
+    "common": {
+        "home": "Home",
+        "destinations": "Destinations",
+        "planner": "Smart Planner",
+        "community": "Community",
+        "dashboard": "Dashboard",
+        "login": "Login",
+        "logout": "Logout",
+        "search": "Search",
+        "loading": "Loading...",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "home": {
+        "hero_title": "Discover Hidden Bangladesh",
+        "hero_subtitle": "Experience the beauty of the delta with the ultimate travel OS.",
+        "start_booking": "Start Booking",
+        "popular_trips": "Popular Trips"
+    },
+    "sos": {
+        "trigger": "Trigger SOS",
+        "sending": "Sending Signal...",
+        "sent": "SOS Signal Sent! Help is on the way.",
+        "failed": "Failed to send signal. Please call 999."
+    }
+}
