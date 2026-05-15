@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import React, { lazy, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
 import { Facebook, Instagram, Youtube, Loader2 } from 'lucide-react';
 import Navbar from './components/Navbar';

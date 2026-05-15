@@ -29,7 +29,7 @@ const FoodCard = ({ vendor }) => {
           <div className="space-y-2 text-sm text-gray-700">
             <p><span className="font-semibold">সেরা মেনু:</span> {menu.item_name || 'বাংলা খাবার'}</p>
             <p><span className="font-semibold">শ্রেণী:</span> {menu.category || 'ভাত'}</p>
-            <p><span className="font-semibold">দর:</span> ৳{menu.price ?? ১৫০}</p>
+            <p><span className="font-semibold">দর:</span> ৳{menu.price ?? 150}</p>
           </div>
         </div>
       </Link>

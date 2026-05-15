@@ -29,7 +29,7 @@ const TransportCard = ({ vendor }) => {
           <div className="space-y-2 text-sm text-gray-700">
             <p><span className="font-semibold">মডেল:</span> {vehicle.vehicle_model || 'Toyota Noah'}</p>
             <p><span className="font-semibold">ধারণ ক্ষমতা:</span> {vehicle.capacity ?? 6} জন</p>
-            <p><span className="font-semibold">দর:</span> ৳{vehicle.base_price_per_km ?? ২৫} / কিমি</p>
+            <p><span className="font-semibold">দর:</span> ৳{vehicle.base_price_per_km ?? 25} / কিমি</p>
           </div>
         </div>
       </Link>

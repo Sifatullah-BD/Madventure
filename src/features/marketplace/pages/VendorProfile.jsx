@@ -116,7 +116,7 @@ const VendorProfile = () => {
                 <p><span className="font-semibold">Vehicle type:</span> {vehicle.vehicle_type || 'Car'}</p>
                 <p><span className="font-semibold">Model:</span> {vehicle.vehicle_model || 'Toyota Noah'}</p>
                 <p><span className="font-semibold">Capacity:</span> {vehicle.capacity ?? 6} জন</p>
-                <p><span className="font-semibold">Price per km:</span> ৳{vehicle.base_price_per_km ?? ২৫}</p>
+                <p><span className="font-semibold">Price per km:</span> ৳{vehicle.base_price_per_km ?? 25}</p>
                 <p><span className="font-semibold">Available:</span> {vehicle.is_available ? 'Yes' : 'No'}</p>
               </div>
             </div>

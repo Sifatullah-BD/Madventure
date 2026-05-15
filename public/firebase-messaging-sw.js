@@ -2,15 +2,16 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-firebase.initializeApp({
-  apiKey: "REPLACE_WITH_ENV_VALUE",
-  authDomain: "REPLACE_WITH_ENV_VALUE",
-  projectId: "REPLACE_WITH_ENV_VALUE",
-  storageBucket: "REPLACE_WITH_ENV_VALUE",
-  messagingSenderId: "REPLACE_WITH_ENV_VALUE",
-  appId: "REPLACE_WITH_ENV_VALUE"
-});
+const firebaseConfig = {
+  apiKey: "AIzaSyDNV7pLayFxPSH6OmLt59eASY8bOk6p0Uo",
+  authDomain: "madventure-dd390.firebaseapp.com",
+  projectId: "madventure-dd390",
+  storageBucket: "madventure-dd390.firebasestorage.app",
+  messagingSenderId: "506292869719",
+  appId: "1:506292869719:web:e7ecd945b43f73c010e112"
+};
 
+firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
