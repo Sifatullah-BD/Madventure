@@ -1,6 +1,6 @@
 // src/lib/firebase.js
 import { initializeApp } from "firebase/app";
-import { getMessaging, onMessage, getToken } from "firebase/messaging"; // getToken যোগ করা হয়েছে
+import { getMessaging, onMessage, getToken } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDNV7pLayFxPSH6OmLt59eASY8bOk6p0Uo",
@@ -12,27 +12,46 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const messaging = getMessaging(app);
 
-// এই ফাংশনটি যোগ করুন যা আপনার NotificationContext খুঁজছে
-export const requestForToken = async () => {
+let messaging = null;
+
+if (typeof window !== 'undefined') {
   try {
+    messaging = getMessaging(app);
+  } catch (err) {
+    console.warn('Firebase messaging init failed:', err);
+  }
+}
+
+export { messaging };
+
+export const requestForToken = async () => {
+  if (!messaging) return null;
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log('Notification permission denied');
+      return null;
+    }
     const currentToken = await getToken(messaging, {
-      vapidKey: "YOUR_VAPID_KEY_HERE" // আপনার Firebase কনসোল থেকে VAPID Key টি এখানে বসান
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY || ""
     });
     if (currentToken) {
-      console.log('Token found:', currentToken);
+      console.log('FCM Token:', currentToken);
       return currentToken;
     } else {
       console.log('No registration token available.');
+      return null;
     }
   } catch (err) {
-    console.log('An error occurred while retrieving token.', err);
+    console.log('Token retrieve error:', err);
+    return null;
   }
 };
 
 export const onMessageListener = () =>
   new Promise((resolve) => {
+    if (!messaging) return;
     onMessage(messaging, (payload) => {
       resolve(payload);
     });
