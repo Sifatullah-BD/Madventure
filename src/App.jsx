@@ -132,11 +132,18 @@ const AppContent = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Register Service Worker
+    // Service Worker: register only in production and ensure dev unregisters old SWs
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('SW Registration successful:', reg.scope))
-        .catch(err => console.log('SW Registration failed:', err));
+      if (import.meta.env.PROD) {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW Registration successful:', reg.scope))
+          .catch(err => console.log('SW Registration failed:', err));
+      } else {
+        // In development, unregister any existing service workers to avoid cached assets and port mismatches
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => regs.forEach(r => r.unregister().then(() => console.log('Unregistered service worker during dev:', r.scope))))
+          .catch(() => {});
+      }
     }
 
     return () => {

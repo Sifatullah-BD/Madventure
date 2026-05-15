@@ -1,13 +1,92 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { Briefcase, CheckCircle, TrendingUp, Users, Globe, ArrowRight, Upload, User, FileText } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import { uploadImages } from '../api/storage';
+import { createPartnerRequest } from '../api/community';
+import { useToast } from '../components/ui/Toast';
 
 const Partner = () => {
-    const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = React.useState(false);
+    const [businessName, setBusinessName] = React.useState('');
+    const [businessType, setBusinessType] = React.useState('Hotel / Resort');
+    const [location, setLocation] = React.useState('');
+    const [ownerName, setOwnerName] = React.useState('');
+    const [nid, setNid] = React.useState('');
+    const [phone, setPhone] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [file, setFile] = React.useState(null);
+    const [uploading, setUploading] = React.useState(false);
+    const fileRef = useRef(null);
+    const toast = useToast();
 
-    const handleSubmit = (e) => {
+    const validatePhone = (value) => {
+        const digits = value.replace(/\D/g, '');
+        return (digits.length === 11 && digits.startsWith('01')) || (digits.length === 13 && digits.startsWith('8801'));
+    };
+
+    const validateNid = (value) => {
+        const digits = value.replace(/\D/g, '');
+        return [10, 13, 17].includes(digits.length);
+    };
+
+    const handleFileClick = () => fileRef.current && fileRef.current.click();
+
+    const handleFileChange = (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        if (f.size > 5 * 1024 * 1024) {
+            toast.error('File too large. Max 5MB allowed.');
+            return;
+        }
+        const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!allowed.includes(f.type)) {
+            toast.error('Invalid file type. Use PDF, JPG or PNG.');
+            return;
+        }
+        setFile(f);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitted(true);
+
+        if (!validatePhone(phone)) return toast.error('Invalid phone number. Use +8801XXXXXXXXX or 01XXXXXXXXX');
+        if (!validateNid(nid)) return toast.error('Invalid NID. Provide 10, 13 or 17 digit national ID');
+
+        setUploading(true);
+        try {
+            let docUrls = [];
+            if (file) {
+                const { data, error } = await uploadImages('partner-docs', [file]);
+                if (error) throw error;
+                docUrls = data || [];
+            }
+
+            const payload = {
+                business_name: businessName,
+                business_type: businessType,
+                location,
+                owner_name: ownerName,
+                nid,
+                phone,
+                email,
+                documents: docUrls,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            };
+
+            const { data, error } = await createPartnerRequest(payload);
+            if (error) throw error;
+
+            toast.success('Application submitted successfully');
+            setSubmitted(true);
+            // Reset form
+            setBusinessName(''); setBusinessType('Hotel / Resort'); setLocation(''); setOwnerName(''); setNid(''); setPhone(''); setEmail(''); setFile(null);
+        } catch (err) {
+            console.error(err);
+            toast.error(err.message || 'Failed to submit application');
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -62,13 +141,13 @@ const Partner = () => {
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Business Name</label>
-                                        <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g. Sea View Hotel" />
+                                        <input value={businessName} onChange={(e) => setBusinessName(e.target.value)} type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="e.g. Sea View Hotel" />
                                     </div>
 
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
-                                            <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <select value={businessType} onChange={(e) => setBusinessType(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                                                 <option>Hotel / Resort</option>
                                                 <option>Tour Guide</option>
                                                 <option>Rent-a-Car</option>
@@ -77,7 +156,7 @@ const Partner = () => {
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                                            <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="City / Area" />
+                                            <input value={location} onChange={(e) => setLocation(e.target.value)} type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="City / Area" />
                                         </div>
                                     </div>
 
@@ -89,37 +168,44 @@ const Partner = () => {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Owner Name</label>
-                                                <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Full Name" />
+                                                <input value={ownerName} onChange={(e) => setOwnerName(e.target.value)} type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Full Name" />
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">NID Number</label>
-                                                <input type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="National ID" />
+                                                <input value={nid} onChange={(e) => setNid(e.target.value)} type="text" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="National ID" />
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Contact Number</label>
-                                        <input type="tel" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="+880..." />
+                                        <input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="+880..." />
                                     </div>
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                                        <input type="email" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="business@example.com" />
+                                        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="business@example.com" />
                                     </div>
 
                                     {/* Trade License Upload */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">Trade License / Business Proof</label>
-                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer bg-gray-50">
+                                        <input ref={fileRef} onChange={handleFileChange} type="file" accept=".pdf,image/*" className="hidden" />
+                                        <div onClick={handleFileClick} className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer bg-gray-50">
                                             <Upload className="mx-auto text-gray-400 mb-2" size={24} />
-                                            <p className="text-sm text-gray-600 font-medium">Click to upload document</p>
-                                            <p className="text-xs text-gray-400">PDF, JPG or PNG (Max 5MB)</p>
+                                            {file ? (
+                                                <p className="text-sm text-gray-700 font-medium">Selected: {file.name}</p>
+                                            ) : (
+                                                <>
+                                                    <p className="text-sm text-gray-600 font-medium">Click to upload document</p>
+                                                    <p className="text-xs text-gray-400">PDF, JPG or PNG (Max 5MB)</p>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <button type="submit" className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg flex items-center justify-center gap-2">
-                                        Submit Application <ArrowRight size={20} />
+                                    <button disabled={uploading} type="submit" className="w-full bg-primary disabled:opacity-60 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg flex items-center justify-center gap-2">
+                                        {uploading ? 'Submitting…' : 'Submit Application'} <ArrowRight size={20} />
                                     </button>
                                 </form>
                             </>

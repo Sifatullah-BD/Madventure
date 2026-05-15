@@ -1,3 +1,5 @@
+import DashboardHeader from '../components/dashboard/DashboardHeader';
+import LoginModal from '../components/LoginModal';
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TicketSearch from '../components/tickets/TicketSearch';

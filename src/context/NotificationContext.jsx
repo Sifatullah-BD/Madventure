@@ -2,44 +2,94 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { requestForToken, onMessageListener } from '../lib/firebase';
 import { useAuth } from '../hooks/useAuth';
 import { supabase } from '../lib/supabase';
-import { Bell } from 'lucide-react';
 
 const NotificationContext = createContext();
 
+// ─── Token Sync ───────────────────────────────────────────────────────────────
 const handleTokenSync = async (user) => {
-    const token = await requestForToken();
-    if (token && user) {
-        await supabase.from('user_tokens').upsert({
-            user_id: user.id,
-            token
+    try {
+        const token = await requestForToken();
+        if (token && user) {
+            await supabase.from('user_tokens').upsert({
+                user_id: user.id,
+                token
+            });
+        }
+    } catch (err) {
+        console.warn('Token sync failed:', err);
+    }
+};
+
+// ─── Browser Toast ────────────────────────────────────────────────────────────
+const showBrowserToast = (notification) => {
+    if (!('Notification' in window)) return;
+
+    const show = () => {
+        try {
+            new Notification(notification.title || 'নতুন বিজ্ঞপ্তি', {
+                body: notification.body || '',
+                icon: '/madventure-logo-v2.png'
+            });
+        } catch (err) {
+            console.warn('Browser notification error:', err);
+        }
+    };
+
+    if (Notification.permission === 'granted') {
+        show();
+    } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') show();
         });
     }
 };
 
-const subscribeToRealTimeNotifications = (setNotifications, setUnreadCount) => {
-    const channel = supabase.channel('notifications');
+// ─── Realtime Subscription (userId filter সহ) ─────────────────────────────────
+const subscribeToRealTimeNotifications = (userId, setNotifications, setUnreadCount) => {
+    if (!userId) return null;
 
-    channel.on('postgres_changes', { event: '*', schema: 'public', table: 'notifications' }, payload => {
-        const newNotif = {
-            id: payload.new.id,
-            title: payload.new.title,
-            body: payload.new.body,
-            time: new Date(payload.new.created_at).toLocaleTimeString(),
-            read: false
-        };
-        setNotifications(prev => [newNotif, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        showBrowserToast(newNotif);
+    const topic = `notifications-user-${userId}`;
+
+    // পুরনো channel remove করো
+    supabase.getChannels().forEach(ch => {
+        if (ch.topic === topic) supabase.removeChannel(ch);
     });
 
-    channel.subscribe();
+    const channel = supabase
+        .channel(topic)
+        .on(
+            'postgres_changes',
+            {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_id=eq.${userId}`   // ✅ শুধু এই user-এর notification
+            },
+            (payload) => {
+                if (!payload.new) return;
+
+                const newNotif = {
+                    id: payload.new.id,
+                    title: payload.new.title,
+                    body: payload.new.body,
+                    type: payload.new.type || 'info',
+                    time: new Date(payload.new.created_at).toLocaleTimeString('bn-BD'),
+                    read: false
+                };
+
+                setNotifications(prev => [newNotif, ...prev]);
+                setUnreadCount(prev => prev + 1);
+                showBrowserToast(newNotif);
+            }
+        )
+        .subscribe((status) => {
+            console.log(`[Notification] Realtime status (${userId}):`, status);
+        });
+
+    return channel;
 };
 
-const showBrowserToast = (notification) => {
-    // Logic to show browser toast (e.g., using a library like react-toastify)
-    console.log('New Notification:', notification);
-};
-
+// ─── Hook ─────────────────────────────────────────────────────────────────────
 export const useNotifications = () => {
     const context = useContext(NotificationContext);
     if (!context) {
@@ -48,72 +98,118 @@ export const useNotifications = () => {
     return context;
 };
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
 export const NotificationProvider = ({ children }) => {
     const { user } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
 
     const fetchNotifications = async (userId) => {
-        const { data, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
-            .limit(20);
-        
-        if (data) {
-            const formatted = data.map(n => ({
-                id: n.id,
-                title: n.title,
-                body: n.body,
-                type: n.type || 'info',
-                time: new Date(n.created_at).toLocaleTimeString(),
-                read: n.is_read
-            }));
-            setNotifications(formatted);
-            setUnreadCount(formatted.filter(n => !n.read).length);
+        try {
+            const { data, error } = await supabase
+                .from('notifications')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) throw error;
+
+            if (data) {
+                const formatted = data.map(n => ({
+                    id: n.id,
+                    title: n.title,
+                    body: n.body,
+                    type: n.type || 'info',
+                    time: new Date(n.created_at).toLocaleTimeString('bn-BD'),
+                    read: n.is_read ?? false
+                }));
+                setNotifications(formatted);
+                setUnreadCount(formatted.filter(n => !n.read).length);
+            }
+        } catch (err) {
+            console.warn('fetchNotifications error:', err);
         }
     };
 
-    useEffect(() => {
-        if (user) {
-            handleTokenSync(user);
-            fetchNotifications(user.id);
-            subscribeToRealTimeNotifications(setNotifications, setUnreadCount);
-        }
+    const markAllRead = async () => {
+        setUnreadCount(0);
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
 
-        // Listen for foreground messages (non-blocking)
-        onMessageListener().then(payload => {
-            if (payload) {
+        if (user) {
+            await supabase
+                .from('notifications')
+                .update({ is_read: true })
+                .eq('user_id', user.id)
+                .eq('is_read', false);
+        }
+    };
+
+    const markOneRead = async (id) => {
+        setNotifications(prev =>
+            prev.map(n => n.id === id ? { ...n, read: true } : n)
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+
+        await supabase
+            .from('notifications')
+            .update({ is_read: true })
+            .eq('id', id);
+    };
+
+    useEffect(() => {
+        if (!user) return;
+
+        let channel = null;
+        let fcmUnsub = null;
+
+        // Initial fetch
+        handleTokenSync(user);
+        fetchNotifications(user.id);
+
+        // Realtime subscribe
+        channel = subscribeToRealTimeNotifications(user.id, setNotifications, setUnreadCount);
+
+        // Firebase foreground messages
+        const listenFCM = async () => {
+            try {
+                fcmUnsub = await onMessageListener();
+                if (fcmUnsub && typeof fcmUnsub === 'function') {
+                    // onMessageListener returns a promise; handle payload below
+                }
+            } catch (err) {
+                console.warn('FCM listener error:', err);
+            }
+        };
+
+        onMessageListener()
+            .then(payload => {
+                if (!payload) return;
                 const newNotif = {
                     id: Date.now(),
-                    title: payload.notification?.title || "New Message",
-                    body: payload.notification?.body || "",
-                    time: new Date().toLocaleTimeString(),
+                    title: payload.notification?.title || 'নতুন বার্তা',
+                    body: payload.notification?.body || '',
+                    type: 'info',
+                    time: new Date().toLocaleTimeString('bn-BD'),
                     read: false
                 };
                 setNotifications(prev => [newNotif, ...prev]);
                 setUnreadCount(prev => prev + 1);
                 showBrowserToast(newNotif);
-            }
-        }).catch(err => console.log('onMessageListener error:', err));
+            })
+            .catch(err => console.warn('onMessageListener error:', err));
 
+        // ✅ Cleanup on unmount / user change
         return () => {
-            // Cleanup if needed
+            if (channel) supabase.removeChannel(channel);
         };
     }, [user]);
 
-    const markAllRead = () => {
-        setUnreadCount(0);
-        setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
-    };
-
     return (
-        <NotificationContext.Provider value={{ notifications, unreadCount, setUnreadCount, markAllRead }}>
+        <NotificationContext.Provider
+            value={{ notifications, unreadCount, markAllRead, markOneRead, setUnreadCount }}
+        >
             {children}
         </NotificationContext.Provider>
     );
 };
-
-
-
