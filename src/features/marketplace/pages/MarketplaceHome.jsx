@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import SEO from '../../components/SEO';
+import SEO from '../../../components/SEO';
 import { marketplaceService } from '../marketplaceService';
 
 const DISTRICTS = ['Cox\'s Bazar', 'Sylhet', 'Bandarban'];

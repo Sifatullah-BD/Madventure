@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import SEO from '../../components/SEO';
+import SEO from '../../../components/SEO';
 import { marketplaceService } from '../marketplaceService';
 import GuideCard from '../components/GuideCard';
 
