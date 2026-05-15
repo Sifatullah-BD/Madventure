@@ -9,8 +9,11 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
   server: {
-    port: 5174,
+    port: 5173,
     strictPort: false,
+    hmr: {
+      port: 5173,
+    },
   },
   optimizeDeps: {
     include: ['react', 'react-dom'],
