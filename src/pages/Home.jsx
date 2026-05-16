@@ -237,11 +237,6 @@ const Home = () => {
                     </button>
                 </div>
             </section>
-                    <button onClick={() => navigate('/destinations')} className="mt-16 bg-orange-500 text-white px-10 py-4 rounded-2xl font-black hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/30">
-                        View More
-                    </button>
-                </div>
-            </section>
 
             {/* 5. Testimonials - Traver Style */}
             <section className="py-24 bg-gray-50 text-gray-900">

@@ -363,7 +363,3 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
 };
 
 export default LoginModal;
-    );
-};
-
-export default LoginModal;

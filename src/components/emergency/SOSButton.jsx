@@ -91,7 +91,6 @@ const SOSButton = () => {
 
     return (
         <>
-        <>
             <div className="relative flex flex-col items-center">
                 {isPressing && !isOpen && (
                     <div className="absolute inset-0 pointer-events-none scale-[1.3] z-[-1] flex items-center justify-center">

@@ -121,8 +121,6 @@ const Adventures = () => {
                                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">People explored</p>
                                     </div>
                                 </div>
-                                    <p className="font-bold text-sm text-gray-800">Bandarban, BD</p>
-                                </div>
                             </motion.div>
                             
                             {/* Decorative Sparks */}
@@ -219,8 +217,6 @@ const Adventures = () => {
                         </button>
                     </div>
                 </div>
-
-            </div>
         </div>
     );
 };

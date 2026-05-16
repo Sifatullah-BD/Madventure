@@ -169,14 +169,6 @@ const Dashboard = ({ user }) => {
                         onAction={() => navigate('/stats')}
                     />
 
-                </div>
-
-            </div>
-        </div>
-    );
-};
-
-                    {/* ... (Destinations, AI Planner, Community remain same) ... */}
 
                     {/* 5. Wallet & Bookings */}
                     <DashboardCard

@@ -98,9 +98,3 @@ const ThreadCard = ({ thread, onClick }) => {
 };
 
 export default ThreadCard;
-    );
-};
-
-export default ThreadCard;
-
-export default ThreadCard;

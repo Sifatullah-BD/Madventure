@@ -200,6 +200,33 @@ export const FORUM_THREADS = [
   }
 ];
 
+export const EMERGENCY = {
+  'cox-bazar': {
+    police: "01713-373726",
+    hospital: "0341-63363",
+    fire: "0341-62222",
+    tourist_police: "01769-690033"
+  },
+  'sylhet': {
+    police: "01713-374351",
+    hospital: "01711-313554",
+    fire: "0821-716333"
+  },
+  'bandarban': {
+    police: "01713-373731",
+    hospital: "0361-62506",
+    fire: "0361-62222"
+  }
+};
+
+export const FARES = [];
+export const MECHANICS = [];
+export const RESTAURANTS = [];
+export const GUIDES = [];
+export const EVENTS = [];
+export const REVIEWS = [];
+export const HIDDEN_GEMS = [];
+
 // Helper functions for easy cross-referencing
 export const getDistrictById = (id) => DISTRICTS.find(d => d.id === id);
 export const getToursByDistrict = (districtId) => TOURS.filter(t => t.districtId === districtId);
