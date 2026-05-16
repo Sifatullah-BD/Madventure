@@ -5,9 +5,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import LoginModal from './components/LoginModal';
 import SocialProofToast from './components/SocialProofToast';
-import SOSButton from './components/emergency/SOSButton';
-import ChatWidget from './components/community/ChatWidget';
-import NotificationButton from './components/NotificationButton';
+import VerticalFab from './components/VerticalFab';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ToastProvider, useToast } from './components/ui/Toast';
 
@@ -82,6 +80,8 @@ import ScrollToTop from './components/ScrollToTop';
 import { cacheEmergencyData, getOfflineData } from './utils/offlineCache';
 
 import { useAuth } from './hooks/useAuth';
+import Onboarding from './components/Onboarding';
+import ChatWidget from './components/community/ChatWidget';
 
 const AppContent = () => {
   const { user, setUser, logout } = useAuth();
@@ -100,6 +100,9 @@ const AppContent = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    return !localStorage.getItem('madventure_onboarded');
+  });
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -198,7 +201,7 @@ const AppContent = () => {
 
   return (
     <div className={`font-sans text-gray-900 bg-background h-screen overflow-hidden flex flex-col ${theme === 'dark' ? 'dark' : ''} `}>
-      <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
+      <div id="app-scroll-root" className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
         <Navbar
           user={user}
           onOpenLogin={() => setShowLogin(true)}
@@ -217,8 +220,9 @@ const AppContent = () => {
 
         <WelcomePopup show={showWelcome} onClose={() => setShowWelcome(false)} />
         <FloatingBackButton user={user} />
-        <SOSButton />
-
+        
+        {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
+        
         {isOffline && (
             <div className="bg-yellow-500 text-yellow-900 px-4 py-2 text-center text-sm font-bold flex justify-center items-center gap-2 z-40 relative shadow-sm">
                 <span>📵 Offline মোড (ইন্টারনেট কানেকশন নেই)। কিছু ফিচারের আপডেট সীমাবদ্ধ হতে পারে, তবে ইমার্জেন্সি সাপোর্ট চালু আছে।</span>
@@ -226,12 +230,12 @@ const AppContent = () => {
         )}
 
         <SocialProofToast />
-        <NotificationButton />
+        <VerticalFab />
         <ChatWidget />
 
         <div className="flex flex-grow relative">
           {isSidebarOpen && user && <Sidebar user={user} />}
-          <main className={`flex-grow ${user && !isDarkPage ? 'bg-gray-50' : ''} flex flex-col`}>
+          <main id="main-content" className={`flex-grow ${user && !isDarkPage ? 'bg-gray-50' : ''} flex flex-col`}>
             <div className="flex-grow max-w-[1140px] mx-auto w-full">
               <ErrorBoundary>
                 <Suspense fallback={
@@ -299,8 +303,8 @@ const AppContent = () => {
                     {/* Blog Routes */}
                     <Route path="/blog" element={<BlogList />} />
                     <Route path="/blog/:slug" element={<BlogDetail />} />
-                    <Route path="/admin/blog/create" element={<ProtectedRoute><RoleProtectedRoute allowedRoles={['admin', 'super_admin']}><BlogEditor /></RoleProtectedRoute></ProtectedRoute>} />
-                    <Route path="/admin/blog/edit/:id" element={<ProtectedRoute><RoleProtectedRoute allowedRoles={['admin', 'super_admin']}><BlogEditor /></RoleProtectedRoute></ProtectedRoute>} />
+                    <Route path="/blog/write" element={<ProtectedRoute><BlogEditor /></ProtectedRoute>} />
+                    <Route path="/blog/edit/:id" element={<ProtectedRoute><BlogEditor /></ProtectedRoute>} />
                   </Routes>
                 </Suspense>
               </ErrorBoundary>
@@ -320,8 +324,8 @@ const AppContent = () => {
                 <p className="text-green-100 text-xs leading-relaxed max-w-xs">
                   Your trusted companion for exploring the hidden wonders of Bangladesh.
                 </p>
-                <Link to="/about" className="inline-block text-xs font-bold text-primary hover:text-white transition-colors border-b border-primary hover:border-white pb-0.5">
-                  Read About Us
+                <Link to="/about" className="inline-flex items-center gap-2 text-xs font-black text-secondary hover:text-white transition-all group">
+                  আমাদের সম্পর্কে আরও জানুন <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
 

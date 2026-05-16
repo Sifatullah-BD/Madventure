@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../../components/SEO';
 import BlogCard from './BlogCard';
 import { blogService } from './blogService';
-import { Search, Loader } from 'lucide-react';
+import { Search, Loader, PenTool } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const CATEGORIES = ['All', 'Destination Guide', 'Budget Travel', 'Travel Tips', 'News'];
 
 const BlogList = () => {
+    const navigate = useNavigate();
     const { i18n } = useTranslation();
     const currentLang = i18n.language === 'en' ? 'en' : 'bn';
     
@@ -53,9 +55,19 @@ const BlogList = () => {
                 
                 {/* Header & Search */}
                 <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 drop-shadow-sm" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-                        ট্রাভেল ব্লগ ও গাইড
-                    </h1>
+                    <div className="flex flex-col items-center justify-center gap-4 mb-6">
+                        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 drop-shadow-sm" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                            ট্রাভেল ব্লগ ও গাইড
+                        </h1>
+                        <button 
+                            onClick={() => navigate('/blog/write')}
+                            className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1B5E20] text-white rounded-full font-bold shadow-lg shadow-[#1B5E20]/20 hover:bg-green-700 transition-all group"
+                        >
+                            <PenTool size={18} className="group-hover:rotate-12 transition-transform" />
+                            আপনার ভ্রমণ গল্প লিখুন
+                        </button>
+                    </div>
+                    
                     <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
                         ভ্রমণ কাহিনী, টিপস, এবং বাজেট গাইড — আপনার পরবর্তী ট্যুরের জন্য দরকারি সব তথ্য।
                     </p>

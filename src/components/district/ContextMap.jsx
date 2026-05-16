@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import bangladeshGeoJSON from '../../data/bangladesh.json';
+import bangladeshGeoJSON from '../../data/bd-geojson/bangladesh.json';
 
 const ContextMap = ({ districtName }) => {
     // Mapping for district names if they differ between app data and GeoJSON
@@ -18,23 +18,20 @@ const ContextMap = ({ districtName }) => {
 
     // Style function to highlight the selected district
     const style = (feature) => {
-        const isSelected = feature.properties.NAME_2 === districtNameInGeoJSON;
+        const isSelected = feature.properties.district_name === districtNameInGeoJSON || 
+                          feature.properties.district_name === districtName;
+        
         return {
             fillColor: isSelected ? '#ffcc00' : '#006a4e', // Yellow for selected, Green for others
-            weight: 2,
+            weight: 1,
             opacity: 1,
             color: 'white',
-            dashArray: '3',
-            fillOpacity: isSelected ? 1 : 0.7
+            fillOpacity: isSelected ? 1 : 0.4
         };
     };
 
-    // Filter to ensure we only render valid features if needed, 
-    // but for context map we want all of them.
-    // We might want to optimize if the geojson is too large, but for now rendering all is fine for context.
-
     return (
-        <div className="py-16 bg-white relative overflow-hidden">
+        <div className="py-16 bg-white relative overflow-hidden border-t border-gray-100">
             <div className="max-w-[1140px] mx-auto px-4 text-center">
                 <h2 className="text-2xl font-bold text-gray-800 mb-8">Location in Bangladesh</h2>
 
@@ -48,14 +45,8 @@ const ContextMap = ({ districtName }) => {
                         doubleClickZoom={false}
                         className="w-full h-full bg-blue-50"
                     >
-                        {/* 
-                           We can omit TileLayer for a cleaner "map only" look, 
-                           or keep it for context. Let's keep it minimal or remove it 
-                           if we want just the polygon shapes. 
-                           Let's try without TileLayer for a pure SVG look, 
-                           or with a very light one.
-                        */}
-                        {/* <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" /> */}
+                        {/* We use a very light TileLayer or none for context */}
+                        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
 
                         {bangladeshGeoJSON && (
                             <GeoJSON
@@ -66,9 +57,9 @@ const ContextMap = ({ districtName }) => {
                     </MapContainer>
 
                     <div className="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">
-                        <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-lg">
-                            <p className="text-sm font-bold text-gray-600">Map Context</p>
-                            <p className="text-xs text-gray-500">{districtName} is highlighted here</p>
+                        <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg border border-blue-100">
+                            <p className="text-sm font-bold text-gray-800">Geographic Context</p>
+                            <p className="text-xs text-primary font-medium">{districtName} highlighted on map</p>
                         </div>
                     </div>
                 </div>

@@ -18,10 +18,10 @@ const NotificationButton = () => {
     };
 
     return (
-        <div className="fixed bottom-48 right-0 z-50">
+        <div className="relative">
             {/* Popup */}
             {isOpen && (
-                <div className="absolute right-[calc(100%+8px)] bottom-0 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-right-4 duration-200">
+                <div className="absolute right-[calc(100%+16px)] bottom-0 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] animate-in fade-in slide-in-from-right-4 duration-200">
                     {/* Header */}
                     <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
                         <h3 className="font-bold text-gray-800 flex items-center gap-2">
@@ -87,13 +87,13 @@ const NotificationButton = () => {
             {/* Floating Button */}
             <button
                 onClick={togglePopup}
-                className="relative p-3 rounded-l-xl shadow-lg transition-all duration-300 hover:-translate-x-1 active:scale-95 group backdrop-blur-md bg-white border border-gray-100 border-r-0 text-gray-700 hover:text-primary"
+                className="relative p-4 rounded-2xl shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 group backdrop-blur-md bg-white border border-gray-100 text-gray-700 hover:text-primary"
             >
                 <Bell size={24} className="relative z-10" />
 
                 {/* Badge */}
                 {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border border-white z-20">
+                    <span className="absolute top-2 right-2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white z-20">
                         {unreadCount}
                     </span>
                 )}

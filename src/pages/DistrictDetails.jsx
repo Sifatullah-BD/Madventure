@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MessagesSquare } from 'lucide-react';
+import { MessagesSquare, Map as MapIcon, ChevronRight } from 'lucide-react';
 import { supabaseService } from '../services/supabaseService';
 import DistrictHero from '../components/district/DistrictHero';
 import FamousItems from '../components/district/FamousItems';
@@ -10,37 +10,43 @@ import ContextMap from '../components/district/ContextMap';
 import StudentTourPlan from '../components/district/StudentTourPlan';
 import Navbar from '../components/Navbar';
 
+// Import local data for Upazilas and Districts mapping
+import bdDistricts from '../data/bd-geojson/bd-districts.json';
+import bdUpazilas from '../data/bd-geojson/bd-upazilas.json';
+
 const DistrictDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [district, setDistrict] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Find Upazilas for this district
+    const upazilas = useMemo(() => {
+        if (!district) return [];
+        
+        // Find district ID from our local JSON using name
+        const localDistrict = bdDistricts.districts.find(d => 
+            d.name.toLowerCase() === district.name.toLowerCase() || 
+            d.bn_name === district.name
+        );
+        
+        if (!localDistrict) return [];
+        
+        return bdUpazilas.upazilas.filter(u => u.district_id === localDistrict.id);
+    }, [district]);
+
     useEffect(() => {
         const fetchDistrictData = async () => {
             setLoading(true);
             try {
-                // 1. Fetch District Info
+                // 1. Fetch District Info from Supabase
                 let districtData;
-                // Check if ID is numeric (from DB) or slug (from URL)
-                if (/^\d+$/.test(id)) {
-                    // It's a numeric ID, but we don't have getDistrictById exposed yet, 
-                    // and the current flow uses names mostly. 
-                    // Let's assume for now we might get a name or ID.
-                    // Actually, let's try by name first if it's not numeric.
-                    // But wait, our service has getDistrictByName.
-                    // If ID is numeric, we should use getDistrictById (need to add it or use select).
-                    // For simplicity, let's assume the URL param is a name/slug like 'dhaka'
-                    districtData = await supabaseService.getDistrictByName(id);
-                } else {
-                    // It's a slug/name
-                    districtData = await supabaseService.getDistrictByName(id);
-                }
+                districtData = await supabaseService.getDistrictByName(id);
 
                 if (!districtData) {
-                    // Try finding by ID if name failed (fallback)
+                    // Fallback to searching all districts if direct name match fails
                     const { data } = await supabaseService.getDistricts();
-                    districtData = data.find(d => d.id === id);
+                    districtData = data.find(d => d.id === id || d.name.toLowerCase() === id.toLowerCase());
                 }
 
                 if (!districtData) {
@@ -49,9 +55,6 @@ const DistrictDetails = () => {
                 }
 
                 // 2. Fetch Related Data (Spots/Places)
-                // We'll search places where location or description contains the district name
-                // Or ideally we should have a district_id in places, but we don't.
-                // We'll use the 'region' or 'location' field.
                 const allPlaces = await supabaseService.getPlaces();
                 const districtPlaces = allPlaces.filter(p =>
                     p.location.toLowerCase().includes(districtData.name.toLowerCase()) ||
@@ -64,17 +67,19 @@ const DistrictDetails = () => {
                     t.destination.toLowerCase().includes(districtData.name.toLowerCase())
                 );
 
-                // 4. Construct the rich object expected by components
-                // We need to mock some fields that are missing in DB (famous_food, hero_image, etc.)
-                // or map them if available.
-                // For now, we'll use placeholders or map what we have.
+                // 4. Enrich object with local data (lat/long from our JSON if missing)
+                const localInfo = bdDistricts.districts.find(d => 
+                    d.name.toLowerCase() === districtData.name.toLowerCase()
+                );
 
                 const richDistrict = {
                     ...districtData,
                     name_en: districtData.name,
-                    division: "Bangladesh", // We could fetch division name if needed
-                    short_description: `Explore the beautiful district of ${districtData.name}.`,
-                    famous_food: [], // Placeholder
+                    lat: districtData.lat || localInfo?.lat,
+                    long: districtData.long || localInfo?.long,
+                    division: districtData.division || "Bangladesh",
+                    short_description: districtData.description || `Explore the beautiful district of ${districtData.name}.`,
+                    famous_food: [], 
                     top_spots: districtPlaces.map(p => ({
                         name: p.name,
                         image: p.image
@@ -83,12 +88,10 @@ const DistrictDetails = () => {
                         title: t.title,
                         budget: `${t.price} BDT`,
                         duration: t.duration,
-                        spots: [t.destination], // Simplified as we don't have a separate spots array in tours yet
+                        spots: [t.destination],
                         notes: t.category || t.description
                     })),
-                    // Use a default hero image or one from the first place
                     hero_image: districtPlaces.length > 0 ? districtPlaces[0].image : "https://images.unsplash.com/photo-1600100598079-423568e6227c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80",
-                    notes: ""
                 };
 
                 setDistrict(richDistrict);
@@ -134,21 +137,44 @@ const DistrictDetails = () => {
 
             <DistrictHero district={district} />
 
+            <div className="max-w-7xl mx-auto px-4 -mt-12 relative z-10">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-8 border border-gray-100">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div>
+                            <h2 className="text-2xl font-black text-gray-900 mb-2 flex items-center gap-2">
+                                <MapIcon className="text-primary" size={28} /> উপজেলার তালিকা
+                            </h2>
+                            <p className="text-gray-500 font-medium">{district.name} জেলায় মোট {upazilas.length}টি উপজেলা রয়েছে</p>
+                        </div>
+                        <div className="flex flex-wrap gap-2 md:max-w-2xl justify-end">
+                            {upazilas.map((u) => (
+                                <div key={u.id} className="group cursor-pointer">
+                                    <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-50 hover:bg-primary hover:text-white border border-gray-100 rounded-xl text-sm font-bold text-gray-700 transition-all duration-300">
+                                        {u.bn_name} <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 transition-all" />
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <FamousItems items={district.famous_food} />
 
             <DistrictInfoMap district={district} />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 sm:p-8 text-center shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="text-left">
-                        <h3 className="text-2xl font-black text-blue-900 mb-2">এই গন্তব্য নিয়ে কোনো প্রশ্ন আছে?</h3>
-                        <p className="text-blue-700 font-medium">ম্যাডভেঞ্চার কমিউনিটির লোকাল গাইড ও এক্সপেরিয়েন্সড ট্রাভেলারদের কাছে যেকোনো ট্যুর বা রুট নিয়ে প্রশ্ন করুন।</p>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2rem] p-8 md:p-12 text-center shadow-xl shadow-blue-500/20 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                    <div className="text-left relative z-10">
+                        <h3 className="text-3xl font-black text-white mb-3">এই গন্তব্য নিয়ে কোনো প্রশ্ন আছে?</h3>
+                        <p className="text-blue-50 font-medium text-lg max-w-xl">ম্যাডভেঞ্চার কমিউনিটির লোকাল গাইড ও এক্সপেরিয়েন্সড ট্রাভেলারদের কাছে যেকোনো ট্যুর বা রুট নিয়ে প্রশ্ন করুন।</p>
                     </div>
                     <button 
                         onClick={() => navigate(`/community?tab=forum&threadId=new&districtId=${district.id || id}`)}
-                        className="bg-blue-600 text-white min-w-[220px] px-8 py-4 rounded-full font-black shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                        className="bg-white text-blue-700 min-w-[220px] px-8 py-5 rounded-2xl font-black shadow-lg hover:bg-blue-50 hover:scale-105 transition-all flex items-center justify-center gap-3 relative z-10"
                     >
-                        <MessagesSquare size={20}/> প্রশ্ন করুন
+                        <MessagesSquare size={24}/> প্রশ্ন করুন
                     </button>
                 </div>
             </div>

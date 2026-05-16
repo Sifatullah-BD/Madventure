@@ -37,30 +37,38 @@ const Community = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            <DashboardHeader
-                title="ম্যাডভেঞ্চার কমিউনিটি"
-                subtitle="অন্যান্য লোকাল ট্রাভেলারদের সাথে কানেক্ট করুন, এক্সপেরিয়েন্স শেয়ার করুন এবং ট্রাভেল পার্টনার খুঁজুন।"
-            />
+        <div className="min-h-screen bg-[#050f08] text-gray-100 flex flex-col">
+            <div className="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8 text-center overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-forest-light/10 blur-[100px] rounded-full"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 blur-[100px] rounded-full"></div>
+                </div>
+                <div className="relative z-10">
+                    <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>ম্যাডভেঞ্চার কমিউনিটি</h1>
+                    <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-medium opacity-90">
+                        অন্যান্য ট্রাভেলারদের সাথে কানেক্ট করুন, অভিজ্ঞতা শেয়ার করুন এবং আপনার পরবর্তী ট্রিপের জন্য সঙ্গী খুঁজুন।
+                    </p>
+                </div>
+            </div>
 
-            {/* Custom Tab Navigation */}
+            {/* Custom Tab Navigation - Scandi Style */}
             {!selectedThread && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 w-full">
-                    <div className="bg-white rounded-xl flex shadow-sm border border-gray-200 p-1 mx-auto max-w-2xl text-center font-bold">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full">
+                    <div className="bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 p-2 mx-auto max-w-lg flex shadow-2xl">
                         <button
                             onClick={() => setActiveTab('forum')}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg transition-all ${activeTab === 'forum'
-                                ? 'bg-primary text-white shadow-md scale-[1.02]'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                            className={`flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black text-sm transition-all ${activeTab === 'forum'
+                                ? 'bg-forest-light text-white shadow-lg shadow-forest-light/20 scale-[1.02]'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             <MessagesSquare size={18}/> ট্রাভেল ফোরাম
                         </button>
                         <button
                             onClick={() => setActiveTab('partner')}
-                            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg transition-all ${activeTab === 'partner'
-                                ? 'bg-[#f97316] text-white shadow-md scale-[1.02]'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                            className={`flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black text-sm transition-all ${activeTab === 'partner'
+                                ? 'bg-[#f97316] text-white shadow-lg shadow-orange-500/20 scale-[1.02]'
+                                : 'text-gray-400 hover:text-white'
                                 }`}
                         >
                             <Users size={18}/> ট্রাভেল পার্টনার
@@ -70,15 +78,25 @@ const Community = () => {
             )}
 
             {/* Content Area */}
-            <div className="w-full mx-auto flex-grow">
-                {selectedThread ? (
-                    <ThreadDetail threadId={selectedThread} onBack={handleBackToForum} />
-                ) : (
-                    <>
-                        {activeTab === 'forum' && <Forum onSelectThread={setSelectedThread} />}
-                        {activeTab === 'partner' && <TravelPartner />}
-                    </>
-                )}
+            <div className="w-full mx-auto flex-grow px-4 sm:px-6 lg:px-8 pb-16">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={selectedThread || activeTab}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {selectedThread ? (
+                            <ThreadDetail threadId={selectedThread} onBack={handleBackToForum} />
+                        ) : (
+                            <>
+                                {activeTab === 'forum' && <Forum onSelectThread={setSelectedThread} />}
+                                {activeTab === 'partner' && <TravelPartner />}
+                            </>
+                        )}
+                    </motion.div>
+                </AnimatePresence>
             </div>
         </div>
     );

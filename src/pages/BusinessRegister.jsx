@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Store, MapPin, Phone, Camera, DollarSign, Check, ArrowRight, ArrowLeft, CheckCircle, Building2, Globe, MessageCircle } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '../data/businessData';
-import { districtsData } from '../data/districts';
 import { businessService } from '../services/businessService';
 import { useToast } from '../components/ui/Toast';
+
+// Import the new comprehensive location data
+import bdDivisions from '../data/bd-geojson/bd-divisions.json';
+import bdDistricts from '../data/bd-geojson/bd-districts.json';
 
 const STEPS = [
     { id: 1, label: 'মৌলিক তথ্য', icon: Store },
@@ -20,8 +23,8 @@ const BusinessRegister = () => {
         name: '',
         category: '',
         description: '',
-        division: '',
-        district: '',
+        division_id: '',
+        district_id: '',
         address: '',
         phone: '',
         whatsapp: '',
@@ -34,14 +37,16 @@ const BusinessRegister = () => {
 
     const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
-    const filteredDistricts = form.division
-        ? districtsData.find(d => d.division === form.division)?.districts || []
-        : [];
+    // Memoized filtered districts based on selected division
+    const filteredDistricts = useMemo(() => {
+        if (!form.division_id) return [];
+        return bdDistricts.districts.filter(d => d.division_id === form.division_id);
+    }, [form.division_id]);
 
     const canProceed = () => {
         switch (currentStep) {
             case 1: return form.name && form.category && form.description;
-            case 2: return form.division && form.district && form.phone;
+            case 2: return form.division_id && form.district_id && form.phone;
             default: return true;
         }
     };
@@ -49,9 +54,14 @@ const BusinessRegister = () => {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
+            const selectedDivision = bdDivisions.divisions.find(d => d.id === form.division_id)?.name;
+            const selectedDistrict = bdDistricts.districts.find(d => d.id === form.district_id)?.name;
+
             await businessService.registerBusiness({
                 ...form,
-                location: `${form.district}, ${form.division}`,
+                division: selectedDivision,
+                district: selectedDistrict,
+                location: `${selectedDistrict}, ${selectedDivision}`,
             });
             setIsSubmitted(true);
             toast.success('আপনার আবেদন সফলভাবে জমা হয়েছে!');
@@ -81,7 +91,7 @@ const BusinessRegister = () => {
         );
     }
 
-    const inputClass = "w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-gray-800 dark:text-white placeholder-gray-400";
+    const inputClass = "w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-gray-800 dark:text-white placeholder-gray-400 transition-all";
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8">
@@ -123,11 +133,11 @@ const BusinessRegister = () => {
                         <div className="space-y-5 animate-fade-in">
                             <h2 className="text-lg font-bold text-gray-800 dark:text-white">মৌলিক তথ্য</h2>
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">ব্যবসার নাম *</label>
+                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ব্যবসার নাম *</label>
                                 <input type="text" value={form.name} onChange={e => update('name', e.target.value)} className={inputClass} placeholder="যেমন: সী পার্ল বিচ রিসোর্ট" />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">ক্যাটেগরি *</label>
+                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ক্যাটেগরি *</label>
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                     {BUSINESS_CATEGORIES.map(cat => (
                                         <button
@@ -136,7 +146,7 @@ const BusinessRegister = () => {
                                             onClick={() => update('category', cat.id)}
                                             className={`p-3 rounded-xl border text-sm font-bold transition-all text-left ${
                                                 form.category === cat.id
-                                                    ? 'border-primary bg-primary/10 text-primary'
+                                                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
                                                     : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-primary/30'
                                             }`}
                                         >
@@ -146,7 +156,7 @@ const BusinessRegister = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">বিবরণ *</label>
+                                <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">বিবরণ *</label>
                                 <textarea value={form.description} onChange={e => update('description', e.target.value)} rows={4} className={`${inputClass} resize-none`} placeholder="আপনার ব্যবসা সম্পর্কে বিস্তারিত লিখুন..." />
                             </div>
                         </div>
@@ -158,20 +168,20 @@ const BusinessRegister = () => {
                             <h2 className="text-lg font-bold text-gray-800 dark:text-white">যোগাযোগ ও লোকেশন</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">বিভাগ *</label>
-                                    <select value={form.division} onChange={e => { update('division', e.target.value); update('district', ''); }} className={inputClass}>
+                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">বিভাগ *</label>
+                                    <select value={form.division_id} onChange={e => { update('division_id', e.target.value); update('district_id', ''); }} className={inputClass}>
                                         <option value="">বিভাগ নির্বাচন করুন</option>
-                                        {districtsData.map((d, i) => (
-                                            <option key={i} value={d.division}>{d.division}</option>
+                                        {bdDivisions.divisions.map((d) => (
+                                            <option key={d.id} value={d.id}>{d.bn_name} ({d.name})</option>
                                         ))}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">জেলা *</label>
-                                    <select value={form.district} onChange={e => update('district', e.target.value)} className={inputClass} disabled={!form.division}>
+                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">জেলা *</label>
+                                    <select value={form.district_id} onChange={e => update('district_id', e.target.value)} className={inputClass} disabled={!form.division_id}>
                                         <option value="">জেলা নির্বাচন করুন</option>
-                                        {filteredDistricts.map((d, i) => (
-                                            <option key={i} value={d.name}>{d.name}</option>
+                                        {filteredDistricts.map((d) => (
+                                            <option key={d.id} value={d.id}>{d.bn_name} ({d.name})</option>
                                         ))}
                                     </select>
                                 </div>
@@ -179,11 +189,11 @@ const BusinessRegister = () => {
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">ফোন নম্বর *</label>
+                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ফোন নম্বর *</label>
                                     <input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} className={inputClass} placeholder="+880 1XXX-XXXXXX" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2">
+                                    <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                                         <MessageCircle size={12} className="inline mr-1" /> WhatsApp নম্বর
                                     </label>
                                     <input type="tel" value={form.whatsapp} onChange={e => update('whatsapp', e.target.value)} className={inputClass} placeholder="8801XXXXXXXXX" />
@@ -197,12 +207,18 @@ const BusinessRegister = () => {
                         <div className="space-y-5 animate-fade-in">
                             <h2 className="text-lg font-bold text-gray-800 dark:text-white">তথ্য পর্যালোচনা</h2>
                             <div className="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl space-y-3">
-                                <div className="flex justify-between"><span className="text-gray-500 text-sm">নাম</span><span className="font-bold text-gray-800 dark:text-white text-sm">{form.name}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-500 text-sm">ক্যাটেগরি</span><span className="font-bold text-gray-800 dark:text-white text-sm">{BUSINESS_CATEGORIES.find(c => c.id === form.category)?.label}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-500 text-sm">লোকেশন</span><span className="font-bold text-gray-800 dark:text-white text-sm">{form.district}, {form.division?.replace(' Division', '')}</span></div>
-                                <div className="flex justify-between"><span className="text-gray-500 text-sm">ফোন</span><span className="font-bold text-gray-800 dark:text-white text-sm">{form.phone}</span></div>
+                                <div className="flex justify-between"><span className="text-gray-500 text-sm font-medium">ব্যবসার নাম</span><span className="font-bold text-gray-800 dark:text-white text-sm">{form.name}</span></div>
+                                <div className="flex justify-between"><span className="text-gray-500 text-sm font-medium">ক্যাটেগরি</span><span className="font-bold text-gray-800 dark:text-white text-sm">{BUSINESS_CATEGORIES.find(c => c.id === form.category)?.label}</span></div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-500 text-sm font-medium">লোকেশন</span>
+                                    <span className="font-bold text-gray-800 dark:text-white text-sm text-right">
+                                        {bdDistricts.districts.find(d => d.id === form.district_id)?.bn_name}, 
+                                        {bdDivisions.divisions.find(d => d.id === form.division_id)?.bn_name}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between"><span className="text-gray-500 text-sm font-medium">ফোন</span><span className="font-bold text-gray-800 dark:text-white text-sm">{form.phone}</span></div>
                             </div>
-                            <p className="text-xs text-gray-400 text-center">
+                            <p className="text-xs text-gray-400 text-center leading-relaxed">
                                 ছবি আপলোড এবং অন্যান্য বিস্তারিত তথ্য আপনি অ্যাডমিন ড্যাশবোর্ড থেকে দিতে পারবেন।
                                 সাবমিট করার পর আমাদের টিম আপনার তথ্য পর্যালোচনা করবে।
                             </p>

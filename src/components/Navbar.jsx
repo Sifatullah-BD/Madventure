@@ -73,12 +73,12 @@ const Navbar = ({ user, onOpenLogin, onLogout, isSidebarOpen, setIsSidebarOpen, 
                                 className={`p-2 rounded-full transition-colors relative group hidden md:block ${isHomePage
                                     ? 'text-yellow-300 hover:bg-white/10'
                                     : 'text-orange-500 hover:bg-orange-50'}`}
-                                title="Safety Center"
+                                title={t('nav_safety')}
                                 onClick={() => setShowSafety(true)}
                             >
                                 <ShieldCheck size={24} className="cursor-pointer" />
                                 <span className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                    Safety Center
+                                    {t('nav_safety')}
                                 </span>
                             </button>
                         </div>
@@ -103,7 +103,7 @@ const Navbar = ({ user, onOpenLogin, onLogout, isSidebarOpen, setIsSidebarOpen, 
                                         <Link to="/student-tours" className={iconLinkClasses}>
                                             <GraduationCap size={22} strokeWidth={2.5} />
                                             <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                Student Tours
+                                                {t('nav_student_tours')}
                                             </span>
                                         </Link>
                                         <Link to="/adventures" className={iconLinkClasses}>
@@ -128,7 +128,7 @@ const Navbar = ({ user, onOpenLogin, onLogout, isSidebarOpen, setIsSidebarOpen, 
                                                 : isHomePage ? 'hover:bg-white/10 text-primary dark:text-white' : 'hover:bg-gray-100 text-primary dark:text-white'}`}
                                         >
                                             <LayoutDashboard size={18} />
-                                            Dashboard
+                                            {t('nav_dashboard')}
                                         </button>
                                     </div>
                                 )}

@@ -21,19 +21,13 @@ const SocialProofToast = () => {
 
             setTimeout(() => {
                 setVisible(false);
-            }, 5000); // Hide after 5 seconds
+            }, 6000); // Hide after 6 seconds
         };
 
-        // Show first toast after 3 seconds
-        const initialTimer = setTimeout(showToast, 3000);
+        // Show toast ONLY ONCE after 8 seconds delay
+        const timer = setTimeout(showToast, 8000);
 
-        // Then show every 15 seconds
-        const interval = setInterval(showToast, 15000);
-
-        return () => {
-            clearTimeout(initialTimer);
-            clearInterval(interval);
-        };
+        return () => clearTimeout(timer);
     }, []);
 
     if (!visible) return null;

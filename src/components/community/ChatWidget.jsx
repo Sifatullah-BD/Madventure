@@ -1,197 +1,196 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send, Loader2, User, Building2, ShieldCheck } from 'lucide-react';
-import { unicornService } from '../../api/unicorn';
-import { useAuth } from '../../hooks/useAuth';
+import { MessageSquare, X, Send } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../../context/LanguageContext';
 
 const ChatWidget = () => {
     const { user } = useAuth();
+    const { language } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
-    const [rooms, setRooms] = useState([]);
-    const [activeRoom, setActiveRoom] = useState(null);
-    const [messages, setMessages] = useState([]);
+    const [isTyping, setIsTyping] = useState(false);
+    
+    const greetings = {
+        en: "Assalamu Alaikum! I am your Madventure AI Guide. How can I help you today? ✨",
+        bn: "আসসালামু আলাইকুম! আমি আপনার ম্যাডভেঞ্চার এআই গাইড। আজ আপনাকে কীভাবে সাহায্য করতে পারি? ✨"
+    };
+
+    const [messages, setMessages] = useState([
+        { id: 1, text: greetings[language] || greetings.en, time: "Just now", isMe: false },
+    ]);
+
+    // Update greeting if language changes and no messages have been sent yet
+    useEffect(() => {
+        if (messages.length === 1 && !messages[0].isMe) {
+            setMessages([{ id: 1, text: greetings[language] || greetings.en, time: "Just now", isMe: false }]);
+        }
+    }, [language]);
     const [newMessage, setNewMessage] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [sending, setSending] = useState(false);
     const scrollRef = useRef(null);
-
-    useEffect(() => {
-        if (user && isOpen) {
-            loadRooms();
-        }
-    }, [user, isOpen]);
-
-    useEffect(() => {
-        if (activeRoom) {
-            loadMessages();
-            // In a real production app, we would use Supabase Realtime here
-            // const subscription = supabase.from('chat_messages').on(...).subscribe()
-        }
-    }, [activeRoom]);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, isTyping]);
 
-    const loadRooms = async () => {
-        setLoading(true);
-        try {
-            const data = await unicornService.getChatRooms(user.id);
-            setRooms(data);
-            if (data.length > 0 && !activeRoom) {
-                setActiveRoom(data[0]);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const quickActions = [
+        "Best time for Sajek? ☁️",
+        "Sundarban safety? 🐅",
+        "Budget for 3 days? ৳",
+        "Find a travel partner 🤝"
+    ];
 
-    const loadMessages = async () => {
-        try {
-            const { data } = await supabase
-                .from('chat_messages')
-                .select('*')
-                .eq('room_id', activeRoom.id)
-                .order('created_at', { ascending: true });
-            if (data) setMessages(data);
-        } catch (err) {
-            console.error(err);
-        }
+    const handleQuickAction = (action) => {
+        setNewMessage(action);
     };
 
     const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!newMessage.trim() || !activeRoom) return;
+        e?.preventDefault();
+        const msgText = newMessage.trim();
+        if (!msgText) return;
+        
+        const userMsg = { 
+            id: Date.now(), 
+            text: msgText, 
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), 
+            isMe: true
+        };
+        setMessages(prev => [...prev, userMsg]);
+        setNewMessage('');
+        setIsTyping(true);
 
-        setSending(true);
         try {
-            await unicornService.sendMessage(activeRoom.id, user.id, newMessage);
-            setNewMessage('');
-            loadMessages();
+            const { getAIResponse } = await import('../../services/aiAssistant');
+            const aiText = await getAIResponse(msgText);
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: aiText,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isMe: false
+            }]);
         } catch (err) {
-            console.error(err);
-        } finally {
-            setSending(false);
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: "I'm experiencing a temporary connection issue. How can I help with your Madventure plans?",
+                time: "Just now",
+                isMe: false
+            }]);
         }
     };
 
     if (!user) return null;
 
     return (
-        <div className="fixed bottom-24 right-6 z-50">
-            {/* Toggle Button */}
-            <button
+        <div className="fixed bottom-12 right-6 z-[10000]">
+            <motion.button
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 ${
-                    isOpen ? 'bg-red-500 rotate-90' : 'bg-primary hover:scale-110 shadow-primary/30'
-                } text-white`}
+                className={`w-16 h-16 rounded-[2rem] shadow-[0_20px_50px_rgba(27,94,32,0.3)] flex items-center justify-center transition-all duration-500 z-50 relative ${
+                    isOpen ? 'bg-white text-gray-900 rotate-90' : 'bg-[#1B5E20] text-white'
+                }`}
             >
-                {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
-            </button>
-
-            {/* Chat Window */}
-            {isOpen && (
-                <div className="absolute bottom-16 right-0 w-[350px] sm:w-[400px] h-[500px] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    
-                    {/* Header */}
-                    <div className="bg-primary p-4 text-white flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <Building2 size={20} />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-sm">Madventure Support</h3>
-                                <p className="text-[10px] text-green-100 flex items-center gap-1">
-                                    <ShieldCheck size={10} /> Online & Verified
-                                </p>
-                            </div>
-                        </div>
-                        <button onClick={() => setIsOpen(false)} className="hover:bg-white/10 p-1 rounded-full"><X size={20} /></button>
+                {isOpen ? <X size={28} /> : (
+                    <div className="relative">
+                        <MessageSquare size={28} />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-[#1B5E20] animate-pulse"></div>
                     </div>
+                )}
+            </motion.button>
 
-                    {/* Rooms List (If multiple) */}
-                    {rooms.length > 1 && !activeRoom && (
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Your Conversations</p>
-                            {rooms.map(room => (
-                                <button
-                                    key={room.id}
-                                    onClick={() => setActiveRoom(room)}
-                                    className="w-full text-left p-3 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 transition-colors flex items-center gap-3"
-                                >
-                                    <div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold">
-                                        {room.title?.[0] || 'T'}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-sm">{room.title || 'Trip Discussion'}</p>
-                                        <p className="text-xs text-gray-500">Tap to chat</p>
-                                    </div>
-                                </button>
-                            ))}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 50, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, scale: 0.9, y: 50, filter: 'blur(10px)' }}
+                        className="absolute bottom-20 right-0 w-[400px] h-[680px] bg-white/80 backdrop-blur-3xl rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.15)] border border-white/50 flex flex-col overflow-hidden"
+                    >
+                        <div className="absolute inset-0 -z-10 opacity-30 pointer-events-none">
+                            <div className="absolute top-[-10%] left-[-10%] w-full h-full bg-green-200 blur-[100px] animate-pulse"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-full h-full bg-orange-100 blur-[100px] animate-pulse delay-700"></div>
                         </div>
-                    )}
 
-                    {/* Messages Area */}
-                    {activeRoom && (
-                        <>
-                            <div 
-                                ref={scrollRef}
-                                className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-950/50"
-                            >
-                                {loading ? (
-                                    <div className="flex justify-center py-10"><Loader2 className="animate-spin text-primary" /></div>
-                                ) : (
-                                    <>
-                                        <div className="text-center py-4">
-                                            <p className="text-[10px] bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-3 py-1 rounded-full inline-block">
-                                                This is a secure conversation with Madventure Support
-                                            </p>
-                                        </div>
-                                        {messages.map((msg, idx) => {
-                                            const isMe = msg.sender_id === user.id;
-                                            return (
-                                                <div key={idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                                    <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                                                        isMe 
-                                                        ? 'bg-primary text-white rounded-tr-none' 
-                                                        : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-100 dark:border-gray-700 rounded-tl-none shadow-sm'
-                                                    }`}>
-                                                        {msg.message}
-                                                        <p className={`text-[9px] mt-1 ${isMe ? 'text-green-100' : 'text-gray-400'}`}>
-                                                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </>
-                                )}
+                        <div className="p-8 pb-4 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="relative">
+                                    <div className="w-14 h-14 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-700 p-0.5 shadow-lg">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712035.png" className="w-full h-full rounded-[1.4rem] bg-white object-cover" alt="AI" />
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-4 border-white shadow-sm"></div>
+                                </div>
+                                <div>
+                                    <h3 className="font-black text-gray-900 text-lg">AI Assistant</h3>
+                                    <p className="text-[10px] font-black text-green-600 uppercase tracking-widest">Always Online</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ref={scrollRef} className="flex-1 overflow-y-auto px-8 py-4 space-y-6 no-scrollbar">
+                            {messages.map((msg, idx) => (
+                                <motion.div 
+                                    key={idx} 
+                                    initial={{ opacity: 0, x: msg.isMe ? 20 : -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}
+                                >
+                                    <div className={`max-w-[85%] p-5 rounded-[2rem] text-sm shadow-sm leading-relaxed ${
+                                        msg.isMe 
+                                        ? 'bg-[#1B5E20] text-white rounded-tr-none' 
+                                        : 'bg-white/60 backdrop-blur-md text-gray-700 rounded-tl-none border border-white/50'
+                                    }`}>
+                                        {msg.text}
+                                    </div>
+                                </motion.div>
+                            ))}
+                            {isTyping && (
+                                <div className="flex justify-start">
+                                    <div className="bg-white/40 backdrop-blur-md p-4 rounded-3xl rounded-tl-none flex gap-1.5">
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 bg-green-500 rounded-full"></motion.div>
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-green-500 rounded-full"></motion.div>
+                                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-green-500 rounded-full"></motion.div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-8 pt-2 space-y-4">
+                            <div className="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+                                {quickActions.map((action, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleQuickAction(action)}
+                                        className="whitespace-nowrap px-4 py-2 bg-white/40 hover:bg-white text-xs font-bold text-gray-600 rounded-full border border-white/50 transition-all"
+                                    >
+                                        {action}
+                                    </button>
+                                ))}
                             </div>
 
-                            {/* Input Area */}
-                            <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 flex gap-2">
-                                <input
-                                    type="text"
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    placeholder="Type your message..."
-                                    className="flex-1 bg-gray-100 dark:bg-gray-800 border-none rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={sending || !newMessage.trim()}
-                                    className="bg-primary text-white p-2 rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-                                >
-                                    {sending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
-                                </button>
+                            <form onSubmit={handleSendMessage} className="relative group">
+                                <div className="relative flex items-center bg-white/60 backdrop-blur-2xl rounded-[2rem] p-2 pr-4 border border-white/50 shadow-xl">
+                                    <input 
+                                        type="text" 
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        placeholder="Ask Madventure AI..."
+                                        className="flex-1 bg-transparent border-none outline-none px-6 py-3 text-sm text-gray-800 placeholder-gray-400"
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        disabled={!newMessage.trim()}
+                                        className="bg-[#1B5E20] text-white p-3 rounded-[1.4rem] hover:scale-105 transition-all disabled:opacity-50"
+                                    >
+                                        <Send size={18} fill="white" />
+                                    </button>
+                                </div>
                             </form>
-                        </>
-                    )}
-                </div>
-            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -11,23 +11,28 @@ import { getTours } from '../api/tours';
 import { getHotels } from '../api/hotels';
 import { businessService } from '../services/businessService';
 import { districtsData } from '../data/districts';
+import MapDiscovery from '../components/home/MapDiscovery';
+import { motion, AnimatePresence } from 'framer-motion';
+
+import { useLanguage } from '../context/LanguageContext';
 
 // Flatten districts for dropdown
 const allDistricts = districtsData.flatMap(div =>
     div.districts.map(d => ({ name: d.name, division: div.division }))
 ).sort((a, b) => a.name.localeCompare(b.name));
 
-const sortOptions = [
-    { id: 'popular', label: 'জনপ্রিয় (Popular)' },
-    { id: 'price_low', label: 'দাম: কম → বেশি (Price: Low to High)' },
-    { id: 'price_high', label: 'দাম: বেশি → কম (Price: High to Low)' },
-];
-
 const Explore = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const { language } = useLanguage();
 
-    // Map URL Params to State natively
+    const sortOptions = [
+        { id: 'popular', label: language === 'bn' ? 'জনপ্রিয়' : 'Popular' },
+        { id: 'price_low', label: language === 'bn' ? 'দাম: কম → বেশি' : 'Price: Low to High' },
+        { id: 'price_high', label: language === 'bn' ? 'দাম: বেশি → কম' : 'Price: High to Low' },
+    ];
+
+    // Search State
     const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'ALL');
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || '');
@@ -96,7 +101,7 @@ const Explore = () => {
                     aggregated.sort((a, b) => a._price - b._price);
                 } else if (sortBy === 'price_high') {
                     aggregated.sort((a, b) => b._price - a._price);
-                } // Popular etc defaults for now using base rating if it exists usually
+                }
 
                 setResults(aggregated);
             } catch (err) {
@@ -106,7 +111,6 @@ const Explore = () => {
             }
         };
 
-        // Debounce fetching slightly if typing typing typing
         const delay = setTimeout(() => {
             fetchAll();
         }, 300);
@@ -127,46 +131,50 @@ const Explore = () => {
     const renderCard = (item) => {
         if (item._type === 'TOURS') {
             return (
-                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                <div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-md transition">
                     <img src={item.featured_image || item.image || '/assets/tours/placeholder.jpg'} alt={item.title} className="w-full h-48 object-cover" />
                     <div className="p-4">
                         <div className="text-xs text-primary font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><MapIcon size={12}/> TOUR</div>
-                        <h3 className="font-bold text-lg text-gray-900 mb-1">{item.title}</h3>
-                        <p className="text-sm text-gray-500 mb-3">{item.duration} • {item.difficulty}</p>
-                        <div className="flex justify-between items-center border-t border-gray-100 pt-3">
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.title}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.duration} • {item.difficulty}</p>
+                        <div className="flex justify-between items-center border-t border-gray-100 dark:border-slate-700 pt-3">
                             <span className="font-bold text-primary">৳{item._price.toLocaleString()}</span>
-                            <button onClick={() => navigate(`/tours/${item.id}`)} className="text-sm bg-gray-100 px-3 py-1 rounded-lg hover:bg-gray-200 font-medium">View</button>
+                            <button onClick={() => navigate(`/tours/${item.id}`)} className="text-sm bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium dark:text-white transition-colors">View</button>
                         </div>
                     </div>
                 </div>
             );
         } else if (item._type === 'HOTELS') {
             return (
-                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                <div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-md transition">
                     <img src={item.image || '/assets/hotels/placeholder.jpg'} alt={item.name} className="w-full h-48 object-cover" />
                     <div className="p-4">
                         <div className="text-xs text-blue-500 font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><Home size={12}/> HOTEL</div>
-                        <h3 className="font-bold text-lg text-gray-900 mb-1">{item.name}</h3>
-                        <p className="text-sm text-gray-500 mb-3">{item.type || 'Accommodation'}</p>
-                        <div className="flex justify-between items-center border-t border-gray-100 pt-3">
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.type || 'Accommodation'}</p>
+                        <div className="flex justify-between items-center border-t border-gray-100 dark:border-slate-700 pt-3">
                             <span className="font-bold text-blue-600">৳{item._price.toLocaleString()}/night</span>
-                            <button className="text-sm bg-gray-100 px-3 py-1 rounded-lg hover:bg-gray-200 font-medium">View</button>
+                            <button 
+                                onClick={() => navigate(`/hotels/${item.district_id || 'unknown'}/${item.id}/book`)} 
+                                className="text-sm bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium dark:text-white transition-colors"
+                            >
+                                View
+                            </button>
                         </div>
                     </div>
                 </div>
             );
         } else {
-            // Business fallback
             return (
-                <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition">
+                <div key={item.id} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-md transition">
                     <img src={item.logo || item.coverImage || '/api/placeholder/400/300'} alt={item.name} className="w-full h-48 object-cover opacity-80" />
                     <div className="p-4">
                         <div className="text-xs text-orange-500 font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><Store size={12}/> {item.category}</div>
-                        <h3 className="font-bold text-lg text-gray-900 mb-1">{item.name}</h3>
-                        <p className="text-sm text-gray-500 mb-3 truncate">{item.location}</p>
-                        <div className="flex justify-between items-center border-t border-gray-100 pt-3">
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 truncate">{item.location}</p>
+                        <div className="flex justify-between items-center border-t border-gray-100 dark:border-slate-700 pt-3">
                             <span className="text-xs font-medium text-gray-400">Local Business</span>
-                            <button onClick={() => navigate(`/business/${item.slug}`)} className="text-sm bg-gray-100 px-3 py-1 rounded-lg hover:bg-gray-200 font-medium">Profile</button>
+                            <button onClick={() => navigate(`/business/${item.slug}`)} className="text-sm bg-gray-100 dark:bg-slate-700 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 font-medium dark:text-white transition-colors">Profile</button>
                         </div>
                     </div>
                 </div>
@@ -175,24 +183,28 @@ const Explore = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-12">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#020d06] pt-24 pb-12 transition-colors duration-300">
             <div className="max-w-[1140px] mx-auto px-4">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold font-heading text-gray-900 mb-2">Global Search Engine</h1>
-                    <p className="text-gray-600">Find destinations, local guides, hotels, and tours seamlessly.</p>
+                    <h1 className="text-3xl font-black font-heading text-gray-900 dark:text-white mb-2">
+                        {language === 'bn' ? 'গ্লোবাল সার্চ ইঞ্জিন' : 'Global Search Engine'}
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400">
+                        {language === 'bn' ? 'গন্তব্য, গাইড, হোটেল এবং ট্যুর খুঁজুন খুব সহজেই।' : 'Find destinations, local guides, hotels, and tours seamlessly.'}
+                    </p>
                 </div>
 
                 {/* Search Bar */}
                 <div className="mb-6">
-                    <div className="flex gap-2 bg-white p-2 rounded-2xl shadow-sm border border-gray-200">
+                    <div className="flex gap-2 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700">
                         <div className="flex-1 flex items-center gap-2 px-3">
                             <Search size={20} className="text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search 'Sundarbans' or 'Cox's Bazar'..."
+                                placeholder={language === 'bn' ? "সাজেক বা কক্সবাজার লিখে সার্চ করুন..." : "Search 'Sundarbans' or 'Cox's Bazar'..."}
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
-                                className="w-full bg-transparent outline-none text-gray-800 placeholder-gray-400"
+                                className="w-full bg-transparent outline-none text-gray-800 dark:text-white placeholder-gray-400"
                             />
                             {searchTerm && (
                                 <button type="button" onClick={() => setSearchTerm('')} className="text-gray-400 hover:text-gray-600">
@@ -203,113 +215,135 @@ const Explore = () => {
                         <button
                             type="button"
                             onClick={() => setShowFilters(!showFilters)}
-                            className={`px-4 py-2.5 rounded-xl border font-bold transition-colors flex items-center gap-2 ${showFilters ? 'bg-primary text-white border-primary' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'}`}
+                            className={`px-4 py-2.5 rounded-xl border font-bold transition-colors flex items-center gap-2 ${showFilters ? 'bg-primary text-white border-primary' : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-600'}`}
                         >
-                            <SlidersHorizontal size={18} /> <span className="hidden sm:inline">Filters</span>
+                            <SlidersHorizontal size={18} /> <span className="hidden sm:inline">{language === 'bn' ? 'ফিল্টার' : 'Filters'}</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Conditional Filters Panel */}
-                {showFilters && (
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200 mb-6 animate-in fade-in slide-in-from-top-2">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-2">
-                                    <MapPin size={12} className="inline mr-1" /> District Locator
-                                </label>
-                                <select
-                                    value={selectedDistrict}
-                                    onChange={e => setSelectedDistrict(e.target.value)}
-                                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary"
-                                >
-                                    <option value="">All Regions</option>
-                                    {allDistricts.map((d, i) => (
-                                        <option key={i} value={d.name}>{d.name}</option>
-                                    ))}
-                                </select>
+                <AnimatePresence>
+                    {showFilters && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 mb-6"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                                        <MapPin size={12} className="inline mr-1" /> {language === 'bn' ? 'জেলা' : 'District'}
+                                    </label>
+                                    <select
+                                        value={selectedDistrict}
+                                        onChange={e => setSelectedDistrict(e.target.value)}
+                                        className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary dark:text-white"
+                                    >
+                                        <option value="">{language === 'bn' ? 'সব জেলা' : 'All Regions'}</option>
+                                        {allDistricts.map((d, i) => (
+                                            <option key={i} value={d.name}>{d.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                                        {language === 'bn' ? 'সর্বোচ্চ বাজেট (৳)' : 'Max Price limit (৳)'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={maxPrice}
+                                        onChange={e => setMaxPrice(e.target.value)}
+                                        placeholder="e.g. 5000"
+                                        className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-widest">
+                                        {language === 'bn' ? 'বাছাই করুন' : 'Sort By'}
+                                    </label>
+                                    <select
+                                        value={sortBy}
+                                        onChange={e => setSortBy(e.target.value)}
+                                        className="w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary dark:text-white"
+                                    >
+                                        {sortOptions.map(s => (
+                                            <option key={s.id} value={s.id}>{s.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-2">Max Price limit (৳)</label>
-                                <input
-                                    type="number"
-                                    value={maxPrice}
-                                    onChange={e => setMaxPrice(e.target.value)}
-                                    placeholder="e.g. 5000"
-                                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-2">Sort By</label>
-                                <select
-                                    value={sortBy}
-                                    onChange={e => setSortBy(e.target.value)}
-                                    className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary"
-                                >
-                                    {sortOptions.map(s => (
-                                        <option key={s.id} value={s.id}>{s.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        {hasActiveFilters && (
-                            <button onClick={clearFilters} className="mt-4 text-sm text-red-500 hover:text-red-700 font-bold transition-colors">
-                                ✕ Reset all configurations
-                            </button>
-                        )}
-                    </div>
-                )}
+                            {hasActiveFilters && (
+                                <button onClick={clearFilters} className="mt-4 text-sm text-red-500 hover:text-red-700 font-bold transition-colors">
+                                    ✕ {language === 'bn' ? 'ফিল্টার রিসেট করুন' : 'Reset all configurations'}
+                                </button>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
                 {/* Unified Category Tabs */}
                 <div className="flex gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
-                    {['ALL', 'TOURS', 'HOTELS', 'BUSINESSES'].map(tab => (
+                    {[
+                        { id: 'ALL', bn: 'সব কিছু', en: 'Everything' },
+                        { id: 'TOURS', bn: 'ট্যুর', en: 'Tours' },
+                        { id: 'HOTELS', bn: 'হোটেল', en: 'Hotels' },
+                        { id: 'BUSINESSES', bn: 'বিজনেস', en: 'Businesses' }
+                    ].map(tab => (
                         <button
-                            key={tab}
-                            onClick={() => setActiveTab(tab)}
-                            className={`px-5 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${activeTab === tab
-                                ? 'bg-primary text-white shadow-md scale-105'
-                                : 'bg-white text-gray-600 border border-gray-200 hover:border-primary/50'
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-6 py-3 rounded-full text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 ${activeTab === tab.id
+                                ? 'bg-primary text-white shadow-lg scale-105'
+                                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 hover:border-primary/50'
                                 }`}
                         >
-                            {tab === 'ALL' && <Layers size={14} className="inline mr-2" />}
-                            {tab === 'TOURS' && <MapIcon size={14} className="inline mr-2" />}
-                            {tab === 'HOTELS' && <Home size={14} className="inline mr-2" />}
-                            {tab === 'BUSINESSES' && <Store size={14} className="inline mr-2" />}
-                            {tab === 'ALL' ? 'Everything' : tab.charAt(0) + tab.slice(1).toLowerCase()}
+                            {tab.id === 'ALL' && <Layers size={16} />}
+                            {tab.id === 'TOURS' && <MapIcon size={16} />}
+                            {tab.id === 'HOTELS' && <Home size={16} />}
+                            {tab.id === 'BUSINESSES' && <Store size={16} />}
+                            {language === 'bn' ? tab.bn : tab.en}
                         </button>
                     ))}
                 </div>
 
                 {/* Results Count & View Toggle */}
-                <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm text-gray-500">
-                        Showing <span className="font-bold text-gray-900">{results.length}</span> verified results
+                <div className="flex items-center justify-between mb-6">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {language === 'bn' ? 'মোট ' : 'Showing '} 
+                        <span className="font-black text-gray-900 dark:text-white">{results.length}</span> 
+                        {language === 'bn' ? 'টি ফলাফল পাওয়া গেছে' : ' verified results'}
                     </p>
                     <button 
                         onClick={() => setIsMapView(!isMapView)}
-                        className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm"
+                        className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all shadow-sm"
                     >
-                        {isMapView ? <LayoutGrid size={16}/> : <MapIcon size={16}/>}
-                        {isMapView ? 'Grid View' : 'Map View'}
+                        {isMapView ? <LayoutGrid size={18}/> : <MapIcon size={18}/>}
+                        {isMapView ? (language === 'bn' ? 'গ্রিড ভিউ' : 'Grid View') : (language === 'bn' ? 'ম্যাপ ভিউ' : 'Map View')}
                     </button>
                 </div>
 
-                {/* Dynamic Masonry/Grid or Map */}
+                <div className="mb-10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                    <MapDiscovery />
+                </div>
+
+                {/* Results */}
                 {isMapView ? (
-                    <div className="animate-in fade-in duration-500">
+                    <div className="animate-in fade-in duration-500 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800">
                         <InteractiveMap items={results} height="600px" />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {isLoading ? (
                             <CardSkeleton count={8} />
                         ) : results.length === 0 ? (
                             <div className="col-span-full">
                                 <EmptyState
                                     icon="search"
-                                    title="No matches discovered"
-                                    description="Try adjusting your filter constraints or widening the search radius."
-                                    actionLabel="Clear Filters"
+                                    title={language === 'bn' ? "কোনো ফলাফল পাওয়া যায়নি" : "No matches discovered"}
+                                    description={language === 'bn' ? "ফিল্টার পরিবর্তন করে আবার চেষ্টা করুন।" : "Try adjusting your filters or widening the search."}
+                                    actionLabel={language === 'bn' ? "সব ফিল্টার মুছুন" : "Clear Filters"}
                                     onAction={clearFilters}
                                 />
                             </div>

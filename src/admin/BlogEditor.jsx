@@ -80,7 +80,7 @@ const BlogEditor = () => {
 
             await blogService.savePost(postData);
             alert(`Post ${statusToSave === 'published' ? 'published' : 'saved'} successfully!`);
-            navigate('/admin/blog-manage'); // Assume we have a list in admin
+            navigate('/blog'); // Redirect to blog list for all users
         } catch (err) {
             console.error("Save error:", err);
             alert("Error saving post.");

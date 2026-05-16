@@ -91,7 +91,8 @@ const SOSButton = () => {
 
     return (
         <>
-            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center">
+        <>
+            <div className="relative flex flex-col items-center">
                 {isPressing && !isOpen && (
                     <div className="absolute inset-0 pointer-events-none scale-[1.3] z-[-1] flex items-center justify-center">
                         <svg className="w-full h-full transform -rotate-90">
@@ -113,14 +114,22 @@ const SOSButton = () => {
                     onMouseLeave={stopPress}
                     onTouchStart={startPress}
                     onTouchEnd={stopPress}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl transition-all relative
-                        ${isPressing ? 'bg-red-700 scale-95' : 'bg-red-600 animate-pulse hover:scale-105'}`}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all relative
+                        ${isPressing ? 'bg-red-700 scale-95' : 'bg-red-600 animate-pulse hover:scale-110'}`}
                 >
                     <AlertTriangle size={24} className={isPressing ? 'animate-bounce' : ''} />
+                    
+                    {/* Tooltip */}
+                    <span className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-wider shadow-lg">
+                        SOS
+                    </span>
                 </button>
-                <div className="text-[10px] font-bold text-red-600 mt-1 bg-white/80 px-2 py-0.5 rounded-full shadow-sm backdrop-blur-sm">
-                    {progress > 0 && progress < 100 ? `${Math.round(progress)}%` : t('sos.trigger')}
-                </div>
+                
+                {progress > 0 && progress < 100 && (
+                    <div className="absolute -bottom-6 text-[10px] font-bold text-red-600 bg-white/80 px-2 py-0.5 rounded-full shadow-sm backdrop-blur-sm z-20">
+                        {Math.round(progress)}%
+                    </div>
+                )}
             </div>
 
             {isOpen && (

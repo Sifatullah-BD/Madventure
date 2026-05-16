@@ -6,6 +6,9 @@ import { getDistricts, getPlaces } from '../api/destinations';
 import { CardSkeleton } from '../components/ui/LoadingSkeleton';
 import EmptyState from '../components/ui/EmptyState';
 import SEO from '../components/SEO';
+import MapDiscovery from '../components/home/MapDiscovery';
+import { motion } from 'framer-motion';
+import DestinationCard from '../components/district/DestinationCard';
 
 const heroImages = [
     "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
@@ -150,31 +153,15 @@ const Destinations = () => {
                             </div>
                         ) : (
                             filteredPlaces.map((place) => (
-                                <Link
-                                    key={place.id}
-                                    to={`/place/${place.id}`}
-                                    className="group bg-white dark:bg-surface rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
-                                >
-                                    <div className="relative h-56 overflow-hidden">
-                                        <img src={place.image} alt={place.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
-                                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
-                                            {place.region}
-                                        </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2 group-hover:text-primary transition-colors">{place.name}</h3>
-                                        <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 mb-4">{place.description}</p>
-                                        <div className="flex items-center text-primary font-bold text-sm">
-                                            {t('view_details')} <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                                        </div>
-                                    </div>
-                                </Link>
+                                <DestinationCard key={place.id} place={place} />
                             ))
                         )}
                     </div>
                 </div>
 
-                <div>
+                <MapDiscovery />
+
+                <div className="mt-20">
                     <div className="flex flex-col mb-8 gap-6">
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <Filter className="text-primary" /> {t('explore_by_district')}

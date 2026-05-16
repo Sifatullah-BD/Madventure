@@ -1,64 +1,64 @@
 import React, { useMemo } from 'react';
-import { MapPin, Info, History } from 'lucide-react';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { Info, History, MapPin } from 'lucide-react';
+import { MapContainer, TileLayer, GeoJSON, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import bangladeshGeoJSON from '../../data/bangladesh.json';
-import districtsList from '../../data/districts_list.json';
-
-// Fix for default marker icon in Leaflet with React
 import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
+// Import the new comprehensive GeoJSON
+import bangladeshGeoJSON from '../../data/bd-geojson/bangladesh.json';
 
 const DistrictInfoMap = ({ district }) => {
-    // Mapping for district names if they differ between app data and GeoJSON
-    const geoJsonNameMapping = {
-        "Chattogram": "Chittagong",
-        "Bogura": "Bogra",
-        "Cox's Bazar": "Cox's Bazar",
-        "Barishal": "Barisal",
-        "Jashore": "Jessore",
-        "Cumilla": "Comilla"
-        // Add more mappings as needed
+    // 1. Filter features for this district (showing its Upazilas)
+    const districtFeatures = useMemo(() => {
+        if (!bangladeshGeoJSON || !district) return null;
+        
+        const filtered = {
+            ...bangladeshGeoJSON,
+            features: bangladeshGeoJSON.features.filter(f => 
+                f.properties.district_name === district.name_en || 
+                f.properties.district_name === district.name
+            )
+        };
+        
+        return filtered.features.length > 0 ? filtered : null;
+    }, [district]);
+
+    // 2. Style function for Upazilas
+    const style = (feature) => {
+        return {
+            fillColor: '#006a4e', // Bangladesh Green
+            weight: 1.5,
+            opacity: 1,
+            color: 'white',
+            fillOpacity: 0.6,
+            dashArray: '3'
+        };
     };
 
-    const districtNameInGeoJSON = geoJsonNameMapping[district.name_en] || district.name_en;
+    // 3. Interaction
+    const onEachFeature = (feature, layer) => {
+        layer.on({
+            mouseover: (e) => {
+                const layer = e.target;
+                layer.setStyle({
+                    fillOpacity: 0.9,
+                    weight: 2,
+                    fillColor: '#ffcc00' // Yellow highlight
+                });
+            },
+            mouseout: (e) => {
+                const layer = e.target;
+                layer.setStyle(style(feature));
+            }
+        });
+    };
 
-    const districtGeoJSON = useMemo(() => {
-        if (!bangladeshGeoJSON || !bangladeshGeoJSON.features) return null;
-        return bangladeshGeoJSON.features.find(
-            feature => feature.properties.NAME_2 === districtNameInGeoJSON
-        );
-    }, [districtNameInGeoJSON]);
+    if (!district) return null;
 
-    // Calculate center of the district
-    const mapCenter = useMemo(() => {
-        // Priority 1: Use precise coordinates from districts_list.json
-        const preciseDistrict = districtsList.districts.find(d => d.name === district.name_en);
-        if (preciseDistrict && preciseDistrict.lat && preciseDistrict.long) {
-            return [parseFloat(preciseDistrict.lat), parseFloat(preciseDistrict.long)];
-        }
-
-        // Priority 2: Fallback to GeoJSON centroid
-        if (districtGeoJSON) {
-            const layer = L.geoJSON(districtGeoJSON);
-            const bounds = layer.getBounds();
-            return bounds.getCenter();
-        }
-
-        // Priority 3: Default to Bangladesh center
-        return [23.6850, 90.3563];
-    }, [districtGeoJSON, district.name_en]);
-
+    // Center map on district coordinates
+    const center = district.lat && district.long 
+        ? [parseFloat(district.lat), parseFloat(district.long)]
+        : [23.6850, 90.3563];
 
     return (
         <div className="py-16 bg-white">
@@ -75,13 +75,34 @@ const DistrictInfoMap = ({ district }) => {
                                 <h3 className="text-xl font-bold text-gray-800">About {district.name_en}</h3>
                             </div>
                             <p className="text-gray-600 leading-relaxed text-lg">
-                                {district.short_description} {district.notes && <span>{district.notes}</span>}
-                                <br /><br />
-                                {district.name_en} is a prominent district in the {district.division} division. It offers a unique blend of natural beauty and cultural heritage.
+                                {district.short_description || `Explore the beautiful district of ${district.name_en}.`} 
+                                {district.notes && <span className="block mt-2">{district.notes}</span>}
+                                <br />
+                                {district.name_en} is a prominent district in the {district.division || 'Bangladesh'}. It offers a unique blend of natural beauty and cultural heritage.
                             </p>
                         </div>
 
-                        {/* History Placeholder */}
+                        {/* Upazila List Placeholder (Dynamic would be better) */}
+                        <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-600">
+                                    <MapPin size={24} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-800">Administrative Areas</h3>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {districtFeatures?.features.map((f, i) => (
+                                    <span key={i} className="px-3 py-1 bg-white border border-blue-100 rounded-full text-sm font-medium text-blue-700 shadow-sm">
+                                        {f.properties.bn_name || f.properties.name}
+                                    </span>
+                                ))}
+                                {(!districtFeatures || districtFeatures.features.length === 0) && (
+                                    <p className="text-gray-500 italic text-sm">Upazila data loading or unavailable.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* History */}
                         <div className="bg-orange-50/50 p-6 rounded-2xl border border-orange-100">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-orange-500/10 rounded-lg text-orange-600">
@@ -97,35 +118,41 @@ const DistrictInfoMap = ({ district }) => {
 
                     {/* Right: Map (5 cols) */}
                     <div className="lg:col-span-5">
-                        <div className="bg-gray-100 rounded-3xl p-2 h-full min-h-[400px] flex items-center justify-center relative overflow-hidden shadow-inner border-4 border-white">
-                            {districtGeoJSON ? (
-                                <MapContainer
-                                    center={mapCenter}
-                                    zoom={9}
-                                    scrollWheelZoom={false}
-                                    className="w-full h-full rounded-2xl z-0"
-                                    style={{ minHeight: "400px" }}
-                                >
-                                    <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
+                        <div className="bg-gray-100 rounded-3xl p-2 h-full min-h-[500px] flex items-center justify-center relative overflow-hidden shadow-inner border-4 border-white">
+                            <MapContainer
+                                center={center}
+                                zoom={districtFeatures ? 10 : 8}
+                                scrollWheelZoom={false}
+                                className="w-full h-full rounded-2xl z-0"
+                                style={{ minHeight: "500px" }}
+                            >
+                                <TileLayer
+                                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                                />
+                                {districtFeatures && (
                                     <GeoJSON
-                                        data={districtGeoJSON}
-                                        style={{
-                                            fillColor: '#006a4e', // User requested Green
-                                            weight: 2,
-                                            opacity: 1,
-                                            color: 'white',       // User requested White border
-                                            dashArray: '3',       // User requested dashed border
-                                            fillOpacity: 0.7
-                                        }}
-                                    />
-                                </MapContainer>
-                            ) : (
-                                <div className="text-center p-6">
-                                    <MapPin size={48} className="mx-auto text-gray-400 mb-2" />
-                                    <p className="text-gray-500">Map data not available for {district.name_en}</p>
+                                        data={districtFeatures}
+                                        style={style}
+                                        onEachFeature={onEachFeature}
+                                    >
+                                        <Tooltip sticky>
+                                            {(layer) => (
+                                                <div className="font-bold text-primary">
+                                                    {layer.feature.properties.bn_name || layer.feature.properties.name}
+                                                </div>
+                                            )}
+                                        </Tooltip>
+                                    </GeoJSON>
+                                )}
+                            </MapContainer>
+                            
+                            {!districtFeatures && (
+                                <div className="absolute inset-0 bg-gray-50/80 backdrop-blur-sm flex items-center justify-center z-10">
+                                    <div className="text-center p-6">
+                                        <MapPin size={48} className="mx-auto text-gray-400 mb-2 animate-bounce" />
+                                        <p className="text-gray-500 font-bold">Map data loading...</p>
+                                    </div>
                                 </div>
                             )}
                         </div>

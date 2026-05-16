@@ -1,10 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { DISTRICTS } from '../../data/madventure-data';
-import { Search, MapPin, Calendar, Wallet, Users, MessageCircle, AlertTriangle, UserPlus, Filter, Loader2, X, CheckCircle2 } from 'lucide-react';
-import { getTravelPartners, createPartnerRequest } from '../../api/community';
-import { useAuth } from '../../hooks/useAuth';
-
-const BUDGETS = ['বাজেট (৳3000-৳5000)', 'মধ্যম (৳5000-৳8000)', 'প্রিমিয়াম (৳8000+)'];
+import PartnerCard from './PartnerCard';
 
 const TravelPartner = () => {
     const { user } = useAuth();
@@ -70,58 +64,65 @@ const TravelPartner = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 relative min-h-screen">
-            {/* Header & Warning */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                    <Users className="text-primary"/> ট্রাভেল পার্টনার খুঁজুন
-                </h1>
-                
-                <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-xl flex gap-3 text-orange-800 shadow-sm">
-                    <AlertTriangle className="shrink-0 mt-0.5" size={20} />
-                    <p className="font-medium text-sm md:text-base leading-relaxed">
-                        <span className="font-bold block mb-1">⚠️ সতর্কতা:</span> 
-                        অজানা ব্যক্তির সাথে দেখা করার আগে পরিচিতদের জানান। প্রথম দেখায় প্রকাশ্য স্থান বেছে নিন এবং আর্থিক লেনদেনে শতভাগ নিশ্চিত না হয়ে আগাবেন না।
-                    </p>
-                </div>
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 relative min-h-screen">
+            {/* Premium Curved Hero for Partner Discovery */}
+            <CurvedHero 
+                title="FIND A PARTNER"
+                subtitle="TO EXPLORE WITH"
+                image="https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&w=1200&q=80"
+                onAction={() => setShowAddForm(true)}
+                items={[
+                    { label: "NEXT TRIP", value: "Upcoming" },
+                    { label: "LOCATION", value: "64 Districts" },
+                    { label: "BUDGET", value: "Fixed/Shared" },
+                    { label: "SAFETY", value: "Verified Only" }
+                ]}
+            />
+            
+            {/* Floating Warning - Subtle */}
+            <div className="mb-12 bg-[#f97316]/10 border border-[#f97316]/20 p-6 rounded-[2rem] flex gap-4 text-[#f97316] backdrop-blur-sm">
+                <AlertTriangle className="shrink-0" size={24} />
+                <p className="font-bold text-sm leading-relaxed">
+                    সতর্কতা: অজানা ব্যক্তির সাথে দেখা করার আগে পরিচিতদের জানান। প্রথম দেখায় প্রকাশ্য স্থান বেছে নিন এবং আর্থিক লেনদেনে শতভাগ নিশ্চিত না হয়ে আগাবেন না।
+                </p>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
                 {/* Sidebar Filter */}
                 <div className="w-full lg:w-72">
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm sticky top-24">
-                        <h3 className="font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-2">
-                            <Filter size={18}/> ফিল্টার করুন
+                    <div className="bg-[#0d1a11] p-8 rounded-[2rem] border border-white/5 shadow-2xl sticky top-24">
+                        <h3 className="font-black text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-4 uppercase tracking-widest text-xs">
+                            <Filter size={16}/> ফিল্টার করুন
                         </h3>
                         
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">গন্তব্য</label>
+                                <label className="block text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">গন্তব্য</label>
                                 <select 
                                     value={districtId}
                                     onChange={e => setDistrictId(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:border-primary transition-all"
+                                    className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm outline-none focus:border-forest-light text-white font-bold transition-all"
                                 >
-                                    <option value="">সব গন্তব্য</option>
-                                    {DISTRICTS.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                    <option value="" className="bg-[#0d1a11]">সব গন্তব্য</option>
+                                    {DISTRICTS.map(d => <option key={d.id} value={d.id} className="bg-[#0d1a11]">{d.name}</option>)}
                                 </select>
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">জেন্ডার (Gender)</label>
+                                <label className="block text-[10px] font-black text-gray-500 mb-2 uppercase tracking-widest">জেন্ডার (Gender)</label>
                                 <select 
                                     value={genderPref}
                                     onChange={e => setGenderPref(e.target.value)}
-                                    className="w-full bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-xl text-sm outline-none focus:border-primary transition-all"
+                                    className="w-full bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-sm outline-none focus:border-forest-light text-white font-bold transition-all"
                                 >
-                                    <option value="">সবাই (All)</option>
-                                    <option value="male">পুরুষ (Male)</option>
-                                    <option value="female">মহিলা (Female)</option>
+                                    <option value="" className="bg-[#0d1a11]">সবাই (All)</option>
+                                    <option value="male" className="bg-[#0d1a11]">পুরুষ (Male)</option>
+                                    <option value="female" className="bg-[#0d1a11]">মহিলা (Female)</option>
                                 </select>
                             </div>
 
-                            <button onClick={fetchPartners} className="w-full bg-[#1B5E20] text-white font-bold py-3 rounded-xl hover:bg-green-800 transition-all shadow-md active:scale-95">
-                                ফিল্টার প্রয়োগ করুন
+                            <button onClick={fetchPartners} className="w-full bg-forest-light text-white font-black py-4 rounded-xl hover:bg-green-600 transition-all shadow-xl shadow-forest-light/10 active:scale-95 uppercase tracking-widest text-xs">
+                                ফিল্টার প্রয়োগ
                             </button>
                         </div>
                     </div>
@@ -130,71 +131,23 @@ const TravelPartner = () => {
                 {/* Main List Area */}
                 <div className="flex-1">
                     {loading ? (
-                        <div className="flex justify-center py-20"><Loader2 className="animate-spin text-primary" size={40}/></div>
+                        <div className="flex justify-center py-20"><Loader2 className="animate-spin text-forest-light" size={40}/></div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {partners.map(p => {
-                                const d = DISTRICTS.find(dist => dist.id === p.destination_id);
-                                const profile = p.profiles || {};
-                                return (
-                                    <div key={p.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                                        <div className="p-6">
-                                            <div className="flex items-start gap-4 mb-4">
-                                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-100 to-green-600 text-white flex items-center justify-center font-bold text-xl uppercase shadow-inner">
-                                                    {profile.avatar_url ? <img src={profile.avatar_url} className="w-full h-full rounded-full object-cover"/> : (profile.full_name?.charAt(0) || 'U')}
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                                                        {profile.full_name || 'User'} 
-                                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${profile.gender === 'male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                                                            {profile.gender === 'male' ? 'M' : 'F'}
-                                                        </span>
-                                                    </h3>
-                                                    <p className="text-gray-500 text-sm flex items-center gap-1"><MapPin size={12}/> Dhaka, Bangladesh</p>
-                                                </div>
-                                            </div>
-
-                                            <div className="bg-gray-50 p-4 rounded-xl mb-4 space-y-2 text-sm text-gray-700 border border-gray-100">
-                                                <div className="flex justify-between border-b border-gray-100 pb-2">
-                                                    <span className="text-gray-500 flex items-center gap-1.5"><MapPin size={14}/> গন্তব্য:</span>
-                                                    <span className="font-bold">{d ? d.name : p.destination_id}</span>
-                                                </div>
-                                                <div className="flex justify-between border-b border-gray-100 py-2">
-                                                    <span className="text-gray-500 flex items-center gap-1.5"><Calendar size={14}/> তারিখ:</span>
-                                                    <span className="font-bold">{new Date(p.travel_date).toLocaleDateString()}</span>
-                                                </div>
-                                                <div className="flex justify-between pt-2">
-                                                    <span className="text-gray-500 flex items-center gap-1.5"><Wallet size={14}/> বাজেট:</span>
-                                                    <span className="font-bold text-[#1B5E20]">{p.budget_range}</span>
-                                                </div>
-                                            </div>
-
-                                            <p className="text-gray-600 text-sm italic mb-4 line-clamp-3 bg-gray-50/50 p-3 rounded-lg">"{p.description}"</p>
-
-                                            <div className="flex flex-wrap gap-2 mb-6">
-                                                {p.interests?.map(i => (
-                                                    <span key={i} className="text-[10px] font-bold uppercase tracking-wider bg-white border border-gray-200 text-gray-500 px-2.5 py-1 rounded-full shadow-sm">
-                                                        #{i}
-                                                    </span>
-                                                ))}
-                                            </div>
-
-                                            <button 
-                                                onClick={() => handleWhatsApp(profile.phone)}
-                                                className="w-full bg-[#1B5E20] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-800 transition-all shadow-md active:scale-95"
-                                            >
-                                                <MessageCircle size={18}/> যোগাযোগ করুন
-                                            </button>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {partners.map(p => (
+                                <PartnerCard 
+                                    key={p.id} 
+                                    partner={p} 
+                                    onWhatsApp={handleWhatsApp} 
+                                    onJoin={() => alert('Join request sent!')} 
+                                />
+                            ))}
                             
                             {partners.length === 0 && (
-                                <div className="col-span-full text-center py-16 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-                                    <Users size={48} className="mx-auto text-gray-200 mb-4"/>
-                                    <p className="text-gray-500 font-bold text-lg">আপনার সার্চ অনুযায়ী কাউকে পাওয়া যায়নি।</p>
-                                    <p className="text-gray-400 text-sm mt-2">আপনি নিজেই একটি রিকোয়েস্ট পোস্ট করতে পারেন!</p>
+                                <div className="col-span-full text-center py-24 bg-[#0d1a11] rounded-[3rem] border border-dashed border-white/10">
+                                    <Users size={64} className="mx-auto text-gray-800 mb-6"/>
+                                    <p className="text-gray-400 font-black text-xl">আপনার সার্চ অনুযায়ী কাউকে পাওয়া যায়নি।</p>
+                                    <p className="text-gray-500 text-sm mt-2 font-medium">আপনি নিজেই একটি রিকোয়েস্ট পোস্ট করতে পারেন!</p>
                                 </div>
                             )}
                         </div>
@@ -224,26 +177,44 @@ const TravelPartner = () => {
                         <form className="p-8 space-y-6" onSubmit={handleCreateRequest}>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">গন্তব্য <span className="text-red-500">*</span></label>
-                                    <select 
-                                        required 
-                                        value={newRequest.destination_id}
-                                        onChange={e => setNewRequest({...newRequest, destination_id: e.target.value})}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50"
-                                    >
-                                        <option value="">নির্বাচন করুন</option>
-                                        {DISTRICTS.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                     <label className="block text-sm font-bold text-gray-700 mb-2">গন্তব্য <span className="text-red-500">*</span></label>
+                                     <select 
+                                         required 
+                                         value={newRequest.destination_id}
+                                         onChange={e => setNewRequest({...newRequest, destination_id: e.target.value})}
+                                         className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50"
+                                     >
+                                         <option value="">নির্বাচন করুন</option>
+                                         {DISTRICTS.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                     </select>
+                                 </div>
+                                 <div>
+                                     <label className="block text-sm font-bold text-gray-700 mb-2">যাওয়ার তারিখ <span className="text-red-500">*</span></label>
+                                     <input 
+                                         type="date" 
+                                         required 
+                                         value={newRequest.travel_date}
+                                         onChange={e => setNewRequest({...newRequest, travel_date: e.target.value})}
+                                         className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50" 
+                                     />
+                                 </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">বয়সসীমা (Age Group)</label>
+                                    <select className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50">
+                                        <option>২০-৩০ বছর</option>
+                                        <option>৩০-৪০ বছর</option>
+                                        <option>৪০+ বছর</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 mb-2">যাওয়ার তারিখ <span className="text-red-500">*</span></label>
-                                    <input 
-                                        type="date" 
-                                        required 
-                                        value={newRequest.travel_date}
-                                        onChange={e => setNewRequest({...newRequest, travel_date: e.target.value})}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50" 
-                                    />
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">পছন্দ (Preference)</label>
+                                    <div className="flex gap-3">
+                                        <button type="button" className="flex-1 py-3 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all">Non-Smoking</button>
+                                        <button type="button" className="flex-1 py-3 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 transition-all">Photography</button>
+                                    </div>
                                 </div>
                             </div>
 

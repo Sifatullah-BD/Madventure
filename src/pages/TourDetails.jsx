@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Star, Check, Shield, MessageCircle, ArrowLeft, Users, Heart, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, Clock, Star, Check, Shield, MessageCircle, ArrowLeft, Users, Heart, Loader2, Wifi, Truck, Coffee, UserCheck, Ticket, HeartPulse } from 'lucide-react';
 import { agencies } from '../data/tourData';
 import TourBookingModal from '../components/tours/TourBookingModal';
 import { supabaseService } from '../services/supabaseService';
@@ -140,23 +140,37 @@ const TourDetails = () => {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div>
-                                    <h3 className="font-bold text-gray-900 mb-2">Includes</h3>
-                                    <ul className="space-y-2">
-                                        {(event.includes || ['Breakfast', 'Transport', 'Guide']).map((item, i) => (
-                                            <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Check size={14} className="text-green-500" /> {item}
-                                            </li>
+                                    <h3 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px]">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div> Included Facilities
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {[
+                                            { label: 'WiFi', icon: <Wifi size={14} /> },
+                                            { label: 'AC Transport', icon: <Truck size={14} /> },
+                                            { label: 'Breakfast', icon: <Coffee size={14} /> },
+                                            { label: 'Professional Guide', icon: <UserCheck size={14} /> },
+                                            { label: 'Entrance Fees', icon: <Ticket size={14} /> },
+                                            { label: 'Emergency Support', icon: <HeartPulse size={14} /> }
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 group hover:border-emerald-200 hover:bg-emerald-50 transition-all">
+                                                <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-emerald-600 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                    {item.icon}
+                                                </div>
+                                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-tight">{item.label}</span>
+                                            </div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 mb-2">Excludes</h3>
-                                    <ul className="space-y-2">
-                                        {(event.excludes || ['Personal Expenses', 'Dinner']).map((item, i) => (
-                                            <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                <span className="text-red-400 text-xs">✕</span> {item}
+                                    <h3 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-widest text-[10px]">
+                                        <div className="w-1.5 h-1.5 bg-red-500 rounded-full"></div> Not Included
+                                    </h3>
+                                    <ul className="space-y-3">
+                                        {(event.excludes || ['Personal Expenses', 'Dinner', 'Insurance']).map((item, i) => (
+                                            <li key={i} className="flex items-center gap-3 text-xs font-medium text-gray-400">
+                                                <div className="w-5 h-5 bg-red-50 rounded-full flex items-center justify-center text-red-300">✕</div> {item}
                                             </li>
                                         ))}
                                     </ul>

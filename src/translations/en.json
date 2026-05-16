@@ -23,5 +23,14 @@
         "sending": "Sending Signal...",
         "sent": "SOS Signal Sent! Help is on the way.",
         "failed": "Failed to send signal. Please call 999."
-    }
+    },
+    "nav_destinations": "Destinations",
+    "nav_planner": "AI Planner",
+    "nav_student_tours": "Student Tours",
+    "nav_adventures": "Adventures",
+    "nav_shop": "Shop & Rental",
+    "nav_community": "Community",
+    "nav_dashboard": "Dashboard",
+    "nav_login": "Login",
+    "nav_safety": "Safety Center"
 }

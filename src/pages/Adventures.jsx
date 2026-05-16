@@ -1,99 +1,53 @@
 import React, { useState } from 'react';
 import { Mountain, Tent, Waves, Zap, ArrowRight, CheckCircle, AlertTriangle, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+import { motion } from 'framer-motion';
 
 const Adventures = () => {
+    const { language } = useLanguage();
     const [difficulty, setDifficulty] = useState('All');
 
     const adventureSpots = [
         {
             id: 1,
-            name: 'Nafakhum Waterfall',
+            name: language === 'bn' ? 'নাফাকুম জলপ্রপাত' : 'Nafakhum Waterfall',
             location: 'Bandarban',
             type: 'Waterfall',
             level: 'Extreme',
             image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Guide Mandatory', 'No Network'],
-            description: 'Known as the Niagara of Bangladesh. Requires boat ride and trekking.'
+            warnings: language === 'bn' ? ['গাইড আবশ্যক', 'নেটওয়ার্ক নেই'] : ['Guide Mandatory', 'No Network'],
+            description: language === 'bn' ? 'বাংলার নায়াগ্রা হিসেবে পরিচিত। ট্র্যাকিং এবং নৌকা ভ্রমণ আবশ্যক।' : 'Known as the Niagara of Bangladesh. Requires boat ride and trekking.'
         },
         {
             id: 2,
-            name: 'Amiakhum Waterfall',
+            name: language === 'bn' ? 'অমিয়াখুম জলপ্রপাত' : 'Amiakhum Waterfall',
             location: 'Bandarban',
             type: 'Waterfall',
             level: 'Extreme',
             image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Steep Descent', 'Slippery'],
-            description: 'One of the most beautiful and isolated waterfalls near the Indian border.'
+            warnings: language === 'bn' ? ['খাড়া পাহাড়', 'পিচ্ছিল'] : ['Steep Descent', 'Slippery'],
+            description: language === 'bn' ? 'বান্দরবানের অন্যতম সুন্দর ও দুর্গম জলপ্রপাত।' : 'One of the most beautiful and isolated waterfalls.'
         },
         {
             id: 3,
-            name: 'Keokradong Peak',
+            name: language === 'bn' ? 'কেওক্রাডং চূড়া' : 'Keokradong Peak',
             location: 'Bandarban',
             type: 'Trekking',
             level: 'Moderate',
             image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['High Altitude'],
-            description: 'One of the highest peaks in Bangladesh. Famous for its cloudy view.'
+            warnings: language === 'bn' ? ['উচ্চতা সতর্কতা'] : ['High Altitude'],
+            description: language === 'bn' ? 'বাংলাদেশের অন্যতম সর্বোচ্চ চূড়া। মেঘের ভিউর জন্য বিখ্যাত।' : 'One of the highest peaks in Bangladesh. Famous for its cloudy view.'
         },
         {
             id: 4,
-            name: 'Marayan Tong',
+            name: language === 'bn' ? 'মারায়ন তং' : 'Marayan Tong',
             location: 'Bandarban',
             type: 'Camping',
             level: 'Moderate',
             image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Strong Wind', 'No Water Source'],
-            description: 'A flat camping ground on top of a hill with a 360-degree view.'
-        },
-        {
-            id: 5,
-            name: 'Andharmanik',
-            location: 'Thanchi',
-            type: 'Danger Zone',
-            level: 'Extreme',
-            image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Restricted Area', 'Wild Animals'],
-            description: 'A mysterious and dangerous valley. Entry often restricted.'
-        },
-        {
-            id: 6,
-            name: 'Ham Ham Waterfall',
-            location: 'Moulvibazar',
-            type: 'Waterfall',
-            level: 'Hard',
-            image: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Leech Alert', 'Slippery'],
-            description: 'Deep inside the Rajkandi reserve forest. Famous for leeches.'
-        },
-        {
-            id: 7,
-            name: 'Sundarbans Deep Jungle',
-            location: 'Khulna',
-            type: 'Danger Zone',
-            level: 'Hard',
-            image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Tiger Zone', 'Tides'],
-            description: 'The largest mangrove forest. Home of the Royal Bengal Tiger.'
-        },
-        {
-            id: 8,
-            name: 'Saka Haphong',
-            location: 'Bandarban',
-            type: 'Trekking',
-            level: 'Extreme',
-            image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Very Remote', 'Physical Fitness'],
-            description: 'Currently considered the highest peak. A test of endurance.'
-        },
-        {
-            id: 9,
-            name: 'Nijhum Dwip',
-            location: 'Noakhali',
-            type: 'Camping',
-            level: 'Easy',
-            image: 'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            warnings: ['Deer Crossing'],
-            description: 'A quiet island with mangrove forests and spotted deer.'
+            warnings: language === 'bn' ? ['তীব্র বাতাস'] : ['Strong Wind'],
+            description: language === 'bn' ? 'পাহাড়ের চূড়ায় দারুণ ক্যাম্পিং গ্রাউন্ড।' : 'A flat camping ground on top of a hill with a 360-degree view.'
         }
     ];
 
@@ -102,148 +56,153 @@ const Adventures = () => {
         : adventureSpots.filter(spot => spot.type === difficulty);
 
     return (
-        <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-orange-500 selection:text-white">
+        <div className="min-h-screen bg-white dark:bg-[#050f08] font-sans text-gray-900 dark:text-gray-100 selection:bg-orange-500 selection:text-white transition-colors duration-300">
             {/* Hero Section */}
-            <div className="relative bg-[#022c22] pt-16 pb-24 overflow-hidden rounded-b-[2.5rem]">
-                {/* Background Elements */}
-                <div className="absolute top-0 right-0 w-2/3 h-full bg-[#064e3b] opacity-20 rounded-l-full transform translate-x-1/4"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-orange-500 opacity-10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2"></div>
-
-                <div className="max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <section className="relative pt-32 pb-20 overflow-hidden bg-[#fffaf5] dark:bg-[#081a0e]">
+                {/* Abstract Background Decoration */}
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-orange-50/50 dark:bg-orange-950/20 rounded-l-[10rem] -z-0"></div>
+                
+                <div className="max-w-[1140px] mx-auto px-6 relative z-10">
+                    <div className="flex flex-col lg:flex-row items-center gap-16">
                         {/* Text Content */}
-                        <div className="space-y-4">
-                            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tight text-white leading-tight">
-                                Live Your <br />
-                                <span className="text-orange-500">Adventure</span>
-                            </h1>
-                            <p className="text-base text-gray-300 max-w-lg">
-                                Don't wait until tomorrow, discover your adventure now and feel the sensation of closeness to nature around you.
-                            </p>
+                        <div className="flex-1 space-y-8 text-left">
+                            <motion.div
+                                initial={{ opacity: 0, x: -50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8 }}
+                            >
+                                <h1 className="text-6xl md:text-8xl font-[900] leading-[0.9] text-gray-900 dark:text-white tracking-tighter">
+                                    {language === 'bn' ? <>ট্র্যাকিং ও <br /><span className="text-orange-600">ক্যাম্পিং</span></> : <>Trekking & <br /><span className="text-orange-600">Camping</span></>}
+                                </h1>
+                                <p className="text-xl text-gray-500 dark:text-gray-400 mt-6 max-w-md font-medium">
+                                    {language === 'bn' ? 'আপনার পরবর্তী অ্যাডভেঞ্চারের জন্য একটি সঠিক গাইডলাইন।' : 'A perfect guide to your snow peak adventures and wild forest explorations.'}
+                                </p>
+                            </motion.div>
 
-                            {/* Search Box */}
-                            <div className="bg-white/10 backdrop-blur-md p-1.5 rounded-full border border-white/20 flex items-center max-w-md mt-6">
-                                <div className="flex-1 px-4 border-r border-white/20">
-                                    <label className="block text-[10px] text-gray-400 uppercase tracking-wider">Location</label>
-                                    <input type="text" placeholder="Bandarban, BD" className="w-full bg-transparent text-white text-sm font-bold placeholder-gray-500 focus:outline-none" />
-                                </div>
-                                <div className="flex-1 px-4">
-                                    <label className="block text-[10px] text-gray-400 uppercase tracking-wider">Date</label>
-                                    <input type="text" placeholder="16 Aug 2025" className="w-full bg-transparent text-white text-sm font-bold placeholder-gray-500 focus:outline-none" />
-                                </div>
-                                <button className="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-full transition-colors shadow-lg shadow-orange-500/30">
-                                    <ArrowRight size={20} />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="flex gap-4 pt-4"
+                            >
+                                <button className="bg-orange-600 hover:bg-orange-700 text-white px-10 py-5 rounded-2xl font-black text-lg shadow-2xl shadow-orange-600/30 flex items-center gap-3 group transition-all">
+                                    {language === 'bn' ? 'বুক করুন' : 'BOOK NOW'} 
+                                    <div className="bg-white/20 p-1 rounded-full group-hover:translate-x-1 transition-transform">
+                                        <ArrowRight size={20} />
+                                    </div>
                                 </button>
-                            </div>
+                            </motion.div>
                         </div>
 
                         {/* Hero Image */}
-                        <div className="relative hidden lg:block">
-                            <div className="absolute inset-0 bg-orange-500 rounded-full transform rotate-6 scale-90 opacity-20 blur-xl"></div>
-                            <div className="relative z-10 bg-orange-500 rounded-[2.5rem] p-1.5 rotate-3 shadow-2xl">
-                                <img
-                                    src="https://images.unsplash.com/photo-1526772662000-3f88f107f5d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                                    alt="Hiker"
-                                    className="rounded-[2rem] w-full h-[400px] object-cover -rotate-3 border-4 border-white/10"
-                                />
-                            </div>
+                        <div className="flex-1 relative">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1 }}
+                                className="relative z-10"
+                            >
+                                <div className="w-full h-[500px] rounded-[4rem] rounded-tr-[15rem] rounded-bl-[15rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.2)] border-8 border-white dark:border-gray-800">
+                                    <img 
+                                        src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80" 
+                                        className="w-full h-full object-cover"
+                                        alt="Adventure" 
+                                    />
+                                </div>
 
-                            {/* Floating Badge */}
-                            <div className="absolute bottom-8 -left-8 bg-white p-3 rounded-xl shadow-xl z-20 flex items-center gap-3 animate-bounce duration-[3000ms]">
-                                <div className="bg-green-100 p-2 rounded-full text-green-600">
-                                    <MapPin size={20} />
+                                <div className="absolute -bottom-10 -right-10 bg-white dark:bg-slate-800 p-6 rounded-[2.5rem] shadow-2xl z-20 flex items-center gap-4 border border-gray-50 dark:border-slate-700">
+                                    <div className="flex -space-x-4">
+                                        {[1, 2, 3].map(i => (
+                                            <img key={i} src={`https://i.pravatar.cc/100?u=${i}`} className="w-12 h-12 rounded-full border-4 border-white dark:border-slate-800 shadow-sm" alt="" />
+                                        ))}
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl font-black text-gray-900 dark:text-white leading-none">100k</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">People explored</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase">Location</p>
-                                    <p className="font-bold text-sm text-gray-900">Bandarban, BD</p>
+                                    <p className="font-bold text-sm text-gray-800">Bandarban, BD</p>
                                 </div>
+                            </motion.div>
+                            
+                            {/* Decorative Sparks */}
+                            <div className="absolute -top-10 right-10 text-orange-200 animate-pulse">
+                                <Zap size={40} fill="currentColor" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div className="max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-                {/* Section Header & Filter */}
-                <div className="flex flex-col md:flex-row items-end justify-between mb-10 gap-6">
-                    <div>
-                        <h2 className="text-3xl font-black uppercase text-gray-900 mb-2">
-                            Find Popular <span className="text-orange-500">Destinations</span>
-                        </h2>
-                        <div className="h-1 w-16 bg-orange-500 rounded-full"></div>
-                    </div>
-
-                    {/* Filter Chips */}
-                    <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar">
-                        {[
-                            { name: 'All', icon: null },
-                            { name: 'Trekking', icon: '🧗' },
-                            { name: 'Waterfall', icon: '🌊' },
-                            { name: 'Danger Zone', icon: '⚠️', danger: true },
-                            { name: 'Camping', icon: '⛺' }
-                        ].map(cat => (
-                            <button
-                                key={cat.name}
-                                onClick={() => setDifficulty(cat.name)}
-                                className={`px-5 py-2 rounded-full font-bold text-xs uppercase whitespace-nowrap transition-all flex items-center gap-2 shadow-sm ${difficulty === cat.name
-                                    ? cat.danger ? 'bg-red-600 text-white shadow-red-500/30' : 'bg-orange-500 text-white shadow-orange-500/30'
-                                    : 'bg-white text-gray-500 border border-gray-100 hover:border-orange-500 hover:text-orange-500'
-                                    }`}
-                            >
-                                <span>{cat.icon}</span> {cat.name}
-                            </button>
-                        ))}
-                    </div>
+            <div className="max-w-[1140px] mx-auto px-6 py-24">
+                {/* Section Title */}
+                <div className="text-center mb-16 space-y-4">
+                    <span className="text-orange-600 font-bold uppercase tracking-widest text-sm">Destinations</span>
+                    <h2 className="text-4xl md:text-5xl font-black text-gray-900">Find Your Next <br /> <span className="text-orange-600">Adventure Point</span></h2>
                 </div>
 
-                {/* Adventure Spots Grid */}
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6 mb-16">
+                {/* Filter Chips - Clean Style */}
+                <div className="flex flex-wrap justify-center gap-3 mb-16">
+                    {['All', 'Trekking', 'Waterfall', 'Camping', 'Danger Zone'].map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => setDifficulty(cat)}
+                            className={`px-8 py-3 rounded-2xl font-bold text-sm transition-all ${
+                                difficulty === cat 
+                                ? 'bg-orange-600 text-white shadow-xl shadow-orange-600/20' 
+                                : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                            }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Adventure Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {filteredSpots.map((spot) => (
-                        <div key={spot.id} className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 border border-gray-100 flex flex-col h-full">
-                            {/* Card Image */}
-                            <div className="h-48 overflow-hidden relative shrink-0">
-                                <img src={spot.image} alt={spot.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
-                                <div className="absolute top-3 right-3">
-                                    <span className="bg-white/90 backdrop-blur text-gray-900 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase shadow-sm flex items-center gap-1">
-                                        ⭐ 4.8
-                                    </span>
+                        <motion.div 
+                            key={spot.id} 
+                            whileHover={{ y: -10 }}
+                            className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-50 group"
+                        >
+                            <div className="h-72 relative">
+                                <img src={spot.image} alt={spot.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-orange-600">
+                                    ⭐ 4.9
                                 </div>
-                                <div className="absolute bottom-3 left-3 flex gap-2">
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm ${spot.level === 'Extreme' ? 'bg-red-600 text-white' : spot.level === 'Hard' ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'}`}>
+                                <div className="absolute bottom-6 left-6">
+                                    <span className="px-4 py-1.5 bg-orange-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
                                         {spot.level}
                                     </span>
                                 </div>
                             </div>
-
-                            {/* Card Content */}
-                            <div className="p-4 flex flex-col flex-grow">
-                                <h3 className="text-lg font-black uppercase text-gray-900 mb-1 group-hover:text-orange-500 transition-colors line-clamp-1">{spot.name}</h3>
-                                <div className="flex items-center gap-1 text-gray-500 text-xs mb-3">
-                                    <MapPin size={12} className="text-orange-500" /> {spot.location}
-                                </div>
-
-                                <div className="flex flex-wrap gap-1.5 mb-4">
-                                    {spot.warnings.map(warn => (
-                                        <span key={warn} className="text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded border border-red-100 flex items-center gap-1">
-                                            <AlertTriangle size={8} /> {warn}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+                            <div className="p-8">
+                                <div className="flex justify-between items-start mb-4">
                                     <div>
-                                        <span className="text-xl font-black text-gray-900">$20</span>
-                                        <span className="text-[10px] text-gray-400 font-medium">/Person</span>
+                                        <h4 className="text-2xl font-black text-gray-900 group-hover:text-orange-600 transition-colors">{spot.name}</h4>
+                                        <p className="text-gray-400 text-sm flex items-center gap-1 mt-1 font-medium">
+                                            <MapPin size={14} className="text-orange-600" /> {spot.location}
+                                        </p>
                                     </div>
-                                    <button className="bg-orange-100 hover:bg-orange-500 hover:text-white text-orange-600 px-4 py-1.5 rounded-lg font-bold text-xs transition-all duration-300">
-                                        Book
-                                    </button>
+                                    <div className="text-right">
+                                        <p className="text-2xl font-black text-gray-900">$20</p>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">/Person</p>
+                                    </div>
                                 </div>
+                                <p className="text-gray-500 text-sm leading-relaxed mb-8 line-clamp-2">{spot.description}</p>
+                                <Link 
+                                    to={`/tours/${spot.id}/book`}
+                                    className="w-full block text-center bg-gray-50 group-hover:bg-orange-600 group-hover:text-white text-gray-900 py-4 rounded-2xl font-black transition-all"
+                                >
+                                    Book Adventure
+                                </Link>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
+            </div>
 
                 {/* Bottom CTA */}
                 <div className="bg-[#022c22] rounded-2xl p-8 relative overflow-hidden text-center">

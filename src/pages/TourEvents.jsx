@@ -39,7 +39,10 @@ const TourEvents = () => {
                 title="Group Adventures"
                 subtitle="Join curated group tours organized by trusted agencies."
                 action={
-                    <button className="px-4 py-2 bg-[#1B5E20] text-white text-sm font-bold rounded-lg hover:bg-green-800 transition-colors">
+                    <button 
+                        onClick={() => navigate('/tours/create')}
+                        className="px-4 py-2 bg-[#1B5E20] text-white text-sm font-bold rounded-lg hover:bg-green-800 transition-colors"
+                    >
                         + Create Trip
                     </button>
                 }
