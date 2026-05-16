@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate, Link, useLocation } from 'react-router-dom';
-import { Facebook, Instagram, Youtube, Loader2 } from 'lucide-react';
+import { Facebook, Instagram, Youtube, Loader2, ArrowRight } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import LoginModal from './components/LoginModal';
@@ -77,7 +77,7 @@ import FloatingBackButton from './components/FloatingBackButton';
 import WelcomePopup from './components/WelcomePopup';
 import LiveSupportWidget from './components/ui/LiveSupportWidget';
 import ScrollToTop from './components/ScrollToTop';
-import { cacheEmergencyData, getOfflineData } from './utils/offlineCache';
+import { cacheEmergencyData } from './utils/offlineCache';
 
 import { useAuth } from './hooks/useAuth';
 import Onboarding from './components/Onboarding';

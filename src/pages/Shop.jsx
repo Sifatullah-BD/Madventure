@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { products } from '../data/products';
 import ProductCard from '../components/shop/ProductCard';

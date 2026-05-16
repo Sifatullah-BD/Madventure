@@ -1,7 +1,7 @@
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import LoginModal from '../components/LoginModal';
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import TicketSearch from '../components/tickets/TicketSearch';
 import SearchResults from '../components/tickets/SearchResults';
 import SeatSelection from '../components/tickets/SeatSelection';
@@ -100,18 +100,18 @@ const TicketBooking = () => {
 
                 <AnimatePresence mode="wait">
                     {step === 'search' && (
-                        <motion.div
+                        <Motion.div
                             key="search"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                         >
                             <TicketSearch onSearch={handleSearch} />
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {step === 'results' && (
-                        <motion.div
+                        <Motion.div
                             key="results"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -123,11 +123,11 @@ const TicketBooking = () => {
                                 </button>
                             </div>
                             <SearchResults results={results} onSelectTrip={handleSelectTrip} loading={loading} />
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {step === 'seats' && (
-                        <motion.div
+                        <Motion.div
                             key="seats"
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -140,11 +140,11 @@ const TicketBooking = () => {
                                 <h2 className="text-xl font-black text-gray-900 tracking-tight">Select Your Seats</h2>
                             </div>
                             <SeatSelection trip={selectedTrip} onConfirmBooking={handleConfirmSeats} />
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {step === 'checkout' && (
-                        <motion.div
+                        <Motion.div
                             key="checkout"
                             initial={{ opacity: 0, x: 50 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -162,11 +162,11 @@ const TicketBooking = () => {
                                 totalPrice={selectedSeats.length * selectedTrip.price} 
                                 onPaymentConfirm={handlePaymentConfirm} 
                             />
-                        </motion.div>
+                        </Motion.div>
                     )}
 
                     {step === 'confirmation' && (
-                        <motion.div
+                        <Motion.div
                             key="confirmation"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -188,7 +188,7 @@ const TicketBooking = () => {
                                     Book Another Trip
                                 </button>
                             </div>
-                        </motion.div>
+                        </Motion.div>
                     )}
                 </AnimatePresence>
 

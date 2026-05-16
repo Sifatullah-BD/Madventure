@@ -1,9 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import bangladeshGeoJSON from '../../data/bd-geojson/bangladesh.json';
 
 const ContextMap = ({ districtName }) => {
+    const [bangladeshGeoJSON, setBangladeshGeoJSON] = useState(null);
+
+    useEffect(() => {
+        fetch('/data/bd-geojson/bangladesh.json')
+            .then(res => res.json())
+            .then(data => setBangladeshGeoJSON(data))
+            .catch(err => console.error("Error loading geojson", err));
+    }, []);
+
     // Mapping for district names if they differ between app data and GeoJSON
     const geoJsonNameMapping = {
         "Chattogram": "Chittagong",

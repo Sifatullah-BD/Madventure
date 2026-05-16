@@ -8,7 +8,7 @@ import { sampleBusinesses, sampleListings, sampleReviews, pendingBusinesses } fr
 export const businessService = {
 
     // ─── Businesses ──────────────────────────────────
-    async getBusinesses({ category, district, sort, search, priceRange } = {}) {
+    async getBusinesses({ category, district, sort, search } = {}) {
         if (!isSupabaseConfigured) {
             let results = [...sampleBusinesses].filter(b => b.isApproved);
             if (category && category !== 'ALL') results = results.filter(b => b.category === category);

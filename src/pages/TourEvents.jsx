@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, MapPin } from 'lucide-react';
+import { Search } from 'lucide-react';
 import EventCard from '../components/tours/EventCard';
 import { supabaseService } from '../services/supabaseService';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ const TourEvents = () => {
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [events, setEvents] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, ArrowRight, Filter, X, Loader2 } from 'lucide-react';
+import { Search, MapPin, Filter, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getDistricts, getPlaces } from '../api/destinations';
@@ -7,7 +7,6 @@ import { CardSkeleton } from '../components/ui/LoadingSkeleton';
 import EmptyState from '../components/ui/EmptyState';
 import SEO from '../components/SEO';
 import MapDiscovery from '../components/home/MapDiscovery';
-import { motion } from 'framer-motion';
 import DestinationCard from '../components/district/DestinationCard';
 
 const heroImages = [

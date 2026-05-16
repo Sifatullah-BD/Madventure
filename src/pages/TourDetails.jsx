@@ -54,7 +54,7 @@ const TourDetails = () => {
             setIsWishlisted(false);
             setWishlistId(null);
         } else {
-            const { data, error } = await addToWishlist(user.id, 'tour', id);
+            const { data } = await addToWishlist(user.id, 'tour', id);
             if (data) {
                 setIsWishlisted(true);
                 setWishlistId(data.id);

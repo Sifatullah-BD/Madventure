@@ -41,7 +41,6 @@ const BudgetCalculator = () => {
   }, [formData]);
 
   const calculateBudget = () => {
-    const district = DISTRICTS.find(d => d.id === formData.destinationId);
     let newWarnings = [];
 
     // Date Logic (Peak vs Off-peak)

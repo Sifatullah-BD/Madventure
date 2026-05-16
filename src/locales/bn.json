@@ -10,6 +10,7 @@
     "nav_shop": "শপ",
     "nav_community": "কমিউনিটি",
     "nav_settings": "সেটিংস",
+    "nav_login": "লগইন",
     "theme_forest": "বন",
     "theme_ocean": "সমুদ্র",
     "theme_sunset": "সূর্যাস্ত",
@@ -17,5 +18,18 @@
     "theme_earth": "পৃথিবী",
     "settings_title": "সেটিংস",
     "language_label": "ভাষা",
-    "theme_label": "থিম"
+    "theme_label": "থিম",
+    "destinations_title": "বাংলাদেশ ঘুরে দেখুন",
+    "destinations_subtitle": "বাংলাদেশের লুকানো রত্ন, ঐতিহাসিক স্থান এবং প্রাকৃতিক সৌন্দর্য আবিষ্কার করুন।",
+    "search_placeholder": "গন্তব্য, জেলা বা পর্যটন কেন্দ্র খুঁজুন...",
+    "popular_destinations": "জনপ্রিয় গন্তব্য",
+    "explore_by_district": "জেলা ভিত্তিক অনুসন্ধান",
+    "all_divisions": "সব বিভাগ",
+    "view_details": "বিস্তারিত দেখুন",
+    "spots": "স্পট",
+    "more": "আরও",
+    "no_destinations": "কোনো গন্তব্য খুঁজে পাওয়া যায়নি",
+    "no_destinations_desc": "\"{{searchTerm}}\" এর সাথে মিলে এমন কোনো জায়গা পাওয়া যায়নি। অন্য কিছু লিখে খুঁজুন।",
+    "clear_search": "সার্চ মুছুন",
+    "explore_bangladesh": "বাংলাদেশ ভ্রমণ"
 }

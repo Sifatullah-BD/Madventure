@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const TourBookingFlow = () => {
     const { id } = useParams();
+    // eslint-disable-next-line no-unused-vars
     const navigate = useNavigate();
     const { user } = useAuth();
     const [tour, setTour] = useState(null);
@@ -41,7 +42,7 @@ const TourBookingFlow = () => {
         };
         fetchTour();
         logEvent('tour_booking_started', { tour_id: id }, user?.id);
-    }, [id]);
+    }, [id, user?.id]);
 
     if (loading) return <div className="min-h-screen pt-24 text-center">Loading booking engine...</div>;
     if (error || !tour) return <div className="min-h-screen pt-24 text-center text-red-500 font-bold">{error}</div>;

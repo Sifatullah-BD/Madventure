@@ -27,5 +27,9 @@
     "all_divisions": "جميع الأقسام",
     "view_details": "عرض التفاصيل",
     "spots": "أماكن",
-    "more": "المزيد"
+    "more": "المزيد",
+    "no_destinations": "لم يتم العثور على وجهات",
+    "no_destinations_desc": "لم نتمكن من العثور على أي أماكن تطابق \"{{searchTerm}}\". حاول استخدام مصطلح بحث آخر.",
+    "clear_search": "مسح البحث",
+    "explore_bangladesh": "استكشف بنغلاديش"
 }

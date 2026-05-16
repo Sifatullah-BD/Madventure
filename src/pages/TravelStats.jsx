@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
-import { Award, Map, Globe, Clock, TrendingUp, Share2, Leaf, DollarSign, Camera, Mountain, Tent, Building } from 'lucide-react';
+import { Award, Map, Globe, Clock, TrendingUp, Share2, Leaf, DollarSign, Camera, Tent } from 'lucide-react';
 
 const TravelStats = () => {
     const [showShareModal, setShowShareModal] = useState(false);
@@ -14,7 +14,7 @@ const TravelStats = () => {
         { label: 'Eco Score', value: '85/100', icon: <Leaf className="text-teal-500" />, color: 'bg-teal-50' },
     ];
 
-    const [badges, setBadges] = useState([
+    const [badges] = useState([
         { name: 'Explorer', icon: '🌍', desc: 'Visited 5 cities', unlocked: true },
         { name: 'Mountain Lover', icon: '🏔️', desc: 'Summit 3 peaks', unlocked: true },
         { name: 'Beach Hunter', icon: '🏖️', desc: 'Visit 3 beaches', unlocked: true },

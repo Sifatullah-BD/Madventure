@@ -4,7 +4,7 @@ import ItineraryGenerator from '../components/planner/ItineraryGenerator';
 import BudgetCalculator from '../components/planner/BudgetCalculator';
 import SmartChecklist from '../components/planner/SmartChecklist';
 
-const SmartPlanner = ({ user }) => {
+const SmartPlanner = () => {
     const [activeTab, setActiveTab] = useState('itinerary');
 
     // Simple scroll to top on tab change

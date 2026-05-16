@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Phone, Calendar, Camera, AlertCircle, CheckCircle, Shield, MessageCircle, Printer, Gift, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Calendar, Camera, Shield, MessageCircle, Loader2, Search, AlertCircle, CheckCircle, Printer, Gift } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import ClaimModal from '../components/lostfound/ClaimModal';
 import ChatModal from '../components/lostfound/ChatModal';
@@ -14,6 +14,7 @@ const LostFound = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Modals State
     const [claimModal, setClaimModal] = useState({ isOpen: false, item: null });
@@ -103,7 +104,11 @@ const LostFound = () => {
         alert('Claim submitted! The reporter will review your answer.');
     };
 
-    const filteredItems = items.filter(item => item.status === activeTab);
+    const filteredItems = items.filter(item => 
+        item.status === activeTab && 
+        (item.item.toLowerCase().includes(searchQuery.toLowerCase()) || 
+         item.location.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
     return (
         <div className="h-full bg-gray-50 dark:bg-gray-950">
@@ -121,21 +126,32 @@ const LostFound = () => {
             />
             <div className="max-w-5xl mx-auto px-4 pb-12">
 
-                {/* Tabs */}
-                <div className="flex justify-center mb-8">
+                {/* Tabs & Search */}
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
                     <div className="bg-white p-1 rounded-full shadow-sm flex">
                         <button
                             onClick={() => setActiveTab('lost')}
-                            className={`px-8 py-2 rounded-full font-bold transition-all ${activeTab === 'lost' ? 'bg-red-500 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+                            className={`px-8 py-2 rounded-full font-bold transition-all flex items-center gap-2 ${activeTab === 'lost' ? 'bg-red-500 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
                         >
-                            Lost Something?
+                            {activeTab === 'lost' && <AlertCircle size={16} />} Lost Something?
                         </button>
                         <button
                             onClick={() => setActiveTab('found')}
-                            className={`px-8 py-2 rounded-full font-bold transition-all ${activeTab === 'found' ? 'bg-green-500 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+                            className={`px-8 py-2 rounded-full font-bold transition-all flex items-center gap-2 ${activeTab === 'found' ? 'bg-green-500 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
                         >
-                            Found Something?
+                            {activeTab === 'found' && <CheckCircle size={16} />} Found Something?
                         </button>
+                    </div>
+
+                    <div className="relative w-full md:w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input 
+                            type="text" 
+                            placeholder="Search items..." 
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
                     </div>
                 </div>
 
@@ -172,15 +188,16 @@ const LostFound = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Date (Approx)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Reward (Optional)</label>
                                 <div className="relative">
-                                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                    <Gift className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                                     <input
-                                        type="date"
-                                        name="date"
-                                        value={newItem.date}
+                                        type="text"
+                                        name="reward"
+                                        value={newItem.reward}
                                         onChange={handleInputChange}
                                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        placeholder="e.g. ৳500 or Treat"
                                     />
                                 </div>
                             </div>
@@ -244,24 +261,34 @@ const LostFound = () => {
                                     <div>
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="text-xl font-bold text-gray-800">{item.item}</h3>
-                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${item.status === 'lost' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 ${item.status === 'lost' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                                                {item.status === 'lost' ? <AlertCircle size={12} /> : <CheckCircle size={12} />}
                                                 {item.status}
                                             </span>
                                         </div>
                                         <p className="text-gray-600 mb-4 line-clamp-2">{item.description}</p>
-                                        <div className="space-y-2 text-sm text-gray-500">
+                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
                                             <div className="flex items-center gap-2">
                                                 <MapPin size={16} className="text-primary" /> {item.location}
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Calendar size={16} className="text-primary" /> {new Date(item.date).toLocaleDateString()}
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <Phone size={16} className="text-primary" /> {item.contact || 'N/A'}
-                                            </div>
+                                            {item.reward && (
+                                                <div className="flex items-center gap-2 text-orange-600 font-bold">
+                                                    <Gift size={16} /> {item.reward}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-3 justify-end">
+                                    <div className="mt-4 pt-4 border-t border-gray-100 flex flex-wrap gap-3 justify-end items-center">
+                                        <button
+                                            onClick={() => setPosterModal({ isOpen: true, item })}
+                                            className="text-gray-400 hover:text-primary transition-colors p-2"
+                                            title="Generate Poster"
+                                        >
+                                            <Printer size={20} />
+                                        </button>
                                         <button
                                             onClick={() => setChatModal({ isOpen: true, item })}
                                             className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 font-bold text-sm hover:bg-blue-100 transition-colors"

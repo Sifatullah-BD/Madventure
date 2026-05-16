@@ -48,6 +48,7 @@ const ItineraryGenerator = () => {
     if (savedPlan) {
       const parsed = JSON.parse(savedPlan);
       if (parsed.result) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFormData(parsed.formData);
         setResult(parsed.result);
         setStep(6);
@@ -135,7 +136,7 @@ const ItineraryGenerator = () => {
       share_slug: `${result.district.id}-${Date.now().toString(36)}`
     };
 
-    const { data, error } = await saveItinerary(itineraryData);
+    const { error } = await saveItinerary(itineraryData);
     if (error) {
       alert(error.message);
     } else {

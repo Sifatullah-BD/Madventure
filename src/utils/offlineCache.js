@@ -21,7 +21,7 @@ export const getOfflineData = () => {
         const stored = localStorage.getItem('madventure_offline');
         if (stored) return JSON.parse(stored);
         return null;
-    } catch (e) {
+    } catch {
         return null;
     }
 };

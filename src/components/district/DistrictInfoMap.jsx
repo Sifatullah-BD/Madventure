@@ -1,13 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Info, History, MapPin } from 'lucide-react';
 import { MapContainer, TileLayer, GeoJSON, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Import the new comprehensive GeoJSON
-import bangladeshGeoJSON from '../../data/bd-geojson/bangladesh.json';
-
 const DistrictInfoMap = ({ district }) => {
+    const [bangladeshGeoJSON, setBangladeshGeoJSON] = useState(null);
+
+    useEffect(() => {
+        fetch('/data/bd-geojson/bangladesh.json')
+            .then(res => res.json())
+            .then(data => setBangladeshGeoJSON(data))
+            .catch(err => console.error("Error loading geojson", err));
+    }, []);
+
     // 1. Filter features for this district (showing its Upazilas)
     const districtFeatures = useMemo(() => {
         if (!bangladeshGeoJSON || !district) return null;

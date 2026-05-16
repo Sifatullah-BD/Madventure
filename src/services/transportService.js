@@ -1,7 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 export const transportService = {
-    async searchTransports({ from, to, date, type } = {}) {
+    async searchTransports({ from, to, type } = {}) {
         if (!isSupabaseConfigured) {
             // Mock data fallback for demo
             return [
