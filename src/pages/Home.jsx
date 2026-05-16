@@ -1,3 +1,8 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MapPin, Calendar, DollarSign, Star, Quote, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
 import { useLanguage } from '../context/LanguageContext';
 
 const Home = () => {
@@ -182,9 +187,9 @@ const Home = () => {
                     <h2 className="text-4xl md:text-5xl font-black mt-4 mb-16">{language === 'bn' ? 'আপনার জন্য সেরা সব ফিচার' : 'Best Features For You'}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
-                            { icon: "⛺", title: language === 'bn' ? "অজস্র পছন্দ" : "Lots of Choices", desc: "We provide several choices of destinations and travelling packages." },
-                            { icon: "🗺️", title: language === 'bn' ? "সেরা ট্যুর গাইড" : "Best Tour Guide", desc: "Professional tour guides who understand the local culture." },
-                            { icon: "🎟️", title: language === 'bn' ? "সহজ বুকিং" : "Easy Booking", desc: "Easy to book tickets or the place you want with one click." }
+                            { icon: "⛺", title: language === 'bn' ? "অজস্র পছন্দ" : "Lots of Choices", desc: language === 'bn' ? "আমরা বিভিন্ন ধরনের গন্তব্য এবং ট্রাভেল প্যাকেজ সরবরাহ করি।" : "We provide several choices of destinations and travelling packages." },
+                            { icon: "🗺️", title: language === 'bn' ? "সেরা ট্যুর গাইড" : "Best Tour Guide", desc: language === 'bn' ? "স্থানীয় সংস্কৃতি বোঝে এমন পেশাদার ট্যুর গাইড।" : "Professional tour guides who understand the local culture." },
+                            { icon: "🎟️", title: language === 'bn' ? "সহজ বুকিং" : "Easy Booking", desc: language === 'bn' ? "এক ক্লিকেই আপনার পছন্দের জায়গা বুক করুন।" : "Easy to book tickets or the place you want with one click." }
                         ].map((f, i) => (
                             <motion.div 
                                 key={i} 
@@ -239,31 +244,38 @@ const Home = () => {
             </section>
 
             {/* 5. Testimonials - Traver Style */}
-            <section className="py-24 bg-gray-50 text-gray-900">
+            <section className="py-24 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-24 items-center">
                     <div className="flex-1 space-y-8">
-                        <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">What They Say ——</span>
-                        <h2 className="text-4xl md:text-5xl font-black text-gray-900">What Our Customer <br /> Say About Us</h2>
-                        <div className="bg-white p-10 rounded-[3rem] shadow-sm border border-gray-100 relative">
-                            <Quote className="text-orange-100 absolute top-8 right-8" size={80} />
+                        <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">{language === 'bn' ? 'মতামত' : 'What They Say'} ——</span>
+                        <h2 className="text-4xl md:text-5xl font-black">{language === 'bn' ? <>আমাদের গ্রাহকরা <br /> কী বলেন</> : <>What Our Customers <br /> Say About Us</>}</h2>
+                        <div className="bg-white dark:bg-gray-800 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 relative">
+                            <Quote className="text-orange-100 dark:text-orange-900/30 absolute top-8 right-8" size={80} />
                             <div className="flex gap-1 mb-6">
                                 {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FFD700" className="text-yellow-400" />)}
                             </div>
-                            <p className="text-gray-600 text-lg leading-relaxed italic mb-8 relative z-10">"{reviews[0].text}"</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed italic mb-8 relative z-10">"{reviews[0].text}"</p>
                             <div className="flex items-center gap-4">
                                 <img src={reviews[0].avatar} className="w-14 h-14 rounded-full border-2 border-orange-500" alt="" />
                                 <div>
-                                    <h4 className="font-black text-gray-900">{reviews[0].name}</h4>
-                                    <p className="text-xs text-gray-400 font-bold">Travel Enthusiast</p>
+                                    <h4 className="font-black">{reviews[0].name}</h4>
+                                    <p className="text-xs text-gray-400 font-bold">{language === 'bn' ? 'ভ্রমণ উৎসাহী' : 'Travel Enthusiast'}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="flex-1">
                         <div className="grid grid-cols-3 gap-4">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
+                            {[
+                                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
+                                'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80',
+                                'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80',
+                                'https://images.unsplash.com/photo-1596895111956-bf57059e00fa?auto=format&fit=crop&w=400&q=80',
+                                'https://images.unsplash.com/photo-1590603740183-980e7f6920eb?auto=format&fit=crop&w=400&q=80',
+                                'https://images.unsplash.com/photo-1589886307379-342410a563b7?auto=format&fit=crop&w=400&q=80'
+                            ].map((url, i) => (
                                 <div key={i} className={`rounded-2xl overflow-hidden h-40 ${i % 2 === 0 ? 'mt-8' : ''}`}>
-                                    <img src={`https://images.unsplash.com/photo-${1500000000000 + i}?auto=format&fit=crop&w=400&q=80`} className="w-full h-full object-cover" alt="" />
+                                    <img src={url} className="w-full h-full object-cover" alt="" />
                                 </div>
                             ))}
                         </div>
@@ -296,7 +308,7 @@ const Home = () => {
                                 className="group cursor-pointer relative"
                             >
                                 <div className="h-[550px] rounded-[3.5rem] overflow-hidden relative shadow-2xl border border-white/5">
-                                    <OptimizedImage src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                                    <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" loading="lazy" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#050f08] via-[#050f08]/10 to-transparent"></div>
                                     <div className="absolute top-10 left-10">
                                         <span className="px-5 py-2 bg-forest-light/90 backdrop-blur-md rounded-full text-[10px] font-black text-white uppercase tracking-widest">{post.category}</span>
