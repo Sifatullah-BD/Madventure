@@ -103,14 +103,14 @@ const Home = () => {
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.3 }}
-                        className="bg-white dark:bg-gray-800 rounded-[2.5rem] p-3 md:p-4 shadow-2xl mx-auto max-w-4xl grid grid-cols-1 md:grid-cols-4 gap-4"
+                        className="bg-white/10 dark:bg-black/30 backdrop-blur-md rounded-3xl p-2 md:p-3 shadow-2xl mx-auto max-w-3xl grid grid-cols-1 md:grid-cols-4 gap-3 border border-white/10"
                     >
-                        <div className="flex items-center px-5 py-3 bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 group focus-within:bg-white transition-all">
-                            <MapPin className="text-[#1B5E20]" size={20} />
-                            <div className="text-left ml-3 flex-grow">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase">Location</p>
+                        <div className="flex items-center px-4 py-2 bg-white/5 dark:bg-white/5 rounded-xl border border-white/10 group focus-within:bg-white/10 transition-all">
+                            <MapPin className="text-[#1B5E20]" size={18} />
+                            <div className="text-left ml-2 flex-grow">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase">Location</p>
                                 <select 
-                                    className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-sm font-bold appearance-none cursor-pointer"
+                                    className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-xs font-bold appearance-none cursor-pointer"
                                     value={destination} 
                                     onChange={e => setDestination(e.target.value)}
                                 >
@@ -119,35 +119,36 @@ const Home = () => {
                                         div.districts.map(d => ({ name: d.name, division: div.division }))
                                     ).sort((a, b) => a.name.localeCompare(b.name)).map((dist, idx) => (
                                         <option key={idx} value={dist.name} className="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
-                                            {dist.name} ({dist.division.replace(' Division', '')})
+                                            {dist.name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                         </div>
-                        <div className="flex items-center px-5 py-3 bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 group focus-within:bg-white transition-all">
-                            <Calendar className="text-[#1B5E20]" size={20} />
-                            <div className="text-left ml-3">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase">Date</p>
-                                <input type="date" className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-sm font-bold" value={date} onChange={e => setDate(e.target.value)} />
+                        <div className="flex items-center px-4 py-2 bg-white/5 dark:bg-white/5 rounded-xl border border-white/10 group focus-within:bg-white/10 transition-all">
+                            <Calendar className="text-[#1B5E20]" size={18} />
+                            <div className="text-left ml-2">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase">Date</p>
+                                <input type="date" className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-xs font-bold" value={date} onChange={e => setDate(e.target.value)} />
                             </div>
                         </div>
-                        <div className="flex items-center px-5 py-3 bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 group focus-within:bg-white transition-all">
-                            <DollarSign className="text-[#1B5E20]" size={20} />
-                            <div className="text-left ml-3">
-                                <p className="text-[10px] font-bold text-gray-400 uppercase">Budget</p>
-                                <select className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-sm font-bold appearance-none cursor-pointer" value={budget} onChange={e => setBudget(e.target.value)}>
-                                    <option value="">{language === 'bn' ? 'বাজেট নির্বাচন করুন' : 'Select Budget'}</option>
+                        <div className="flex items-center px-4 py-2 bg-white/5 dark:bg-white/5 rounded-xl border border-white/10 group focus-within:bg-white/10 transition-all">
+                            <DollarSign className="text-[#1B5E20]" size={18} />
+                            <div className="text-left ml-2">
+                                <p className="text-[9px] font-bold text-gray-400 uppercase">Budget</p>
+                                <select className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-xs font-bold appearance-none cursor-pointer" value={budget} onChange={e => setBudget(e.target.value)}>
+                                    <option value="">{language === 'bn' ? 'বাজেট' : 'Budget'}</option>
                                     <option value="low">৳০ - ৳৩,০০০</option>
                                     <option value="med">৳৩,০০০ - ৳৭,০০০</option>
                                     <option value="high">৳৭,০০০+</option>
                                 </select>
                             </div>
                         </div>
-                        <button onClick={handleSearch} className="bg-[#1B5E20] hover:bg-green-800 text-white rounded-2xl font-black transition-all active:scale-95 shadow-lg">
+                        <button onClick={handleSearch} className="bg-[#1B5E20] hover:bg-green-800 text-white rounded-xl font-black transition-all active:scale-95 shadow-lg text-sm">
                             {language === 'bn' ? 'শুরু করুন' : 'Get Started'}
                         </button>
                     </motion.div>
+
                 </div>
             </section>
 

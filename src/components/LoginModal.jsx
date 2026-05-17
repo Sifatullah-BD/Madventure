@@ -85,7 +85,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-[#0a140d] rounded-[3rem] shadow-[0_0_100px_rgba(34,197,94,0.1)] w-full max-w-5xl h-[700px] flex overflow-hidden border border-white/5 relative"
+                className="bg-[#0a140d] rounded-[2.5rem] shadow-[0_0_100px_rgba(34,197,94,0.1)] w-full max-w-4xl h-[600px] flex overflow-hidden border border-white/5 relative"
             >
                 {/* Close Button */}
                 <button 
@@ -104,10 +104,10 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                         alt="Adventure"
                     />
                     
-                    <div className="relative z-10 p-16 flex flex-col justify-between h-full">
+                    <div className="relative z-10 p-10 flex flex-col justify-between h-full">
                         <div>
-                            <img src="/madventure-logo-v2.png" alt="Logo" className="h-10 w-auto mb-12 opacity-90" />
-                            <h2 className="text-5xl font-black text-white leading-tight tracking-tighter mb-6">
+                            <img src="/madventure-logo-v2.png" alt="Logo" className="h-8 w-auto mb-8 opacity-90" />
+                            <h2 className="text-4xl font-black text-white leading-tight tracking-tighter mb-4">
                                 EXPLORE <br />
                                 <span className="text-forest-light">THE UNKNOWN</span>
                             </h2>
@@ -148,7 +148,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                 </div>
 
                 {/* Right Side: Glassmorphic Form */}
-                <div className="w-full lg:w-1/2 p-8 sm:p-16 flex flex-col justify-center relative bg-[#0a140d]">
+                <div className="w-full lg:w-1/2 p-6 sm:p-10 flex flex-col justify-center relative bg-[#0a140d]">
                     <AnimatePresence mode="wait">
                         {step === 1 ? (
                             <motion.div 
