@@ -91,7 +91,7 @@ const Home = () => {
                         transition={{ duration: 1 }}
                     >
                         <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-white mb-6 tracking-tighter leading-tight shadow-text">
-                            {language === 'bn' ? <>নতুনত্বের টানে <br /> <span className="text-white">বাংলাদেশ ঘুরে দেখো</span></> : <>Explore the <br /> <span className="text-white">Beauty of Bangladesh</span></>}
+                            {language === 'bn' ? <>অজানা ট্রেইল ও সৌন্দর্যের খোঁজে <br /> <span className="text-[#A5D6A7]">ঘুরে দেখুন প্রিয় বাংলাদেশ</span></> : <>Unveil Hidden Wonders <br /> <span className="text-[#A5D6A7]">Across Scenic Bangladesh</span></>}
                         </h1>
                         <p className="text-gray-100 text-lg md:text-xl mb-12 font-medium max-w-2xl mx-auto drop-shadow-lg">
                             {language === 'bn' ? '৬৪ জেলা • ৫০০+ প্যাকেজ • ১০০+ বিশ্বস্ত গাইড।' : '64 Districts • 500+ Packages • 100+ Trusted Guides.'}
@@ -226,7 +226,7 @@ const Home = () => {
                     <h2 className="text-4xl md:text-5xl font-black mt-4 mb-4">{language === 'bn' ? 'আপনার পছন্দের গন্তব্যটি খুঁজে নিন' : "Explore Your Dream Destination!"}</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto mb-16">{language === 'bn' ? 'আমরা প্রতি সপ্তাহে জনপ্রিয় সব ট্যুর প্যাকেজ সাজিয়ে থাকি।' : "Popular destinations recommended every week just for you."}</p>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {trendingTours.map((tour) => (
                             <motion.div 
                                 key={tour.id} 
