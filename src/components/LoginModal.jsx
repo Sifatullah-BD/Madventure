@@ -15,7 +15,7 @@ const STYLES = [
 ];
 
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
-    const { login, register } = useAuth();
+    const { login, register, signInWithGoogle } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [step, setStep] = useState(1); // 1: Auth, 2: Personalization
     const [email, setEmail] = useState('');
@@ -170,11 +170,15 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                                 {/* Social Logins */}
                                 <div className="grid grid-cols-3 gap-3 mb-8">
                                     {[
-                                        { icon: Google, label: 'Google', color: 'bg-white/5 border-white/5 hover:bg-white/10' },
+                                        { icon: Google, label: 'Google', color: 'bg-white/5 border-white/5 hover:bg-white/10', action: signInWithGoogle },
                                         { icon: Facebook, label: 'FB', color: 'bg-blue-600/10 border-blue-600/20 hover:bg-blue-600/20' },
                                         { icon: Github, label: 'Apple', color: 'bg-white/5 border-white/5 hover:bg-white/10' }
                                     ].map((social, idx) => (
-                                        <button key={idx} className={`${social.color} border py-3 rounded-2xl flex items-center justify-center transition-all group`}>
+                                        <button 
+                                            key={idx} 
+                                            onClick={social.action}
+                                            className={`${social.color} border py-3 rounded-2xl flex items-center justify-center transition-all group`}
+                                        >
                                             <social.icon size={20} className="text-white/60 group-hover:text-white transition-colors" />
                                         </button>
                                     ))}

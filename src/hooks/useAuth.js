@@ -85,12 +85,29 @@ export const useAuth = () => {
         await supabase.auth.signOut();
     };
 
+    // Google Sign In Function
+    const signInWithGoogle = async () => {
+        if (!isSupabaseConfigured) {
+            alert('Supabase is not configured for Google Auth.');
+            return { error: new Error('Supabase not configured') };
+        }
+
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'https://madventure-six.vercel.app'
+            }
+        });
+        return { data, error };
+    };
+
     return {
         user,
         loading,
         login,
         register,
         logout,
+        signInWithGoogle,
         isSupabaseConfigured
     };
 };
