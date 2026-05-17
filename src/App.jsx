@@ -175,8 +175,6 @@ const AppContent = () => {
     }
     setShowLogin(false);
     setShowWelcome(true);
-    // Navigate to home page after login/signup
-    navigate('/');
   };
 
   const handleLogout = async () => {

@@ -41,14 +41,14 @@ export const useAuth = () => {
     };
 
     // Register Function
-    const register = async (email, password, name) => {
+    const register = async (email, password, userData) => {
         if (!isSupabaseConfigured) {
             // Mock register behavior
             return new Promise((resolve) => {
                 setTimeout(() => {
                     const newUser = {
                         id: `usr_${Date.now()}`,
-                        name,
+                        name: userData.name || 'Demo User',
                         email,
                         role: 'Traveler'
                     };
@@ -65,11 +65,22 @@ export const useAuth = () => {
             password,
             options: {
                 data: {
-                    full_name: name,
+                    full_name: userData.name,
+                    phone: userData.phone,
+                    gender: userData.gender,
+                    styles: userData.styles,
                     role: 'Traveler'
                 }
             }
         });
+
+        // Update profiles table if trigger didn't handle everything or to ensure data is saved
+        if (data?.user) {
+            await supabase.from('profiles').update({
+                phone: userData.phone,
+                // We can add more fields here if the profiles table has them
+            }).eq('id', data.user.id);
+        }
 
         return { user: data?.user, error };
     };
@@ -95,7 +106,7 @@ export const useAuth = () => {
         const { data, error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: 'https://madventure-six.vercel.app'
+                redirectTo: window.location.href
             }
         });
         return { data, error };
