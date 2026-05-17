@@ -48,27 +48,89 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!user) return;
-        // In a real app, we'd fetch actual data here
-        // Using mock data for visual demonstration as per instructions
+        if (!user?.id) return;
+        
+        const fetchProfile = async () => {
+            setLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                
+                if (error) throw error;
+                if (data) {
+                    setProfileForm({
+                        name: data.full_name || user.name || 'User Name',
+                        username: data.username || user.username || 'traveler_01',
+                        email: user.email || '',
+                        phone: data.phone || user.phone || '',
+                        bio: data.bio || '',
+                        location: data.district ? `${data.district}, ${data.division}` : '',
+                        avatar: data.avatar_url || user.avatar || null
+                    });
+                }
+            } catch (err) {
+                console.error('Error fetching profile:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
     }, [user]);
 
-    const handleUpdateProfile = (e) => {
+    const handleUpdateProfile = async (e) => {
         e.preventDefault();
-        onUpdateUser({ ...user, ...profileForm });
-        toast.success('প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
+        if (!user?.id) return;
+
+        setLoading(true);
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({
+                    full_name: profileForm.name,
+                    phone: profileForm.phone,
+                    bio: profileForm.bio,
+                    // we can split location if needed or store as is if column exists
+                })
+                .eq('id', user.id);
+
+            if (error) throw error;
+
+            onUpdateUser({ ...user, ...profileForm });
+            toast.success('প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
+        } catch (err) {
+            console.error('Error updating profile:', err);
+            toast.error('প্রোফাইল আপডেট করতে সমস্যা হয়েছে।');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
-        if (file) {
+        if (file && user?.id) {
             setIsUploading(true);
             try {
+                // Upload to Supabase Storage
                 const { data, error } = await uploadImages('avatars', [file]);
                 if (error) throw error;
+                
                 if (data && data[0]) {
-                    setProfileForm(prev => ({ ...prev, avatar: data[0] }));
-                    onUpdateUser({ ...user, avatar: data[0] });
+                    const avatarUrl = data[0];
+                    
+                    // Update profiles table
+                    const { error: updateErr } = await supabase
+                        .from('profiles')
+                        .update({ avatar_url: avatarUrl })
+                        .eq('id', user.id);
+                        
+                    if (updateErr) throw updateErr;
+
+                    setProfileForm(prev => ({ ...prev, avatar: avatarUrl }));
+                    onUpdateUser({ ...user, avatar: avatarUrl });
                     toast.success('ছবি আপডেট করা হয়েছে!');
                 }
             } catch (err) {
