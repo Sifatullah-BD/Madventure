@@ -14,7 +14,7 @@ const CATEGORIES = [
     { id: 'alert', label: 'সতর্কতা' }
 ];
 
-const Forum = ({ onSelectThread }) => {
+const Forum = ({ onSelectThread, onLoginRequired }) => {
     const { user } = useAuth();
     const { language } = useLanguage();
     const [threads, setThreads] = useState([]);
@@ -150,7 +150,8 @@ const Forum = ({ onSelectThread }) => {
                                         likes: thread.upvotes || 0,
                                         replyCount: 0 // Fetching replies separately in detail
                                     }} 
-                                    onClick={onSelectThread} 
+                                onClick={onSelectThread} 
+                                    onLoginRequired={onLoginRequired}
                                 />
                             ))}
                             {filteredThreads.length === 0 && (

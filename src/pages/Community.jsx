@@ -7,6 +7,8 @@ import ThreadDetail from '../components/community/ThreadDetail';
 import TravelPartner from '../components/community/TravelPartner';
 import { Users, MessagesSquare } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import LoginModal from '../components/LoginModal';
+import { useAuth } from '../hooks/useAuth';
 
 const Community = () => {
     const location = useLocation();
@@ -20,6 +22,8 @@ const Community = () => {
 
     const [activeTab, setActiveTab] = useState(initialTab); // 'forum' | 'partner'
     const [selectedThread, setSelectedThread] = useState(initialThread); // null | threadId
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const { user } = useAuth();
 
     // Sync state to URL without reloading
     useEffect(() => {
@@ -96,13 +100,14 @@ const Community = () => {
                             <ThreadDetail threadId={selectedThread} onBack={handleBackToForum} />
                         ) : (
                             <>
-                                {activeTab === 'forum' && <Forum onSelectThread={setSelectedThread} />}
+                                {activeTab === 'forum' && <Forum onSelectThread={setSelectedThread} onLoginRequired={() => setShowLoginModal(true)} />}
                                 {activeTab === 'partner' && <TravelPartner />}
                             </>
                         )}
                     </motion.div>
                 </AnimatePresence>
             </div>
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={() => setShowLoginModal(false)} />
         </div>
     );
 };

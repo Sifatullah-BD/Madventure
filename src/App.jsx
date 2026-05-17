@@ -156,10 +156,27 @@ const AppContent = () => {
   }, []);
 
   const handleLogin = (userData) => {
-    // Auth state is handled inside AuthContext. Just manage UI.
+    // Immediately sync user into AuthContext to prevent white screen
+    if (userData) {
+      const shaped = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.user_metadata?.full_name || userData.email?.split('@')[0] || 'Traveler',
+        avatar: userData.user_metadata?.avatar_url || 
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.email?.split('@')[0] || 'T')}&background=1B5E20&color=fff`,
+        app_role: userData.user_metadata?.app_role || 'traveler',
+        role: 'Traveler',
+        user_metadata: userData.user_metadata
+      };
+      try {
+        localStorage.setItem('madventure_user', JSON.stringify(shaped));
+      } catch {}
+      setUser(shaped);
+    }
     setShowLogin(false);
     setShowWelcome(true);
-    navigate('/dashboard');
+    // Navigate to home page after login/signup
+    navigate('/');
   };
 
   const handleLogout = async () => {
