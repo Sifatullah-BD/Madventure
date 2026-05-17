@@ -25,7 +25,7 @@ const StudentTours = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#050f08] transition-colors">
 
 
             {/* Hero Banner */}
@@ -44,26 +44,26 @@ const StudentTours = () => {
 
             {/* Filters */}
             <div className="max-w-[1140px] mx-auto px-4 -mt-8 relative z-20 mb-12">
-                <div className="bg-white p-4 rounded-xl shadow-lg flex flex-wrap items-center justify-center gap-4 border border-gray-100">
-                    <div className="flex items-center gap-2 text-gray-500 font-bold mr-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg flex flex-wrap items-center justify-center gap-4 border border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 font-bold mr-4">
                         <ListFilter size={20} />
                         Filters:
                     </div>
                     <button
                         onClick={() => setFilter('all')}
-                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                     >
                         All Tours
                     </button>
                     <button
                         onClick={() => setFilter('under1000')}
-                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === 'under1000' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === 'under1000' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                     >
                         Under 1000৳
                     </button>
                     <button
                         onClick={() => setFilter('1day')}
-                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === '1day' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${filter === '1day' ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                     >
                         1 Day Trips
                     </button>
@@ -76,7 +76,7 @@ const StudentTours = () => {
                     {filteredTours.map((district) => {
                         const tour = district.student_tours[0];
                         return (
-                            <div key={district.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                            <div key={district.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 group">
                                 {/* Image */}
                                 <div className="relative h-56 overflow-hidden">
                                     <img
@@ -84,7 +84,7 @@ const StudentTours = () => {
                                         alt={tour.title}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     />
-                                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 shadow-sm flex items-center gap-1">
+                                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-gray-800 dark:text-gray-200 shadow-sm flex items-center gap-1">
                                         <Clock size={14} className="text-orange-500" />
                                         {tour.duration}
                                     </div>
@@ -96,22 +96,22 @@ const StudentTours = () => {
 
                                 {/* Content */}
                                 <div className="p-6">
-                                    <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-3 group-hover:text-primary transition-colors">
                                         {tour.title}
                                     </h3>
 
                                     <div className="flex flex-wrap gap-2 mb-6">
                                         {tour.spots.slice(0, 3).map((spot, idx) => (
-                                            <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+                                            <span key={idx} className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md">
                                                 {spot}
                                             </span>
                                         ))}
                                     </div>
 
-                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-700">
                                         <div>
-                                            <p className="text-xs text-gray-500 mb-1">Estimated Cost</p>
-                                            <p className="text-green-600 font-bold text-lg flex items-center gap-1">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Estimated Cost</p>
+                                            <p className="text-green-600 dark:text-green-400 font-bold text-lg flex items-center gap-1">
                                                 <Wallet size={18} />
                                                 {tour.budget}
                                             </p>
@@ -131,7 +131,7 @@ const StudentTours = () => {
 
                 {filteredTours.length === 0 && (
                     <div className="text-center py-20">
-                        <p className="text-gray-500 text-lg">No tours found matching your filters.</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-lg">No tours found matching your filters.</p>
                         <button
                             onClick={() => setFilter('all')}
                             className="mt-4 text-primary font-bold hover:underline"

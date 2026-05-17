@@ -105,21 +105,21 @@ const BudgetCalculator = () => {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-5xl mx-auto my-8">
-      <div className="flex items-center gap-2 mb-8 text-secondary">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 max-w-5xl mx-auto my-8 transition-colors">
+      <div className="flex items-center gap-2 mb-8 text-secondary dark:text-orange-400">
         <Calculator size={28} />
-        <h2 className="text-2xl font-bold">স্মার্ট বাজেট ক্যালকুলেটর</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">স্মার্ট বাজেট ক্যালকুলেটর</h2>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Form Column */}
         <div className="space-y-6">
           <div>
-            <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
               <MapPin size={16} className="text-primary"/> ১. গন্তব্য
             </label>
             <select 
-              className="w-full p-3 rounded-xl border-2 border-gray-100 focus:border-primary bg-gray-50 outline-none font-bold"
+              className="w-full p-3 rounded-xl border-2 border-gray-100 dark:border-gray-700 focus:border-primary bg-gray-50 dark:bg-gray-900 outline-none font-bold text-gray-700 dark:text-gray-200"
               value={formData.destinationId}
               onChange={e => setFormData({...formData, destinationId: e.target.value})}
             >
@@ -130,41 +130,41 @@ const BudgetCalculator = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+              <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                 <Calendar size={16} className="text-primary"/> ২. তারিখ
               </label>
               <input 
                 type="date" 
-                className="w-full p-3 rounded-xl border-2 border-gray-100 focus:border-primary bg-gray-50 outline-none font-bold"
+                className="w-full p-3 rounded-xl border-2 border-gray-100 dark:border-gray-700 focus:border-primary bg-gray-50 dark:bg-gray-900 outline-none font-bold text-gray-700 dark:text-gray-200"
                 value={formData.startDate}
                 onChange={e => setFormData({...formData, startDate: e.target.value})}
               />
             </div>
             <div>
-              <label className="block font-bold text-gray-800 mb-2">৩. কত রাত? ({formData.duration})</label>
+              <label className="block font-bold text-gray-800 dark:text-white mb-2">৩. কত রাত? ({formData.duration})</label>
               <input 
                 type="range" min="1" max="14" 
                 value={formData.duration}
                 onChange={e => setFormData({...formData, duration: parseInt(e.target.value)})}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary mt-3"
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary mt-3"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
               <Users size={16} className="text-primary"/> ৪. লোকসংখ্যা ({formData.groupSize} জন)
             </label>
             <input 
               type="range" min="1" max="20" 
               value={formData.groupSize}
               onChange={e => setFormData({...formData, groupSize: parseInt(e.target.value)})}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary mt-2"
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary mt-2"
             />
           </div>
 
           <div>
-            <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
               <Home size={16} className="text-primary"/> ৫. হোটেলের ধরন
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -172,7 +172,7 @@ const BudgetCalculator = () => {
                <button 
                 key={a.id}
                 onClick={() => setFormData({...formData, accomType: a.id})}
-                className={`p-3 rounded-xl border-2 text-center text-sm font-bold transition-all ${formData.accomType === a.id ? 'border-primary bg-green-50 text-primary' : 'border-gray-100 bg-white hover:bg-gray-50 text-gray-600'}`}
+                className={`p-3 rounded-xl border-2 text-center text-sm font-bold transition-all ${formData.accomType === a.id ? 'border-primary bg-green-50 dark:bg-green-950/20 text-primary dark:text-green-400 font-bold' : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
                >
                  {a.label}<br/><span className="text-[10px] font-normal opacity-70">{a.range}</span>
                </button> 
@@ -181,7 +181,7 @@ const BudgetCalculator = () => {
           </div>
 
           <div>
-            <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
               <Bus size={16} className="text-primary"/> ৬. যাতায়াত মাধ্যম
             </label>
             <div className="flex flex-wrap gap-3">
@@ -189,7 +189,7 @@ const BudgetCalculator = () => {
                <button 
                 key={t.id}
                 onClick={() => setFormData({...formData, transportType: t.id})}
-                className={`px-4 py-2 rounded-full border-2 text-sm font-bold transition-colors ${formData.transportType === t.id ? 'border-secondary bg-orange-50 text-secondary' : 'border-gray-100 bg-white hover:bg-gray-50 text-gray-600'}`}
+                className={`px-4 py-2 rounded-full border-2 text-sm font-bold transition-colors ${formData.transportType === t.id ? 'border-secondary bg-orange-50 dark:bg-orange-950/20 text-secondary dark:text-orange-400' : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
                >
                  {t.label}
                </button> 
@@ -200,19 +200,19 @@ const BudgetCalculator = () => {
         </div>
 
         {/* Result Column */}
-        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 h-full flex flex-col">
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-700 h-full flex flex-col transition-colors">
           {!result ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50">
               <Calculator size={48} className="mb-4 text-gray-400" />
-              <p className="font-bold text-gray-600 text-lg">গন্তব্য ও তারিখ নির্বাচন করুন</p>
-              <p className="text-sm">হিসাব দেখতে তথ্য পূরণ করুন</p>
+              <p className="font-bold text-gray-600 dark:text-gray-300 text-lg">গন্তব্য ও তারিখ নির্বাচন করুন</p>
+              <p className="text-sm dark:text-gray-400">হিসাব দেখতে তথ্য পূরণ করুন</p>
             </div>
           ) : (
             <div className="flex-1 flex flex-col">
               <div className="text-center mb-6">
-                <p className="text-gray-500 font-bold mb-1">মোট সম্ভাব্য খরচ</p>
-                <h3 className="text-4xl font-bold text-[#1B5E20]">৳{Math.round(result.total).toLocaleString()}</h3>
-                <p className="text-sm text-secondary font-bold mt-2 bg-orange-100 inline-block px-3 py-1 rounded-full">
+                <p className="text-gray-500 dark:text-gray-400 font-bold mb-1">মোট সম্ভাব্য খরচ</p>
+                <h3 className="text-4xl font-bold text-[#1B5E20] dark:text-green-400">৳{Math.round(result.total).toLocaleString()}</h3>
+                <p className="text-sm text-secondary dark:text-orange-400 font-bold mt-2 bg-orange-100 dark:bg-orange-950/30 inline-block px-3 py-1 rounded-full">
                   মাথাপিছু: ৳{Math.round(result.perPerson).toLocaleString()}
                 </p>
               </div>

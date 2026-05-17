@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, User, AlertTriangle, Moon, Sun, Sidebar as SidebarIcon, LogIn, LogOut, ShieldAlert, ShieldCheck, Search, Compass, CalendarDays, GraduationCap, Tent, ShoppingBag, Bell, Settings, User as UserIcon, LayoutDashboard } from 'lucide-react';
+import { Menu, X, User, AlertTriangle, Moon, Sun, Sidebar as SidebarIcon, LogIn, LogOut, ShieldAlert, ShieldCheck, Search, Compass, CalendarDays, GraduationCap, Tent, ShoppingBag, Bell, Settings, User as UserIcon, LayoutDashboard, Users, Ticket, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import SafetyModal from './SafetyModal';
 import { useNotifications } from '../context/NotificationContext';
@@ -25,11 +25,13 @@ const Navbar = ({ user, onOpenLogin, onLogout, isSidebarOpen, setIsSidebarOpen, 
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false); // FIXED: Added missing state
+    const [showServicesMenu, setShowServicesMenu] = useState(false);
     
     const { notifications, unreadCount, markAllRead } = useNotifications();
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useTranslation();
+    const { language } = useLanguage();
 
     const isHomePage = location.pathname === '/';
 
@@ -85,53 +87,128 @@ const Navbar = ({ user, onOpenLogin, onLogout, isSidebarOpen, setIsSidebarOpen, 
 
                         {/* Center: Navigation Links */}
                         <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 h-full justify-center w-auto">
-                            <div className="flex items-center space-x-8 h-full">
-                                {!user ? (
-                                    <div className="flex items-center gap-3">
-                                        <Link to="/destinations" className={iconLinkClasses}>
-                                            <Compass size={22} strokeWidth={2.5} />
-                                            <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                {t('nav_destinations')}
-                                            </span>
-                                        </Link>
-                                        <Link to="/planner" className={iconLinkClasses}>
-                                            <CalendarDays size={22} strokeWidth={2.5} />
-                                            <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                {t('nav_planner')}
-                                            </span>
-                                        </Link>
-                                        <Link to="/student-tours" className={iconLinkClasses}>
-                                            <GraduationCap size={22} strokeWidth={2.5} />
-                                            <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                {t('nav_student_tours')}
-                                            </span>
-                                        </Link>
-                                        <Link to="/adventures" className={iconLinkClasses}>
-                                            <Tent size={22} strokeWidth={2.5} />
-                                            <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                {t('nav_adventures')}
-                                            </span>
-                                        </Link>
-                                        <Link to="/shop" className={iconLinkClasses}>
-                                            <ShoppingBag size={22} strokeWidth={2.5} />
-                                            <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
-                                                {t('nav_shop')}
-                                            </span>
-                                        </Link>
-                                    </div>
-                                ) : (
-                                    <div className="relative h-full flex items-center">
-                                        <button
-                                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                                            className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold transition-all ${isSidebarOpen
-                                                ? 'bg-primary text-white'
-                                                : isHomePage ? 'hover:bg-white/10 text-primary dark:text-white' : 'hover:bg-gray-100 text-primary dark:text-white'}`}
+                            <div className="flex items-center space-x-6 h-full">
+                                <Link to="/destinations" className={iconLinkClasses}>
+                                    <Compass size={22} strokeWidth={2.5} />
+                                    <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+                                        {t('nav_destinations')}
+                                    </span>
+                                </Link>
+
+                                {/* Services Dropdown */}
+                                <div className="relative h-full flex items-center">
+                                    <button
+                                        onClick={() => setShowServicesMenu(!showServicesMenu)}
+                                        onMouseEnter={() => setShowServicesMenu(true)}
+                                        className={`flex items-center gap-1.5 px-3 py-2 rounded-full font-bold transition-all text-sm cursor-pointer
+                                            ${showServicesMenu 
+                                                ? 'bg-primary text-white shadow-lg' 
+                                                : isHomePage ? 'hover:bg-white/10 text-white' : 'hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-700 dark:text-gray-200'}`}
+                                    >
+                                        <span>{language === 'bn' ? 'টুলস ও ট্যুর' : 'Services & Tours'}</span>
+                                        <ChevronDown size={16} className={`transition-transform duration-200 ${showServicesMenu ? 'rotate-180' : ''}`} />
+                                    </button>
+
+                                    {showServicesMenu && (
+                                        <div 
+                                            onMouseLeave={() => setShowServicesMenu(false)}
+                                            className="absolute top-14 left-1/2 transform -translate-x-1/2 w-72 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-800 py-3 z-50 animate-in fade-in slide-in-from-top-3 duration-200"
                                         >
-                                            <LayoutDashboard size={18} />
-                                            {t('nav_dashboard')}
-                                        </button>
-                                    </div>
-                                )}
+                                            {/* Small Search Bar inside dropdown */}
+                                            <div className="px-4 py-2 border-b border-gray-100 dark:border-slate-800 mb-2">
+                                                <div className="relative">
+                                                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                                    <input 
+                                                        type="text"
+                                                        placeholder={language === 'bn' ? 'ট্যুর বা টিকিট খুঁজুন...' : 'Search tours or tickets...'}
+                                                        className="w-full pl-9 pr-3 py-1.5 bg-gray-50 dark:bg-slate-800 border border-gray-150 dark:border-slate-700 rounded-xl text-xs outline-none focus:ring-2 focus:ring-primary/20 text-gray-900 dark:text-white"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' && e.target.value.trim()) {
+                                                                navigate(`/explore?q=${encodeURIComponent(e.target.value.trim())}`);
+                                                                setShowServicesMenu(false);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1 px-2">
+                                                <Link 
+                                                    to="/student-tours" 
+                                                    onClick={() => setShowServicesMenu(false)}
+                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-green-400 transition-colors font-bold text-sm"
+                                                >
+                                                    <GraduationCap size={18} className="text-primary dark:text-green-400" />
+                                                    <div className="flex flex-col">
+                                                        <span>{language === 'bn' ? 'স্টুডেন্ট ব্যাকপ্যাক ট্যুর' : 'Student Backpack Tours'}</span>
+                                                        <span className="text-[10px] text-gray-450 dark:text-gray-400 font-medium">{language === 'bn' ? 'বাজেট ফ্রেন্ডলি গ্রুপ ট্যুর' : 'Budget group travels'}</span>
+                                                    </div>
+                                                </Link>
+
+                                                <Link 
+                                                    to="/planner" 
+                                                    onClick={() => setShowServicesMenu(false)}
+                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-green-400 transition-colors font-bold text-sm"
+                                                >
+                                                    <CalendarDays size={18} className="text-primary dark:text-green-400" />
+                                                    <div className="flex flex-col">
+                                                        <span>{language === 'bn' ? 'স্মার্ট ট্রিপ প্ল্যানার' : 'Smart Trip Planner'}</span>
+                                                        <span className="text-[10px] text-gray-455 dark:text-gray-400 font-medium">{language === 'bn' ? 'এআই সহায়তায় ভ্রমণ পরিকল্পনা' : 'AI-assisted routing & budgets'}</span>
+                                                    </div>
+                                                </Link>
+
+                                                <Link 
+                                                    to="/tickets" 
+                                                    onClick={() => setShowServicesMenu(false)}
+                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-green-400 transition-colors font-bold text-sm"
+                                                >
+                                                    <Ticket size={18} className="text-primary dark:text-green-400" />
+                                                    <div className="flex flex-col">
+                                                        <span>{language === 'bn' ? 'টিকিট ও ট্রান্সপোর্ট' : 'Tickets & Transport'}</span>
+                                                        <span className="text-[10px] text-gray-455 dark:text-gray-400 font-medium">{language === 'bn' ? 'বাস, ট্রেন, লঞ্চ ও বিমান' : 'Bus, Train, Flight & Launch'}</span>
+                                                    </div>
+                                                </Link>
+
+                                                <Link 
+                                                    to="/adventures" 
+                                                    onClick={() => setShowServicesMenu(false)}
+                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-green-400 transition-colors font-bold text-sm"
+                                                >
+                                                    <Tent size={18} className="text-primary dark:text-green-400" />
+                                                    <div className="flex flex-col">
+                                                        <span>{language === 'bn' ? 'গ্রুপ অ্যাডভেঞ্চার' : 'Group Adventures'}</span>
+                                                        <span className="text-[10px] text-gray-455 dark:text-gray-400 font-medium">{language === 'bn' ? 'রোমাঞ্চকর ট্রেকিং ও ক্যাম্পিং' : 'Thrilling camping & trekking'}</span>
+                                                    </div>
+                                                </Link>
+
+                                                <Link 
+                                                    to="/bookings" 
+                                                    onClick={() => setShowServicesMenu(false)}
+                                                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 dark:hover:bg-green-950/30 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-green-400 transition-colors font-bold text-sm"
+                                                >
+                                                    <LayoutDashboard size={18} className="text-primary dark:text-green-400" />
+                                                    <div className="flex flex-col">
+                                                        <span>{language === 'bn' ? 'বুকিং ও লেনদেনের ইতিহাস' : 'Booking & Transactions'}</span>
+                                                        <span className="text-[10px] text-gray-455 dark:text-gray-400 font-medium">{language === 'bn' ? 'আপনার সকল ট্রিপ হিস্টোরি' : 'View all your trip tickets'}</span>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Link to="/community" className={iconLinkClasses}>
+                                    <Users size={22} strokeWidth={2.5} />
+                                    <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+                                        {t('nav_community')}
+                                    </span>
+                                </Link>
+                                <Link to="/shop" className={iconLinkClasses}>
+                                    <ShoppingBag size={22} strokeWidth={2.5} />
+                                    <span className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-900 border border-primary/20 dark:border-transparent text-primary dark:text-white font-bold text-[10px] px-2.5 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-lg">
+                                        {t('nav_shop')}
+                                    </span>
+                                </Link>
                             </div>
                         </div>
 

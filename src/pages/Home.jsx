@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, DollarSign, Star, Quote, ArrowRight } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Star, Quote, ArrowRight, Tent, Map as MapIcon, Ticket } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 import { useLanguage } from '../context/LanguageContext';
+import { districtsData } from '../data/districts';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Home = () => {
         { 
             id: 1, 
             title: language === 'bn' ? 'সাজেক মেঘকন্যা রিলাক্স ট্যুর' : 'Sajek Valley Relax Tour', 
-            image: 'https://images.unsplash.com/photo-1623169822765-a86f9175d713?auto=format&fit=crop&w=600&q=80', 
+            image: '/images/destinations_hero_1_1778975470949.png', 
             price: language === 'bn' ? '৳৫,৫০০' : '৳5,500', 
             agency: 'Green Valley Tours', 
             rating: 4.8 
@@ -35,7 +36,7 @@ const Home = () => {
         { 
             id: 2, 
             title: language === 'bn' ? 'সুন্দরবন এডভেঞ্চার ক্রুজ' : 'Sundarban Adventure Cruise', 
-            image: 'https://images.unsplash.com/photo-1589886307379-342410a563b7?auto=format&fit=crop&w=600&q=80', 
+            image: '/images/destinations_hero_2_1778975509415.png', 
             price: language === 'bn' ? '৳১২,০০০' : '৳12,000', 
             agency: 'River Trips BD', 
             rating: 4.9 
@@ -43,7 +44,7 @@ const Home = () => {
         { 
             id: 3, 
             title: language === 'bn' ? 'সেন্টমার্টিন স্পেশাল প্যাকেজ' : 'Saint Martin Special Package', 
-            image: 'https://images.unsplash.com/photo-1596895111956-bf57059e00fa?auto=format&fit=crop&w=600&q=80', 
+            image: '/images/destinations_hero_3_1778975530619.png', 
             price: language === 'bn' ? '৳৬,২০০' : '৳6,200', 
             agency: 'Ocean Travels', 
             rating: 4.7 
@@ -51,7 +52,7 @@ const Home = () => {
         { 
             id: 4, 
             title: language === 'bn' ? 'সিলেট-শ্রীমঙ্গল এক্সপ্লোর' : 'Sylhet-Srimangal Explore', 
-            image: 'https://images.unsplash.com/photo-1579781498175-1e0e84b2c140?auto=format&fit=crop&w=600&q=80', 
+            image: '/images/home_dest_1_1778976669789.png', 
             price: language === 'bn' ? '৳৪,৫০০' : '৳4,500', 
             agency: 'Sylhet Guides', 
             rating: 4.6 
@@ -79,7 +80,7 @@ const Home = () => {
             {/* 1. Hero Section */}
             <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
-                    <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" className="w-full h-full object-cover" alt="Mountain" />
+                    <img src="/images/home_hero_1778976642283.png" className="w-full h-full object-cover" alt="Bangladesh Landscape" />
                     <div className="absolute inset-0 bg-black/40"></div>
                 </div>
 
@@ -106,9 +107,22 @@ const Home = () => {
                     >
                         <div className="flex items-center px-5 py-3 bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 group focus-within:bg-white transition-all">
                             <MapPin className="text-[#1B5E20]" size={20} />
-                            <div className="text-left ml-3">
+                            <div className="text-left ml-3 flex-grow">
                                 <p className="text-[10px] font-bold text-gray-400 uppercase">Location</p>
-                                <input type="text" placeholder={language === 'bn' ? "কোথায় যাবেন?" : "Where to?"} className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-sm font-bold" value={destination} onChange={e => setDestination(e.target.value)} />
+                                <select 
+                                    className="bg-transparent border-none outline-none w-full text-gray-800 dark:text-white text-sm font-bold appearance-none cursor-pointer"
+                                    value={destination} 
+                                    onChange={e => setDestination(e.target.value)}
+                                >
+                                    <option value="" className="text-gray-400 bg-white dark:bg-gray-800">{language === 'bn' ? "কোথায় যাবেন?" : "Where to?"}</option>
+                                    {districtsData.flatMap(div => 
+                                        div.districts.map(d => ({ name: d.name, division: div.division }))
+                                    ).sort((a, b) => a.name.localeCompare(b.name)).map((dist, idx) => (
+                                        <option key={idx} value={dist.name} className="text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800">
+                                            {dist.name} ({dist.division.replace(' Division', '')})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div className="flex items-center px-5 py-3 bg-gray-50 dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 group focus-within:bg-white transition-all">
@@ -143,10 +157,10 @@ const Home = () => {
                     <div className="flex-1 relative">
                         <div className="grid grid-cols-2 gap-4">
                             <motion.div initial={{ y: 20 }} whileInView={{ y: 0 }} className="rounded-3xl overflow-hidden h-80 shadow-xl border-4 border-white dark:border-gray-800">
-                                <img src="https://images.unsplash.com/photo-1590603740183-980e7f6920eb?auto=format&fit=crop&w=600&q=80" className="w-full h-full object-cover" alt="" />
+                                <img src="/images/home_dest_1_1778976669789.png" className="w-full h-full object-cover" alt="" />
                             </motion.div>
                             <motion.div initial={{ y: -20 }} whileInView={{ y: 0 }} className="rounded-3xl overflow-hidden h-80 mt-12 shadow-xl border-4 border-white dark:border-gray-800">
-                                <img src="https://images.unsplash.com/photo-1589886307379-342410a563b7?auto=format&fit=crop&w=600&q=80" className="w-full h-full object-cover" alt="" />
+                                <img src="/images/home_dest_2_1778976690365.png" className="w-full h-full object-cover" alt="" />
                             </motion.div>
                         </div>
                         <div className="absolute -bottom-6 -right-6 bg-[#1B5E20] text-white p-8 rounded-3xl shadow-2xl z-20">
@@ -194,9 +208,9 @@ const Home = () => {
                             <motion.div 
                                 key={i} 
                                 whileHover={{ y: -10 }}
-                                className="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center space-y-6 transition-all"
+                                className="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center space-y-6 transition-all group"
                             >
-                                <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950 rounded-2xl flex items-center justify-center text-3xl">{f.icon}</div>
+                                <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">{f.icon}</div>
                                 <h4 className="text-xl font-black">{f.title}</h4>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{f.desc}</p>
                             </motion.div>
@@ -267,12 +281,12 @@ const Home = () => {
                     <div className="flex-1">
                         <div className="grid grid-cols-3 gap-4">
                             {[
-                                'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
-                                'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=400&q=80',
-                                'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80',
-                                'https://images.unsplash.com/photo-1596895111956-bf57059e00fa?auto=format&fit=crop&w=400&q=80',
-                                'https://images.unsplash.com/photo-1590603740183-980e7f6920eb?auto=format&fit=crop&w=400&q=80',
-                                'https://images.unsplash.com/photo-1589886307379-342410a563b7?auto=format&fit=crop&w=400&q=80'
+                                '/images/home_dest_1_1778976669789.png',
+                                '/images/destinations_hero_1_1778975470949.png',
+                                '/images/destinations_hero_2_1778975509415.png',
+                                '/images/destinations_hero_3_1778975530619.png',
+                                '/images/home_dest_2_1778976690365.png',
+                                '/images/home_hero_1778976642283.png'
                             ].map((url, i) => (
                                 <div key={i} className={`rounded-2xl overflow-hidden h-40 ${i % 2 === 0 ? 'mt-8' : ''}`}>
                                     <img src={url} className="w-full h-full object-cover" alt="" />
@@ -289,18 +303,18 @@ const Home = () => {
                     <div className="flex justify-between items-end mb-24">
                         <div>
                             <span className="text-forest-light font-black tracking-[0.5em] uppercase text-xs mb-4 block">Travel Guides</span>
-                            <h2 className="text-5xl md:text-6xl font-black text-white">ভ্রমণ ডায়েরি</h2>
+                            <h2 className="text-5xl md:text-6xl font-black text-white">{language === 'bn' ? 'ভ্রমণ ডায়েরি' : 'Travel Diary'}</h2>
                         </div>
                         <button onClick={() => navigate('/blog')} className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black hover:bg-forest-light transition-all flex items-center gap-3">
-                            সব পড়ুন <ArrowRight size={20} />
+                            {language === 'bn' ? 'সব পড়ুন' : 'Read All'} <ArrowRight size={20} />
                         </button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         {[
-                            { id: 1, title: 'সাজেক ভ্যালি ভ্রমণের সঠিক সময় এবং টিপস', image: 'https://images.unsplash.com/photo-1623169822765-a86f9175d713?auto=format&fit=crop&w=800&q=80', date: '১২ মে, ২০২৪', category: 'Guide' },
-                            { id: 2, title: 'সুন্দরবনে কি কি দেখবেন? পূর্ণাঙ্গ গাইডলাইন', image: 'https://images.unsplash.com/photo-1589886307379-342410a563b7?auto=format&fit=crop&w=800&q=80', date: '১০ মে, ২০২৪', category: 'Adventure' },
-                            { id: 3, title: 'কক্সবাজার ভ্রমণে খরচ বাঁচানোর ৫টি উপায়', image: 'https://images.unsplash.com/photo-1600295628549-05eb823b16d7?auto=format&fit=crop&w=800&q=80', date: '০৫ মে, ২০২৪', category: 'Budget' }
+                            { id: 1, title: language === 'bn' ? 'সাজেক ভ্যালি ভ্রমণের সঠিক সময় এবং টিপস' : 'Best Time & Tips for Sajek Valley', image: '/images/destinations_hero_1_1778975470949.png', date: language === 'bn' ? '১২ মে, ২০২৪' : 'May 12, 2024', category: 'Guide' },
+                            { id: 2, title: language === 'bn' ? 'সুন্দরবনে কি কি দেখবেন? পূর্ণাঙ্গ গাইডলাইন' : 'What to see in Sundarbans? Complete Guideline', image: '/images/destinations_hero_2_1778975509415.png', date: language === 'bn' ? '১০ মে, ২০২৪' : 'May 10, 2024', category: 'Adventure' },
+                            { id: 3, title: language === 'bn' ? 'কক্সবাজার ভ্রমণে খরচ বাঁচানোর ৫টি উপায়' : '5 Ways to Save Money on Cox\'s Bazar Trip', image: '/images/destinations_hero_3_1778975530619.png', date: language === 'bn' ? '০৫ মে, ২০২৪' : 'May 5, 2024', category: 'Budget' }
                         ].map(post => (
                             <motion.div 
                                 key={post.id} 

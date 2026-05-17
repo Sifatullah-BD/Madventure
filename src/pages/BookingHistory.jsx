@@ -88,7 +88,7 @@ const BookingHistory = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-gray-50 dark:bg-[#050f08] flex flex-col transition-colors">
             <DashboardHeader 
                 title="বুকিং ও ট্রানজাকশন হিস্টোরি"
                 subtitle="আপনার সকল ট্যুর এবং ইভেন্ট বুকিংয়ের বিস্তারিত তথ্য এখানে দেখুন।"
@@ -98,12 +98,12 @@ const BookingHistory = () => {
                 
                 {/* Filters */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-                    <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100 overflow-x-auto no-scrollbar">
+                    <div className="flex bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-x-auto no-scrollbar">
                         {['all', 'upcoming', 'completed', 'cancelled'].map(f => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all ${filter === f ? 'bg-primary text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold capitalize transition-all ${filter === f ? 'bg-primary text-white shadow-md' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}
                             >
                                 {f}
                             </button>
@@ -115,7 +115,7 @@ const BookingHistory = () => {
                         <input 
                             type="text" 
                             placeholder="বুকিং আইডি দিয়ে খুঁজুন..." 
-                            className="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm w-full sm:w-64"
+                            className="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-primary/20 text-sm w-full sm:w-64 text-gray-900 dark:text-white placeholder-gray-400"
                         />
                     </div>
                 </div>
@@ -126,7 +126,7 @@ const BookingHistory = () => {
                 ) : (
                     <div className="space-y-4">
                         {bookings.length > 0 ? bookings.map(booking => (
-                            <div key={booking.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group">
+                            <div key={booking.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow group">
                                 <div className="flex flex-col md:flex-row justify-between gap-6">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-3 mb-3">
@@ -135,17 +135,17 @@ const BookingHistory = () => {
                                             </span>
                                             <span className="text-gray-400 text-xs font-mono">#{booking.id.slice(0, 8)}</span>
                                         </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">{booking.tour_title || 'Tour Name'}</h3>
-                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary transition-colors">{booking.tour_title || 'Tour Name'}</h3>
+                                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400">
                                             <span className="flex items-center gap-1.5"><Clock size={16}/> {new Date(booking.created_at).toLocaleDateString()}</span>
-                                            <span className="flex items-center gap-1.5 font-bold text-gray-900">৳{booking.total_amount || 0}</span>
+                                            <span className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white">৳{booking.total_amount || 0}</span>
                                         </div>
                                     </div>
 
                                     <div className="flex items-center gap-3 md:flex-col md:items-end justify-center">
                                         <button 
                                             onClick={() => navigate(`/booking-confirmation?booking_id=${booking.id}`)}
-                                            className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-2"
+                                            className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-2"
                                         >
                                             View Ticket <ChevronRight size={16}/>
                                         </button>
@@ -162,9 +162,9 @@ const BookingHistory = () => {
                                 </div>
                             </div>
                         )) : (
-                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-                                <AlertCircle className="mx-auto mb-4 text-gray-300" size={48} />
-                                <p className="text-gray-500 font-bold">এখনো কোনো বুকিং পাওয়া যায়নি।</p>
+                            <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+                                <AlertCircle className="mx-auto mb-4 text-gray-300 dark:text-gray-600" size={48} />
+                                <p className="text-gray-500 dark:text-gray-400 font-bold">এখনো কোনো বুকিং পাওয়া যায়নি।</p>
                                 <button onClick={() => navigate('/destinations')} className="mt-4 text-primary font-black hover:underline">নতুন ট্যুর খুঁজুন →</button>
                             </div>
                         )}

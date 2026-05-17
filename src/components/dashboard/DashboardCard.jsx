@@ -35,13 +35,13 @@ const DashboardCard = ({
         },
         green: {
             border: 'border-green-500',
-            bgIcon: 'bg-green-100',
-            textIcon: 'text-green-600',
-            bgStats: 'bg-green-50',
-            borderStats: 'border-green-100',
-            textStats: 'text-green-800',
-            btn: 'bg-green-600 hover:bg-green-700 text-white',
-            btnOutline: 'border-2 border-green-500 text-green-600 hover:bg-green-50'
+            bgIcon: 'bg-green-100 dark:bg-green-950/40',
+            textIcon: 'text-green-600 dark:text-green-400',
+            bgStats: 'bg-green-50 dark:bg-green-900/20',
+            borderStats: 'border-green-100 dark:border-green-800/30',
+            textStats: 'text-green-800 dark:text-green-200',
+            btn: 'bg-green-600 hover:bg-green-750 text-white dark:bg-green-700 dark:hover:bg-green-600',
+            btnOutline: 'border-2 border-green-500 text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/30'
         },
         orange: {
             border: 'border-orange-500',

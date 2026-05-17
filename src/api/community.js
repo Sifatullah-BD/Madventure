@@ -58,6 +58,12 @@ export const getForumThreads = async (tag = null) => {
         }
 
         const { data, error } = await query;
+        if (!data || data.length === 0) {
+            const { FORUM_THREADS } = await import('../data/madventure-data');
+            let mockData = FORUM_THREADS;
+            if (tag) mockData = mockData.filter(t => t.category === tag || (t.tags && t.tags.includes(tag)));
+            return { data: mockData, error: null };
+        }
         return { data, error };
     } catch (error) {
         return { data: null, error };
@@ -72,7 +78,14 @@ export const getThreadDetails = async (threadId) => {
             .eq('id', threadId)
             .single();
         
-        if (tErr) return { data: null, error: tErr };
+        if (tErr || !thread) {
+            const { FORUM_THREADS } = await import('../data/madventure-data');
+            const mockThread = FORUM_THREADS.find(t => t.id === threadId);
+            if (mockThread) {
+                return { data: { ...mockThread, replies: [] }, error: null };
+            }
+            return { data: null, error: tErr || new Error('Thread not found') };
+        }
 
         const { data: replies, error: rErr } = await supabase
             .from('forum_replies')

@@ -137,11 +137,11 @@ const SmartChecklist = () => {
   const progressPercent = totalItems === 0 ? 0 : Math.round((doneItems / totalItems) * 100);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto my-8 relative">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden max-w-4xl mx-auto my-8 relative transition-colors">
       
       {/* Celebration Overlay */}
       {showCelebration && (
-        <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm transition-all duration-500">
+        <div className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center bg-white/60 dark:bg-black/60 backdrop-blur-sm transition-all duration-500">
           <div className="bg-[#1B5E20] text-white px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center animate-bounce">
             <span className="text-6xl mb-2">🎉</span>
             <h2 className="text-2xl font-bold text-center">অভিনন্দন!</h2>
@@ -151,19 +151,19 @@ const SmartChecklist = () => {
       )}
 
       {/* Header Form Area */}
-      <div className="bg-gray-50 border-b border-gray-100 p-8">
-        <div className="flex items-center gap-2 mb-6 text-secondary">
+      <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-700 p-8">
+        <div className="flex items-center gap-2 mb-6 text-secondary dark:text-orange-400">
           <CheckSquare size={28} />
-          <h2 className="text-2xl font-bold">স্মার্ট প্যাকিং চেকলিস্ট</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">স্মার্ট প্যাকিং চেকলিস্ট</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
           <div className="md:col-span-5">
-            <label className="block font-bold text-gray-800 mb-2 flex items-center gap-2">
+            <label className="block font-bold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
               <MapPin size={16} className="text-primary"/> গন্তব্য (ঐচ্ছিক)
             </label>
             <select 
-              className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-primary bg-white outline-none font-bold"
+              className="w-full p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-primary bg-white dark:bg-gray-800 outline-none font-bold text-gray-700 dark:text-gray-200"
               value={destinationId}
               onChange={e => setDestinationId(e.target.value)}
             >
@@ -172,10 +172,10 @@ const SmartChecklist = () => {
             </select>
           </div>
           <div className="md:col-span-4">
-            <label className="block font-bold text-gray-800 mb-2">সম্ভাব্য মাস</label>
+            <label className="block font-bold text-gray-800 dark:text-white mb-2">সম্ভাব্য মাস</label>
             <input 
               type="month" 
-              className="w-full p-3 rounded-xl border-2 border-gray-200 focus:border-primary bg-white outline-none font-bold"
+              className="w-full p-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-primary bg-white dark:bg-gray-800 outline-none font-bold text-gray-700 dark:text-gray-200"
               value={month}
               onChange={e => setMonth(e.target.value)}
             />
@@ -194,13 +194,13 @@ const SmartChecklist = () => {
       <div className="p-8">
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex justify-between font-bold text-gray-800 mb-2">
+          <div className="flex justify-between font-bold text-gray-800 dark:text-white mb-2">
             <span>প্রস্তুতি</span>
-            <span className={progressPercent === 100 ? 'text-green-600' : 'text-primary'}>
+            <span className={progressPercent === 100 ? 'text-green-600 dark:text-green-400' : 'text-primary'}>
               {doneItems}/{totalItems} ({progressPercent}%)
             </span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
             <div 
               className={`h-full transition-all duration-500 rounded-full ${progressPercent === 100 ? 'bg-green-500' : 'bg-primary'}`} 
               style={{ width: `${progressPercent}%` }}
@@ -211,8 +211,8 @@ const SmartChecklist = () => {
         {/* Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {Object.entries(checklist).map(([category, items]) => (
-            <div key={category} className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100">
-              <h3 className="font-bold text-lg text-[#1B5E20] border-b pb-2 mb-4 flex items-center gap-2">
+            <div key={category} className="bg-gray-50/50 dark:bg-gray-900/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <h3 className="font-bold text-lg text-[#1B5E20] dark:text-green-400 border-b border-gray-100 dark:border-gray-700 pb-2 mb-4 flex items-center gap-2">
                 <span>{CATEGORY_ICONS[category] || '🔹'}</span> {category}
               </h3>
               <div className="space-y-3">
@@ -226,11 +226,11 @@ const SmartChecklist = () => {
                           onChange={() => toggleItem(category, item.id)}
                           className="peer sr-only"
                         />
-                        <div className="w-6 h-6 bg-white border-2 border-gray-300 rounded-md peer-checked:bg-primary peer-checked:border-primary transition-colors flex items-center justify-center">
+                        <div className="w-6 h-6 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-md peer-checked:bg-primary peer-checked:border-primary transition-colors flex items-center justify-center">
                           <CheckSquare size={16} className="text-white opacity-0 peer-checked:opacity-100 scale-50 peer-checked:scale-100 transition-transform" />
                         </div>
                       </div>
-                      <span className={`text-gray-700 transition-all ${item.done ? 'line-through opacity-50' : 'font-medium'}`}>
+                      <span className={`text-gray-700 dark:text-gray-200 transition-all ${item.done ? 'line-through opacity-50' : 'font-medium'}`}>
                         {item.text}
                       </span>
                     </label>
@@ -247,15 +247,15 @@ const SmartChecklist = () => {
           ))}
 
           {/* Add Custom Item */}
-          <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 border-dashed flex flex-col justify-center">
-            <h3 className="font-bold text-blue-800 mb-3 text-center">নতুন আইটেম যোগ করুন</h3>
+          <div className="bg-blue-50/50 dark:bg-blue-950/20 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/30 border-dashed flex flex-col justify-center">
+            <h3 className="font-bold text-blue-800 dark:text-blue-400 mb-3 text-center">নতুন আইটেম যোগ করুন</h3>
             <form onSubmit={addCustomItem} className="flex gap-2">
               <input 
                 type="text" 
                 placeholder="যেমন: পাওয়ার কর্ড..."
                 value={newItemText}
                 onChange={e => setNewItemText(e.target.value)}
-                className="flex-1 p-3 rounded-xl border border-blue-200 outline-none focus:border-blue-500 bg-white"
+                className="flex-1 p-3 rounded-xl border border-blue-200 dark:border-blue-900 outline-none focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
               <button 
                 type="submit"

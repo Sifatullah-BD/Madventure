@@ -18,7 +18,7 @@ const ThreadCard = ({ thread, onClick }) => {
         <motion.div 
             whileHover={{ x: 10 }}
             onClick={() => onClick(thread.id)}
-            className="group relative bg-[#0a0a0a] rounded-[2rem] p-8 border border-white/5 hover:border-white/10 transition-all cursor-pointer overflow-hidden"
+            className="group relative bg-white dark:bg-[#0a0a0a] rounded-[2rem] p-8 border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md dark:shadow-none"
         >
             {/* Ambient Background Line (Animated) */}
             <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -31,8 +31,8 @@ const ThreadCard = ({ thread, onClick }) => {
                             {thread.avatar ? (
                                 <img src={thread.avatar} className="w-full h-full object-cover" />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-white font-black">
-                                    {thread.author?.charAt(0)}
+                                <div className="w-full h-full flex items-center justify-center text-white font-black bg-gray-800 dark:bg-black">
+                                    {thread.author?.charAt(0) || 'A'}
                                 </div>
                             )}
                         </div>
@@ -60,15 +60,15 @@ const ThreadCard = ({ thread, onClick }) => {
                         <span className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">{thread.createdAt}</span>
                     </div>
 
-                    <h3 className="text-2xl font-black text-white mb-3 tracking-tight group-hover:text-emerald-400 transition-colors">
+                    <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3 tracking-tight group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
                         {thread.title}
                     </h3>
                     
-                    <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-2 font-medium">
+                    <p className="text-gray-600 dark:text-gray-500 text-sm leading-relaxed mb-6 line-clamp-2 font-medium">
                         {thread.content}
                     </p>
 
-                    <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                    <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
                         <div className="flex items-center gap-6">
                             <div className="flex items-center gap-2 text-gray-500 hover:text-red-400 transition-colors">
                                 <Heart size={18} />
@@ -80,10 +80,10 @@ const ThreadCard = ({ thread, onClick }) => {
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <button className="p-2 hover:bg-white/5 rounded-full text-gray-600 hover:text-white transition-all">
+                            <button className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full text-gray-400 dark:text-gray-600 hover:text-gray-900 dark:hover:text-white transition-all">
                                 <Bookmark size={18} />
                             </button>
-                            <button className="p-2 hover:bg-white/5 rounded-full text-gray-600 hover:text-white transition-all">
+                            <button className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full text-gray-400 dark:text-gray-600 hover:text-gray-900 dark:hover:text-white transition-all">
                                 <Share2 size={18} />
                             </button>
                         </div>

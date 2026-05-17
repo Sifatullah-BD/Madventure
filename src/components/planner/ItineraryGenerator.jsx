@@ -157,17 +157,17 @@ const ItineraryGenerator = () => {
 
   if (isGenerating) {
     return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center bg-white rounded-2xl shadow-sm border border-gray-100 p-12">
+      <div className="min-h-[400px] flex flex-col items-center justify-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-12">
         <Loader2 className="w-16 h-16 text-primary animate-spin mb-6" />
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">আপনার নিখুঁত ট্রিপ প্ল্যান করা হচ্ছে...</h3>
-        <p className="text-gray-500">বাজেট, পছন্দ আর অন্যান্য তথ্য বিশ্লেষণ করে অপ্টিমাইজড রুট তৈরি হচ্ছে</p>
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">আপনার নিখুঁত ট্রিপ প্ল্যান করা হচ্ছে...</h3>
+        <p className="text-gray-500 dark:text-gray-400">বাজেট, পছন্দ আর অন্যান্য তথ্য বিশ্লেষণ করে অপ্টিমাইজড রুট তৈরি হচ্ছে</p>
       </div>
     );
   }
 
   if (step === 6 && result) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" id="itinerary-result">
+      <div className="bg-white dark:bg-gray-850 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" id="itinerary-result">
         {/* Result Header */}
         <div className="bg-[#1B5E20] p-8 text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-20 bg-cover bg-center" style={{ backgroundImage: `url(${result.district.heroImage})` }} />
@@ -209,36 +209,36 @@ const ItineraryGenerator = () => {
             
             <div className="space-y-4">
               {result.days.map((day) => (
-                <div key={day.day} className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                <div key={day.day} className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
                   <button 
                     onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
-                    className={`w-full flex items-center justify-between p-4 font-bold text-left transition-colors ${activeDay === day.day ? 'bg-green-50 text-primary' : 'bg-white hover:bg-gray-50'}`}
+                    className={`w-full flex items-center justify-between p-4 font-bold text-left transition-colors ${activeDay === day.day ? 'bg-green-50 dark:bg-green-900/30 text-primary dark:text-green-400' : 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                   >
                     <span>দিন {day.day}</span>
                     {activeDay === day.day ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </button>
                   
                   {activeDay === day.day && (
-                    <div className="p-6 bg-white space-y-6">
+                    <div className="p-6 bg-white dark:bg-gray-900 space-y-6">
                       <div className="flex gap-4">
-                        <div className="bg-orange-100 text-orange-600 p-3 rounded-full h-fit"><Sun size={20}/></div>
+                        <div className="bg-orange-100 dark:bg-orange-950 p-3 rounded-full h-fit text-orange-600 dark:text-orange-400"><Sun size={20}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 mb-1">সকাল</h4>
-                          <p className="text-gray-600 text-sm">{day.morning}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">সকাল</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.morning}</p>
                         </div>
                       </div>
                       <div className="flex gap-4">
-                        <div className="bg-yellow-100 text-yellow-600 p-3 rounded-full h-fit"><Sun size={20}/></div>
+                        <div className="bg-yellow-100 dark:bg-yellow-950 p-3 rounded-full h-fit text-yellow-600 dark:text-yellow-400"><Sun size={20}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 mb-1">দুপুর</h4>
-                          <p className="text-gray-600 text-sm">{day.afternoon}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">দুপুর</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.afternoon}</p>
                         </div>
                       </div>
                       <div className="flex gap-4">
-                        <div className="bg-indigo-100 text-indigo-600 p-3 rounded-full h-fit"><Sunset size={20}/></div>
+                        <div className="bg-indigo-100 dark:bg-indigo-950 p-3 rounded-full h-fit text-indigo-600 dark:text-indigo-400"><Sunset size={20}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 mb-1">সন্ধ্যা</h4>
-                          <p className="text-gray-600 text-sm">{day.evening}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">সন্ধ্যা</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.evening}</p>
                         </div>
                       </div>
                     </div>
@@ -249,60 +249,60 @@ const ItineraryGenerator = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+              <h3 className="font-bold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                 <Wallet className="text-primary" /> সম্ভাব্য খরচ (মোট)
               </h3>
               <div className="space-y-3 pt-2 text-sm">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>যাতায়াত</span>
-                  <span className="font-bold text-gray-800">৳{result.costLine.transport.toLocaleString()}</span>
+                  <span className="font-bold text-gray-800 dark:text-white">৳{result.costLine.transport.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>হোটেল ({formData.duration - 1} রাত)</span>
-                  <span className="font-bold text-gray-800">৳{result.costLine.hotel.toLocaleString()}</span>
+                  <span className="font-bold text-gray-800 dark:text-white">৳{result.costLine.hotel.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>খাবার</span>
-                  <span className="font-bold text-gray-800">৳{result.costLine.food.toLocaleString()}</span>
+                  <span className="font-bold text-gray-800 dark:text-white">৳{result.costLine.food.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>অ্যাক্টিভিটি ও অন্যান্য</span>
-                  <span className="font-bold text-gray-800">৳{result.costLine.activities.toLocaleString()}</span>
+                  <span className="font-bold text-gray-800 dark:text-white">৳{result.costLine.activities.toLocaleString()}</span>
                 </div>
-                <div className="pt-3 border-t border-gray-200 flex justify-between font-bold text-lg text-[#1B5E20]">
+                <div className="pt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between font-bold text-lg text-[#1B5E20] dark:text-green-400">
                   <span>মোট</span>
                   <span>৳{result.costLine.total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-green-50 p-6 rounded-2xl border border-green-100">
-              <h3 className="font-bold text-[#1B5E20] mb-4 flex items-center gap-2">
+            <div className="bg-green-50 dark:bg-green-950/20 p-6 rounded-2xl border border-green-100 dark:border-green-900/30">
+              <h3 className="font-bold text-[#1B5E20] dark:text-green-400 mb-4 flex items-center gap-2">
                 <CheckCircle className="text-primary" /> রিকমেন্ডেশন
               </h3>
               {result.hotels.length > 0 && (
-                <div className="mb-4 bg-white p-3 rounded-xl shadow-sm">
-                  <p className="text-xs text-gray-500 mb-1">সাজেস্টেড হোটেল</p>
-                  <p className="font-bold text-gray-800">{result.hotels[0].name}</p>
-                  <p className="text-xs text-gray-500 mt-1">৳{result.hotels[0].pricePerNight.min}/রাত</p>
+                <div className="mb-4 bg-white dark:bg-gray-900 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">সাজেস্টেড হোটেল</p>
+                  <p className="font-bold text-gray-800 dark:text-white">{result.hotels[0].name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">৳{result.hotels[0].pricePerNight.min}/রাত</p>
                   <Link to={`/business/${result.hotels[0].id}`} className="mt-2 block w-full text-center bg-primary text-white text-sm py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">হোটেল বুক করুন</Link>
                 </div>
               )}
               {result.tours.length > 0 && (
-                <div className="bg-white p-3 rounded-xl shadow-sm">
-                  <p className="text-xs text-gray-500 mb-1">সাজেস্টেড ট্যুর</p>
-                  <p className="font-bold text-gray-800">{result.tours[0].title}</p>
-                  <Link to={`/tours/${result.tours[0].id}`} className="mt-2 block w-full text-center border-2 border-primary text-primary text-sm py-2 rounded-lg font-bold hover:bg-green-50 transition-colors">প্যাকেজ দেখুন</Link>
+                <div className="bg-white dark:bg-gray-900 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">সাজেস্টেড ট্যুর</p>
+                  <p className="font-bold text-gray-800 dark:text-white">{result.tours[0].title}</p>
+                  <Link to={`/tours/${result.tours[0].id}`} className="mt-2 block w-full text-center border-2 border-primary text-primary text-sm py-2 rounded-lg font-bold hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors">প্যাকেজ দেখুন</Link>
                 </div>
               )}
             </div>
 
-            <div className="p-6 rounded-2xl border border-gray-100">
-              <h3 className="font-bold text-gray-800 mb-4">প্যাকিং লিস্ট</h3>
+            <div className="p-6 rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900">
+              <h3 className="font-bold text-gray-800 dark:text-white mb-4">প্যাকিং লিস্ট</h3>
               <ul className="space-y-2">
                 {result.packing.map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                  <li key={i} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <div className="w-1.5 h-1.5 rounded-full bg-secondary"></div>
                     {item}
                   </li>
@@ -316,17 +316,17 @@ const ItineraryGenerator = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 max-w-3xl mx-auto my-8">
-      <div className="flex items-center gap-2 mb-8 text-[#1B5E20]">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 max-w-3xl mx-auto my-8 transition-colors">
+      <div className="flex items-center gap-2 mb-8 text-[#1B5E20] dark:text-green-400">
         <Sparkles size={28} />
         <h2 className="text-2xl font-bold">এআই ট্রিপ প্ল্যানার</h2>
       </div>
 
       <div className="space-y-8">
         <div>
-          <label className="block font-bold text-gray-800 mb-3 flex items-center gap-2"><MapPin size={18} className="text-primary"/> ১. কোথায় যেতে চান?</label>
+          <label className="block font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"><MapPin size={18} className="text-primary"/> ১. কোথায় যেতে চান?</label>
           <select 
-            className="w-full p-4 rounded-xl border-2 border-gray-100 focus:border-primary focus:ring-4 focus:ring-green-50 outline-none transition-all font-bold text-gray-700 bg-gray-50"
+            className="w-full p-4 rounded-xl border-2 border-gray-100 dark:border-gray-750 focus:border-primary focus:ring-4 focus:ring-green-50 dark:focus:ring-green-900/30 outline-none transition-all font-bold text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900"
             value={formData.destinationId}
             onChange={e => setFormData({ ...formData, destinationId: e.target.value })}
           >
@@ -339,32 +339,32 @@ const ItineraryGenerator = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block font-bold text-gray-800 mb-3 flex items-center gap-2"><Calendar size={18} className="text-primary"/> ২. যাত্রার তারিখ</label>
+            <label className="block font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"><Calendar size={18} className="text-primary"/> ২. যাত্রার তারিখ</label>
             <input 
               type="date" 
-              className="w-full p-4 rounded-xl border-2 border-gray-100 focus:border-primary bg-gray-50 outline-none font-bold text-gray-700"
+              className="w-full p-4 rounded-xl border-2 border-gray-100 dark:border-gray-700 focus:border-primary bg-gray-50 dark:bg-gray-900 outline-none font-bold text-gray-700 dark:text-gray-200"
               value={formData.startDate}
               onChange={e => setFormData({ ...formData, startDate: e.target.value })}
             />
           </div>
           <div>
-            <label className="block font-bold text-gray-800 mb-3">৩. কত দিন? ({formData.duration} দিন)</label>
+            <label className="block font-bold text-gray-800 dark:text-white mb-3">৩. কত দিন? ({formData.duration} দিন)</label>
             <input 
               type="range" min="1" max="14" 
               value={formData.duration}
               onChange={e => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary mt-4"
+              className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary mt-4"
             />
           </div>
         </div>
 
         <div>
-          <label className="block font-bold text-gray-800 mb-3 flex items-center gap-2"><Wallet size={18} className="text-primary"/> ৪. মাথাপিছু এস্টিমেট বাজেট (৳{formData.budget.toLocaleString('en-IN')})</label>
+          <label className="block font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"><Wallet size={18} className="text-primary"/> ৪. মাথাপিছু এস্টিমেট বাজেট (৳{formData.budget.toLocaleString('en-IN')})</label>
           <input 
             type="range" min="3000" max="50000" step="500"
             value={formData.budget}
             onChange={e => setFormData({ ...formData, budget: parseInt(e.target.value) })}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary mt-2"
+            className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary mt-2"
           />
           <div className="flex justify-between text-xs text-gray-400 mt-2 font-bold">
             <span>৳৩,০০০</span>
@@ -373,13 +373,13 @@ const ItineraryGenerator = () => {
         </div>
 
         <div>
-          <label className="block font-bold text-gray-800 mb-3 flex items-center gap-2"><Users size={18} className="text-primary"/> ৫. কাদের সাথে যাচ্ছেন?</label>
+          <label className="block font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"><Users size={18} className="text-primary"/> ৫. কাদের সাথে যাচ্ছেন?</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {GROUP_TYPES.map(g => (
               <button 
                 key={g.id}
                 onClick={() => setFormData({ ...formData, groupType: g.id })}
-                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all duration-300 ${formData.groupType === g.id ? 'border-primary bg-green-50 text-primary shadow-sm scale-[1.02]' : 'border-gray-100 hover:border-gray-200 bg-white text-gray-600'}`}
+                className={`p-4 rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all duration-300 ${formData.groupType === g.id ? 'border-primary bg-green-50 dark:bg-green-950/20 text-primary dark:text-green-400 shadow-sm scale-[1.02]' : 'border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300'}`}
               >
                 <g.icon size={24} />
                 <span className="font-bold text-sm">{g.label}</span>
@@ -389,7 +389,7 @@ const ItineraryGenerator = () => {
         </div>
 
         <div>
-          <label className="block font-bold text-gray-800 mb-3 flex items-center gap-2"><Heart size={18} className="text-primary"/> ৬. প্রধান আকর্ষণ (একাধিক হতে পারে)</label>
+          <label className="block font-bold text-gray-800 dark:text-white mb-3 flex items-center gap-2"><Heart size={18} className="text-primary"/> ৬. প্রধান আকর্ষণ (একাধিক হতে পারে)</label>
           <div className="flex flex-wrap gap-3">
             {INTERESTS.map(i => {
               const active = formData.interests.includes(i.id);
@@ -397,7 +397,7 @@ const ItineraryGenerator = () => {
                 <button
                   key={i.id}
                   onClick={() => toggleInterest(i.id)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold border-2 transition-colors ${active ? 'border-primary bg-primary text-white' : 'border-gray-100 bg-white text-gray-600 hover:bg-gray-50'}`}
+                  className={`px-5 py-2.5 rounded-full text-sm font-bold border-2 transition-colors ${active ? 'border-primary bg-primary text-white' : 'border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 >
                   {i.label}
                 </button>
@@ -406,7 +406,7 @@ const ItineraryGenerator = () => {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-gray-100">
+        <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
           <button 
             onClick={handleGenerate}
             className="w-full md:w-auto bg-[#1B5E20] hover:bg-green-800 text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-green-900/20"

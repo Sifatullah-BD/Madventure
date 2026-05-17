@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, MapPin, ArrowRight } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-
 const DISCOVERIES = (lang) => [
     {
         id: 'cox',

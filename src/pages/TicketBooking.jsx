@@ -137,7 +137,7 @@ const TicketBooking = () => {
                                 <button onClick={() => setStep('results')} className="text-gray-500 hover:text-emerald-500 font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all">
                                     <ArrowLeft size={16} /> Change Trip
                                 </button>
-                                <h2 className="text-xl font-black text-gray-900 tracking-tight">Select Your Seats</h2>
+                                <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Select Your Seats</h2>
                             </div>
                             <SeatSelection trip={selectedTrip} onConfirmBooking={handleConfirmSeats} />
                         </Motion.div>
@@ -154,7 +154,7 @@ const TicketBooking = () => {
                                 <button onClick={() => setStep('seats')} className="text-gray-500 hover:text-emerald-500 font-black text-xs uppercase tracking-widest flex items-center gap-2 transition-all">
                                     <ArrowLeft size={16} /> Back to Seats
                                 </button>
-                                <h2 className="text-xl font-black text-gray-900 tracking-tight">Secure Checkout</h2>
+                                <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Secure Checkout</h2>
                             </div>
                             <CheckoutStep 
                                 trip={selectedTrip} 
@@ -173,17 +173,17 @@ const TicketBooking = () => {
                             className="py-10"
                         >
                             <div className="text-center mb-10">
-                                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <CheckCheck size={40} className="text-emerald-600" />
+                                <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <CheckCheck size={40} className="text-emerald-600 dark:text-emerald-400" />
                                 </div>
-                                <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Ticket Booked!</h2>
-                                <p className="text-gray-500 font-medium">Your adventure is ready. Show this pass at boarding.</p>
+                                <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Ticket Booked!</h2>
+                                <p className="text-gray-500 dark:text-gray-400 font-medium">Your adventure is ready. Show this pass at boarding.</p>
                             </div>
                             <BoardingPass ticket={bookedTicket} />
                             <div className="text-center mt-12">
                                 <button
                                     onClick={() => setStep('search')}
-                                    className="bg-gray-100 hover:bg-gray-200 text-gray-600 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
+                                    className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
                                 >
                                     Book Another Trip
                                 </button>
