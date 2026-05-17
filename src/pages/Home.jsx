@@ -78,7 +78,7 @@ const Home = () => {
             />
 
             {/* 1. Hero Section */}
-            <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+            <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <img src="/images/home_hero_1778976642283.png" className="w-full h-full object-cover" alt="Bangladesh Landscape" />
                     <div className="absolute inset-0 bg-black/40"></div>
@@ -90,10 +90,10 @@ const Home = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1 }}
                     >
-                        <h1 className="text-5xl sm:text-7xl md:text-8xl font-black text-white mb-6 tracking-tighter leading-tight shadow-text">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 tracking-tighter leading-tight shadow-text">
                             {language === 'bn' ? <>অজানা ট্রেইল ও সৌন্দর্যের খোঁজে <br /> <span className="text-[#A5D6A7]">ঘুরে দেখুন প্রিয় বাংলাদেশ</span></> : <>Unveil Hidden Wonders <br /> <span className="text-[#A5D6A7]">Across Scenic Bangladesh</span></>}
                         </h1>
-                        <p className="text-gray-100 text-lg md:text-xl mb-12 font-medium max-w-2xl mx-auto drop-shadow-lg">
+                        <p className="text-gray-200 text-sm md:text-base mb-7 font-medium max-w-xl mx-auto drop-shadow-lg">
                             {language === 'bn' ? '৬৪ জেলা • ৫০০+ প্যাকেজ • ১০০+ বিশ্বস্ত গাইড।' : '64 Districts • 500+ Packages • 100+ Trusted Guides.'}
                         </p>
                     </motion.div>
