@@ -8,7 +8,7 @@ import DistrictInfoMap from '../components/district/DistrictInfoMap';
 import TouristSpotsGallery from '../components/district/TouristSpotsGallery';
 import ContextMap from '../components/district/ContextMap';
 import StudentTourPlan from '../components/district/StudentTourPlan';
-import Navbar from '../components/Navbar';
+
 
 // Import local data for Upazilas and Districts mapping
 import bdDistricts from '../data/bd-geojson/bd-districts.json';
@@ -108,7 +108,7 @@ const DistrictDetails = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#020d06] pt-24">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
             </div>
         );
@@ -132,8 +132,7 @@ const DistrictDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            <Navbar />
+        <div className="min-h-screen bg-gray-50 dark:bg-[#020d06] pt-20">
 
             <DistrictHero district={district} />
 
