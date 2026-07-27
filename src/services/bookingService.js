@@ -39,25 +39,44 @@ export const bookingService = {
   },
 
   /**
-   * Create a new booking.
-   * @param {Object} payload – { tour_id, num_adults, num_children, scheduled_date, notes, total_price, extras }
+   * Create a new booking via transaction RPC.
+   * @param {Object} payload - { tour_id, schedule_id, quantity, unit_price, travelers, notes }
    */
   async createBooking(payload) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    const { data, error } = await supabase
-      .from('bookings')
-      .insert({
-        user_id: user.id,
-        status: 'pending',
-        payment_status: 'pending',
-        ...payload,
-      })
-      .select()
-      .single();
+    // For backward compatibility if schedule_id isn't provided by the older UI yet
+    if (!payload.schedule_id || !payload.travelers) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          status: 'pending',
+          payment_status: 'pending',
+          ...payload,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    }
+
+    // Call RPC for transactional booking
+    const { data, error } = await supabase.rpc('create_tour_booking', {
+      p_user_id: user.id,
+      p_tour_id: payload.tour_id,
+      p_schedule_id: payload.schedule_id,
+      p_quantity: payload.quantity,
+      p_unit_price: payload.unit_price,
+      p_travelers: payload.travelers,
+      p_notes: payload.notes || ''
+    });
+
     if (error) throw error;
-    return data;
+    
+    // Return the newly created booking ID in an object matching the old format
+    return { id: data };
   },
 
   /**

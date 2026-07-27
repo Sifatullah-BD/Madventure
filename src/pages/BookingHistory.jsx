@@ -15,6 +15,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
+import { bookingService } from '../services/bookingService';
 
 const BookingHistory = () => {
     const { user } = useAuth();
@@ -35,13 +36,7 @@ const BookingHistory = () => {
     const fetchBookings = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('bookings')
-                .select('*')
-                .eq('user_id', user.id)
-                .order('created_at', { ascending: false });
-            
-            if (error) throw error;
+            const data = await bookingService.getMyBookings();
             setBookings(data || []);
         } catch (err) {
             console.error('Error fetching bookings:', err);

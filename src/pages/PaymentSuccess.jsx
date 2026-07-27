@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Home, FileText } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { logEvent } from '../api/analytics';
-import { awardXP, grantAchievement } from '../api/rewards';
+import { analytics } from '../services/analyticsService';
+import { awardXP, grantAchievement } from '../services/rewardService';
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const PaymentSuccess = () => {
 
     useEffect(() => {
         if (bookingId && user?.id) {
-            logEvent('payment_success', { booking_id: bookingId }, user.id);
+            analytics.bookingCompleted(bookingId);
             
             // Award 100 XP for successful booking
             awardXP(user.id, 100);

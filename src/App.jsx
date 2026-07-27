@@ -82,6 +82,7 @@ import { cacheEmergencyData } from './utils/offlineCache';
 import { useAuth } from './hooks/useAuth';
 import Onboarding from './components/Onboarding';
 import ChatWidget from './components/community/ChatWidget';
+import { analytics } from './services/analyticsService';
 
 const AppContent = () => {
   const { user, setUser, logout } = useAuth();
@@ -116,6 +117,11 @@ const AppContent = () => {
     }
     localStorage.setItem('madventure_theme', theme);
   }, [theme]);
+
+  // Track page views
+  React.useEffect(() => {
+    analytics.pageView(location.pathname);
+  }, [location.pathname]);
 
   // Offline and Service Worker handling
   React.useEffect(() => {

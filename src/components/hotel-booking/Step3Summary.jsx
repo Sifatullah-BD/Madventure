@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Info } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { createPendingBooking } from '../../api/bookings';
+import { createPendingBooking } from '../../services/bookingService';
 
 const Step3Summary = ({ hotelData, formData, onPrev, districtId }) => {
     const navigate = useNavigate();

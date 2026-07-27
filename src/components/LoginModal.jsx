@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Smartphone, ChevronRight, Github, Facebook, Chrome as Google, Compass, Mountain, Map, Camera, Heart, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
-import { logEvent } from '../api/analytics';
+import { analytics, trackEvent } from '../services/analyticsService';
 
 const Wallet = ({ size, className }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" /><path d="M4 6v12c0 1.1.9 2 2 2h14v-4" /><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" /></svg>;
 
@@ -60,14 +60,14 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                 const { user, error } = await login(email, password);
                 if (error) throw error;
                 if (user) {
-                    logEvent('user_login', { method: 'email' }, user.id);
+                    analytics.loginSuccess('email');
                     onLogin(user);
                 }
             } else {
                 const { user, error } = await register(email, password, { name, phone, gender, styles: selectedStyles });
                 if (error) throw error;
                 if (user) {
-                    logEvent('user_register', { method: 'email' }, user.id);
+                    trackEvent('user_register', { method: 'email' });
                     onLogin(user);
                 }
             }

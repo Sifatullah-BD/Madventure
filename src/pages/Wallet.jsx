@@ -3,8 +3,9 @@ import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { Wallet as WalletIcon, CreditCard, History, Ticket, Download, PlusCircle, Gift, AlertCircle, FileText, CheckCircle, RefreshCcw } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { ensureWallet, getWalletLedger } from '../api/wallet';
-import { getUserBookings } from '../api/bookings';
+import { paymentService } from '../services/paymentService';
+import { bookingService } from '../services/bookingService';
+import useWalletStore from '../store/useWalletStore';
 
 const DEMO_TRANSACTIONS = [
     { id: 1, desc: 'Added Money (Bkash)', date: '2025-12-01', amount: '+5000 BDT', type: 'credit' },
@@ -23,10 +24,11 @@ const Wallet = () => {
     const [activeTab, setActiveTab] = useState('wallet');
     const [showDownloadToast, setShowDownloadToast] = useState(false);
     const [loadingRemote, setLoadingRemote] = useState(false);
-    const [balance, setBalance] = useState(0);
-    const [ledgerRows, setLedgerRows] = useState([]);
     const [dbBookings, setDbBookings] = useState([]);
     const [paymentTxns, setPaymentTxns] = useState([]);
+
+    // Use Zustand wallet store for optimistic updates
+    const { balance, ledgerRows, fetchWallet } = useWalletStore();
 
     const staticTransactions = DEMO_TRANSACTIONS;
     const staticBookings = DEMO_BOOKINGS;
@@ -40,22 +42,14 @@ const Wallet = () => {
             }
             setLoadingRemote(true);
             try {
-                const { data: wallet } = await ensureWallet(user.id);
-                if (cancelled) return;
-                if (wallet) {
-                    setBalance(Number(wallet.current_balance) || 0);
-                    const { data: led } = await getWalletLedger(wallet.id);
-                    if (!cancelled) setLedgerRows(led || []);
-                }
-                const { data: bk } = await getUserBookings(String(user.id));
+                // Fetch wallet via Zustand store (handles balance + ledger)
+                await fetchWallet(user.id);
+
+                const bk = await bookingService.getMyBookings();
                 if (!cancelled) setDbBookings(bk || []);
 
                 // Fetch payment transactions
-                const { data: pay } = await supabase
-                    .from('payment_transactions')
-                    .select('*')
-                    .eq('user_id', String(user.id))
-                    .order('created_at', { ascending: false });
+                const pay = await paymentService.getMyTransactions();
                 if (!cancelled) setPaymentTxns(pay || []);
 
             } catch (e) {

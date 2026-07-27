@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getTourById, getTourDepartures } from '../api/tours';
+import { getTourById, getTourDepartures } from '../services/tourService';
 import Step1DateSeat from '../components/booking/Step1DateSeat';
 import Step2Travelers from '../components/booking/Step2Travelers';
 import Step3Summary from '../components/booking/Step3Summary';
 import { ChevronRight } from 'lucide-react';
-import { logEvent } from '../api/analytics';
+import { logEvent } from '../services/analyticsService';
 import { useAuth } from '../hooks/useAuth';
 
 const TourBookingFlow = () => {

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getHotelById, getHotelRooms } from '../api/hotels';
+import { getHotelById, getHotelRooms } from '../services/tourService';
 import Step1Dates from '../components/hotel-booking/Step1Dates';
 import Step2Guests from '../components/hotel-booking/Step2Guests';
 import Step3Summary from '../components/hotel-booking/Step3Summary';

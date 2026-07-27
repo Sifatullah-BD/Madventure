@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { Search, SlidersHorizontal, X, MapPin, Layers, Map as MapIcon, Home, Store, LayoutGrid } from 'lucide-react';
 import InteractiveMap from '../components/map/InteractiveMap';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -7,8 +7,8 @@ import { CardSkeleton } from '../components/ui/LoadingSkeleton';
 import EmptyState from '../components/ui/EmptyState';
 
 // Data APIs
-import { getTours } from '../api/tours';
-import { getHotels } from '../api/hotels';
+import { getTours } from '../services/tourService';
+import { getHotels } from '../services/tourService';
 import { businessService } from '../services/businessService';
 import districtsList from '../data/districts_list.json';
 import upazilasData from '../data/upazilas.json';

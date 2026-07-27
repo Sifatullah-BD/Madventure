@@ -4,10 +4,24 @@ import { useNavigate } from 'react-router-dom';
 import DashboardCard from '../components/dashboard/DashboardCard';
 
 import { useLanguage } from '../context/LanguageContext';
+import { paymentService } from '../services/paymentService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 const Dashboard = ({ user }) => {
     const navigate = useNavigate();
     const { language } = useLanguage();
+    const [balance, setBalance] = React.useState(0);
+    const [loadingBalance, setLoadingBalance] = React.useState(false);
+
+    React.useEffect(() => {
+        if (user && isSupabaseConfigured) {
+            setLoadingBalance(true);
+            paymentService.getWallet()
+                .then(wallet => setBalance(Number(wallet?.current_balance) || 0))
+                .catch(console.error)
+                .finally(() => setLoadingBalance(false));
+        }
+    }, [user]);
 
     if (!user) {
         return (
@@ -120,7 +134,7 @@ const Dashboard = ({ user }) => {
                         color="teal"
                         stats={
                             <div className="text-center w-full">
-                                <p className="text-teal-900 dark:text-teal-100 font-bold text-lg">১,৫০০ টাকা</p>
+                                <p className="text-teal-900 dark:text-teal-100 font-bold text-lg">{loadingBalance ? '...' : `${balance.toLocaleString()} টাকা`}</p>
                                 <p className="text-teal-600 dark:text-teal-400 text-xs">{language === 'bn' ? 'ওয়ালেট ব্যালেন্স' : 'Wallet Balance'}</p>
                             </div>
                         }
@@ -178,7 +192,7 @@ const Dashboard = ({ user }) => {
                         color="teal"
                         stats={
                             <div className="text-center w-full">
-                                <p className="text-teal-900 font-bold text-lg">1,500 BDT</p>
+                                <p className="text-teal-900 font-bold text-lg">{loadingBalance ? '...' : `${balance.toLocaleString()} BDT`}</p>
                                 <p className="text-teal-600 text-xs">Wallet Balance</p>
                             </div>
                         }

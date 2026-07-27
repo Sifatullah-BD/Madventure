@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { getReviews } from '../../api/reviews';
-import { uploadImages } from '../../api/storage';
-import { unicornService } from '../../api/unicorn';
+import { getReviews } from '../../services/communityService';
+import { uploadImages } from '../../services/storageService';
+import { unicornService } from '../../services/unicornService';
 import { Star, Image as ImageIcon, CheckCircle, Upload, ShieldCheck, BadgeCheck, Loader2, XCircle, MessageSquare } from 'lucide-react';
 
 const ReviewSection = ({ entityType, entityId }) => {

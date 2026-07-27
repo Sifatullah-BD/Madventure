@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { displayRoleFromAppRole } from '../utils/appRole';
+import useAuthStore from '../store/useAuthStore';
 
 export const AuthContext = createContext();
 
@@ -43,8 +44,15 @@ function shapeSupabaseSessionUser(authUser, profile) {
 }
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [user, setUserState] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { setUser: setStoreUser } = useAuthStore();
+
+    // Keep Zustand store in sync when user state changes
+    const setUser = (u) => {
+        setUserState(u);
+        setStoreUser(u);
+    };
 
     useEffect(() => {
         if (!isSupabaseConfigured) {

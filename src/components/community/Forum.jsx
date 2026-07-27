@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import districtsData from '../../data/districts_list.json';
 import ThreadCard from './ThreadCard';
 import { Search, Filter, MessageSquarePlus, X, Loader2 } from 'lucide-react';
-import { getForumThreads, createThread } from '../../api/community';
+import { getForumThreads, createThread } from '../../services/communityService';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../context/LanguageContext';
+import useRealtime from '../../hooks/useRealtime';
 
 const CATEGORIES = [
     { id: 'all', label: 'সব' },
@@ -30,18 +31,33 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
     // Form states
     const [newThreadData, setNewThreadData] = useState({ title: '', category: 'question', content: '', tags: '' });
 
-    const fetchThreads = async () => {
+    const fetchThreads = useCallback(async () => {
         setLoading(true);
-        const { data, error } = await getForumThreads();
-        if (data) {
-            setThreads(data);
+        try {
+            const data = await getForumThreads();
+            if (data) setThreads(data);
+        } catch (e) {
+            console.warn('fetchThreads error', e);
         }
         setLoading(false);
-    };
+    }, []);
 
     useEffect(() => {
         fetchThreads();
-    }, []);
+    }, [fetchThreads]);
+
+    // Live feed: new threads appear at the top instantly
+    useRealtime({
+        table: 'forum_threads',
+        event: 'INSERT',
+        onNew: (newThread) => {
+            setThreads(prev => {
+                const exists = prev.some(t => t.id === newThread.id);
+                if (exists) return prev;
+                return [newThread, ...prev];
+            });
+        },
+    });
 
     const handleCreateThread = async (e) => {
         e.preventDefault();
@@ -53,13 +69,14 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
         const tagsArray = newThreadData.tags.split(',').map(t => t.trim()).filter(t => t);
         if (newThreadData.category !== 'all') tagsArray.push(newThreadData.category);
         
-        const { data, error } = await createThread(user.id, newThreadData.title, newThreadData.content, tagsArray);
-        if (error) {
-            alert(error.message);
-        } else {
+        try {
+            await createThread(user.id, newThreadData.title, newThreadData.content, tagsArray);
             setShowNewThreadModal(false);
             setNewThreadData({ title: '', category: 'question', content: '', tags: '' });
+            // Realtime will push new thread, but also refresh to get profile join
             fetchThreads();
+        } catch (error) {
+            alert(error.message);
         }
         setSubmitting(false);
     };

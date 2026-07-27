@@ -6,7 +6,7 @@ import {
   CheckCircle, ArrowRight, Save
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { saveItinerary } from '../../api/planner';
+import { saveItinerary, generateItinerary } from '../../services/plannerService';
 import { useAuth } from '../../hooks/useAuth';
 
 const GROUP_TYPES = [
@@ -70,7 +70,7 @@ const ItineraryGenerator = () => {
     
     setIsGenerating(true);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const district = DISTRICTS.find(d => d.id === formData.destinationId);
       const tours = getToursByDistrict(formData.destinationId);
       const hotels = getHotelsByDistrict(formData.destinationId);
@@ -86,15 +86,23 @@ const ItineraryGenerator = () => {
       const totalHotel = hotelPerNight * Math.max(1, formData.duration - 1);
       const activitiesEst = totalBudget - (transportEst + totalFood + totalHotel);
       
-      const days = [];
-      for (let i = 1; i <= formData.duration; i++) {
-        days.push({
-          day: i,
-          morning: i === 1 ? `যাত্রা শুরু ও ${district.name} পৌঁছানো` : `${district.highlights[0] || 'লোকাল সিনেরি'} ঘুরে দেখা`,
-          afternoon: `${district.localFood[0] || 'লোকাল খাবার'} দিয়ে দুপুরের খাবার ও বিশ্রাম`,
-          evening: i === formData.duration ? `শপিং ও ফেরার প্রস্তুতি` : `সূর্যাস্ত দেখা ও স্থানীয় বাজার ঘোরা`
-        });
-      }
+      // Call Gemini AI
+      const mappedInterests = formData.interests.map(id => INTERESTS.find(i => i.id === id).label);
+      const aiDays = await generateItinerary(district.name, formData.duration, totalBudget, mappedInterests);
+
+      // Adapt Gemini result to UI structure
+      const days = aiDays.map(aiDay => {
+          const m = aiDay.activities.find(a => a.time.toLowerCase().includes('morning') || a.time.includes('09:00'));
+          const a = aiDay.activities.find(a => a.time.toLowerCase().includes('afternoon') || a.time.includes('01:00') || a.time.includes('02:00'));
+          const e = aiDay.activities.find(a => a.time.toLowerCase().includes('evening') || a.time.includes('06:00'));
+          
+          return {
+              day: aiDay.day,
+              morning: m ? `${m.title}: ${m.description}` : `${district.highlights[0] || 'লোকাল সিনেরি'} ঘুরে দেখা`,
+              afternoon: a ? `${a.title}: ${a.description}` : `${district.localFood[0] || 'লোকাল খাবার'} দিয়ে দুপুরের খাবার ও বিশ্রাম`,
+              evening: e ? `${e.title}: ${e.description}` : `সূর্যাস্ত দেখা ও স্থানীয় বাজার ঘোরা`
+          };
+      });
 
       const generatedResult = {
         district,
@@ -116,7 +124,7 @@ const ItineraryGenerator = () => {
       setIsGenerating(false);
       setStep(6);
       setSaved(false);
-    }, 2000);
+    }, 100);
   };
 
   const handleSaveToCloud = async () => {

@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Calendar, Camera, Shield, MessageCircle, Loader2, Search, AlertCircle, CheckCircle, Printer, Gift } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import ClaimModal from '../components/lostfound/ClaimModal';
 import ChatModal from '../components/lostfound/ChatModal';
 import PosterGenerator from '../components/lostfound/PosterGenerator';
-import { getLostFoundItems, reportLostFoundItem } from '../api/community';
+import { getLostFoundItems, reportLostFoundItem } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
 
 const LostFound = () => {

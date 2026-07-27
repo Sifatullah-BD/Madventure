@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { 
     User, Settings, Shield, LogOut, RefreshCw, Camera, 
     Trash2, Save, X, Loader2, Award, Users, TrendingUp,
@@ -7,10 +7,10 @@ import {
     Lock, Smartphone, Mail, Link as LinkIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { uploadImages } from '../api/storage';
+import { uploadImages } from '../services/storageService';
 import { useToast } from '../components/ui/Toast';
-import { getFollowStats, getUserAchievements, getLeaderboard } from '../api/social';
-import { supabase } from '../lib/supabase';
+import { getFollowStats, getUserAchievements, getLeaderboard } from '../services/communityService';
+import { authService } from '../services/authService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
@@ -53,13 +53,8 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
         const fetchProfile = async () => {
             setLoading(true);
             try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .maybeSingle();
+                const data = await authService.getProfile(user.id);
                 
-                if (error) throw error;
                 if (data) {
                     setProfileForm({
                         name: data.full_name || user.name || 'User Name',
@@ -87,17 +82,11 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
 
         setLoading(true);
         try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({
-                    full_name: profileForm.name,
-                    phone: profileForm.phone,
-                    bio: profileForm.bio,
-                    // we can split location if needed or store as is if column exists
-                })
-                .eq('id', user.id);
-
-            if (error) throw error;
+            await authService.updateProfile(user.id, {
+                full_name: profileForm.name,
+                phone: profileForm.phone,
+                bio: profileForm.bio,
+            });
 
             onUpdateUser({ ...user, ...profileForm });
             toast.success('প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
@@ -122,12 +111,7 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
                     const avatarUrl = data[0];
                     
                     // Update profiles table
-                    const { error: updateErr } = await supabase
-                        .from('profiles')
-                        .update({ avatar_url: avatarUrl })
-                        .eq('id', user.id);
-                        
-                    if (updateErr) throw updateErr;
+                    await authService.updateProfile(user.id, { avatar_url: avatarUrl });
 
                     setProfileForm(prev => ({ ...prev, avatar: avatarUrl }));
                     onUpdateUser({ ...user, avatar: avatarUrl });

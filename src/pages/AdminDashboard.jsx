@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
     Users, Briefcase, Calendar, DollarSign, TrendingUp, 
     ArrowUpRight, ArrowDownRight, Package, Hotel, 
@@ -12,8 +12,8 @@ import {
     ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell 
 } from 'recharts';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { getAllUsers, getPendingAgencies, setAgencyStatus, getSystemAuditLogs, updateUserRole } from '../api/admin';
-import { unicornService } from '../api/unicorn';
+import { getAllUsers, getPendingAgencies, setAgencyStatus, getSystemAuditLogs, updateUserRole } from '../services/adminService';
+import { unicornService } from '../services/unicornService';
 import { useToast } from '../components/ui/Toast';
 
 const AdminDashboard = () => {

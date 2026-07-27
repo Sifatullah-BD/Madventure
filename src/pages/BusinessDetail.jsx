@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Phone, MessageCircle, Globe, Facebook, Star, BadgeCheck, Sparkles, Clock, Users, ChevronLeft, Share2, Heart, ExternalLink, ArrowRight, Loader2 } from 'lucide-react';
 import { businessService } from '../services/businessService';
@@ -8,7 +8,7 @@ import BusinessBookingModal from '../components/business/BusinessBookingModal';
 import BusinessCard from '../components/business/BusinessCard';
 import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import ReviewSection from '../components/reviews/ReviewSection';
-import { addToWishlist, removeFromWishlist, getWishlist } from '../api/community';
+import { addToWishlist, removeFromWishlist, getWishlist } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
 
 const BusinessDetail = () => {

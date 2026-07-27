@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, CheckCircle2, Flag, Heart, MessageSquare, Share2, MoreVertical, Loader2 } from 'lucide-react';
-import { getThreadDetails, postReply } from '../../api/community';
+import { getThreadDetails, postReply } from '../../services/communityService';
 import { useAuth } from '../../hooks/useAuth';
+import useRealtime from '../../hooks/useRealtime';
 
 const ThreadDetail = ({ threadId, onBack }) => {
     const { user } = useAuth();
@@ -11,18 +12,33 @@ const ThreadDetail = ({ threadId, onBack }) => {
     const [replyText, setReplyText] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    const fetchDetails = async () => {
+    const fetchDetails = useCallback(async () => {
         setLoading(true);
-        const { data, error } = await getThreadDetails(threadId);
-        if (data) {
-            setThread(data);
-        }
+        const data = await getThreadDetails(threadId).catch(() => null);
+        if (data) setThread(data);
         setLoading(false);
-    };
+    }, [threadId]);
 
     useEffect(() => {
         fetchDetails();
-    }, [threadId]);
+    }, [fetchDetails]);
+
+    // Live reply subscription – appends new replies without a full reload
+    useRealtime({
+        table: 'forum_replies',
+        event: 'INSERT',
+        filter: `thread_id=eq.${threadId}`,
+        enabled: !!threadId,
+        onNew: (newReply) => {
+            setThread(prev => {
+                if (!prev) return prev;
+                // Avoid duplicates (e.g. our own optimistic reply)
+                const exists = (prev.replies || []).some(r => r.id === newReply.id);
+                if (exists) return prev;
+                return { ...prev, replies: [...(prev.replies || []), newReply] };
+            });
+        },
+    });
 
     const handleReply = async (e) => {
         e.preventDefault();
@@ -33,12 +49,13 @@ const ThreadDetail = ({ threadId, onBack }) => {
         if (!replyText.trim()) return;
         
         setSubmitting(true);
-        const { error } = await postReply(threadId, user.id, replyText);
-        if (error) {
-            alert(error.message);
-        } else {
+        try {
+            const reply = await postReply(threadId, user.id, replyText);
+            // Optimistically add our reply immediately (Realtime will handle dedup)
+            setThread(prev => prev ? { ...prev, replies: [...(prev.replies || []), reply] } : prev);
             setReplyText('');
-            fetchDetails();
+        } catch (err) {
+            alert(err.message);
         }
         setSubmitting(false);
     };

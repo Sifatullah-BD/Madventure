@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ShieldCheck, Lock, Tag, CreditCard, ChevronRight, CheckCircle2 } from 'lucide-react';
 import MFSPaymentModal from '../components/payment/MFSPaymentModal';
-import { unicornService } from '../api/unicorn';
+import { unicornService } from '../services/unicornService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { notificationService } from '../services/notificationService';
+import { paymentService } from '../services/paymentService';
 
 const Checkout = () => {
     const location = useLocation();
@@ -112,18 +113,14 @@ const Checkout = () => {
                 return;
             }
 
-            const { data, error } = await supabase.functions.invoke('initiate-payment', {
-                body: { 
-                    bookingId: bookingDetails.id, 
-                    amount: finalAmount,
-                    couponId: activeCoupon?.id,
-                    cus_name: bookingDetails.customerName,
-                    cus_email: bookingDetails.customerEmail || user?.email || 'customer@example.com',
-                    cus_phone: bookingDetails.customerPhone
-                }
+            const data = await paymentService.initiatePayment({
+                bookingId: bookingDetails.id, 
+                amount: finalAmount,
+                cus_name: bookingDetails.customerName,
+                cus_email: bookingDetails.customerEmail || user?.email || 'customer@example.com',
+                cus_phone: bookingDetails.customerPhone
             });
 
-            if (error) throw error;
             if (data?.GatewayPageURL) {
                 window.location.href = data.GatewayPageURL;
             } else {

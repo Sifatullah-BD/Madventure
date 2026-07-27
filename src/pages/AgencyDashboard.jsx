@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Plus, LayoutDashboard, List, Users } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import CreateTripForm from '../components/tours/CreateTripForm';
 import BookingManagement from '../components/tours/BookingManagement';
 import { bookings as mockBookings } from '../data/tourData';
 import { supabaseService } from '../services/supabaseService';
-import { getAgencyBookings } from '../api/bookings';
+import { getAgencyBookings } from '../services/bookingService';
 
 const AgencyDashboard = () => {
     const [activeTab, setActiveTab] = useState('dashboard');

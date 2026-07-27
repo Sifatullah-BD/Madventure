@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { createPendingBooking } from '../../api/bookings';
-import { trackEvent } from '../../utils/analytics';
+import { bookingService } from '../../services/bookingService';
+import { analytics } from '../../services/analyticsService';
 
 const Step3Summary = ({ tourData, formData, onPrev }) => {
     const navigate = useNavigate();
@@ -23,24 +23,19 @@ const Step3Summary = ({ tourData, formData, onPrev }) => {
         }
         setSubmitting(true);
         try {
-            const { data, error } = await createPendingBooking({
-                userId: String(user.id),
-                entityType: 'tour',
-                entityId: String(tourData.id),
-                bookingDate: formData.date,
-                totalPrice: totalPayable,
+            const data = await bookingService.createBooking({
+                tour_id: String(tourData.id),
+                scheduled_date: formData.date,
+                total_price: totalPayable,
+                num_adults: formData.seats,
+                num_children: 0,
                 extras: {
-                    seats: formData.seats,
                     travelers: formData.travelers,
                     tourTitle: tourData.title,
                 },
             });
-            if (error) throw error;
-            trackEvent(
-                'booking_started',
-                { tour_id: tourData.id, booking_id: data.id, seats: formData.seats },
-                String(user.id),
-            );
+            
+            analytics.bookingStarted(tourData.id);
             const checkoutPayload = {
                 id: data.id,
                 amount: totalPayable,

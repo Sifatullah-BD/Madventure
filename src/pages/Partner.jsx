@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+﻿import React, { useRef } from 'react';
 import { Briefcase, CheckCircle, TrendingUp, Users, Globe, ArrowRight, Upload, User, FileText } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
-import { uploadImages } from '../api/storage';
-import { createPartnerRequest } from '../api/community';
+import { uploadImages } from '../services/storageService';
+import { createPartnerRequest } from '../services/communityService';
 import { useToast } from '../components/ui/Toast';
 
 import { useLanguage } from '../context/LanguageContext';

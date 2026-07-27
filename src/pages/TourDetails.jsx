@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Star, Check, Shield, MessageCircle, ArrowLeft, Users, Heart, Loader2, Wifi, Truck, Coffee, UserCheck, Ticket, HeartPulse } from 'lucide-react';
 import { agencies } from '../data/tourData';
 import TourBookingModal from '../components/tours/TourBookingModal';
 import { supabaseService } from '../services/supabaseService';
-import { addToWishlist, removeFromWishlist, getWishlist } from '../api/community';
+import { addToWishlist, removeFromWishlist, getWishlist } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
 import ReviewSection from '../components/reviews/ReviewSection';
 import InteractiveMap from '../components/map/InteractiveMap';
