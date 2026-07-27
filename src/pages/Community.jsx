@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import Forum from '../components/community/Forum';
 import ThreadDetail from '../components/community/ThreadDetail';
@@ -8,7 +8,7 @@ import TravelPartner from '../components/community/TravelPartner';
 import { Users, MessagesSquare } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import LoginModal from '../components/LoginModal';
-import { useAuth } from '../hooks/useAuth';
+
 
 const Community = () => {
     const location = useLocation();
@@ -23,7 +23,7 @@ const Community = () => {
     const [activeTab, setActiveTab] = useState(initialTab); // 'forum' | 'partner'
     const [selectedThread, setSelectedThread] = useState(initialThread); // null | threadId
     const [showLoginModal, setShowLoginModal] = useState(false);
-    const { user } = useAuth();
+
 
     // Sync state to URL without reloading
     useEffect(() => {

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Calendar, Camera, Shield, MessageCircle, Loader2, Search, AlertCircle, CheckCircle, Printer, Gift } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import ClaimModal from '../components/lostfound/ClaimModal';
@@ -6,9 +6,11 @@ import ChatModal from '../components/lostfound/ChatModal';
 import PosterGenerator from '../components/lostfound/PosterGenerator';
 import { getLostFoundItems, reportLostFoundItem } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../components/ui/Toast';
 
 const LostFound = () => {
     const { user } = useAuth();
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState('lost');
     const [showForm, setShowForm] = useState(false);
     const [items, setItems] = useState([]);
@@ -59,20 +61,20 @@ const LostFound = () => {
     };
 
     const handleImageUpload = () => {
-        // Simulating image upload for now
+        // Simulate upload
         const mockImage = 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
         setNewItem({ ...newItem, image: mockImage });
-        alert('Image uploaded successfully! (Mock)');
+        toast.success('Image uploaded successfully! (Mock)');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert('Please login to report an item.');
+            toast.warning('Please login to report an item.');
             return;
         }
         if (!newItem.item || !newItem.location || !newItem.description) {
-            alert('Please fill in all required fields.');
+            toast.warning('Please fill in all required fields.');
             return;
         }
 
@@ -89,19 +91,19 @@ const LostFound = () => {
 
         const { error } = await reportLostFoundItem(itemData);
         if (error) {
-            alert(error.message);
+            toast.error(error.message);
         } else {
             setNewItem({ item: '', location: '', date: '', description: '', image: null, reward: '', verificationQuestion: '' });
             setShowForm(false);
             fetchItems();
-            alert(`${activeTab === 'lost' ? 'Lost' : 'Found'} item reported successfully!`);
+            toast.success(`${activeTab === 'lost' ? 'Lost' : 'Found'} item reported successfully!`);
         }
         setSubmitting(false);
     };
 
     const handleClaim = (itemId, answer) => {
         console.log(`Claiming item ${itemId} with answer: ${answer}`);
-        alert('Claim submitted! The reporter will review your answer.');
+        toast.success('Claim submitted! The reporter will review your answer.');
     };
 
     const filteredItems = items.filter(item => 

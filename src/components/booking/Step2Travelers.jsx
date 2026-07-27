@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { User } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 const Step2Travelers = ({ formData, setFormData, onNext, onPrev }) => {
+    const toast = useToast();
     // Initialize travelers array based on seats selected
     const [travelers, setTravelers] = useState(
         formData.travelers && formData.travelers.length === formData.seats 
@@ -19,7 +21,7 @@ const Step2Travelers = ({ formData, setFormData, onNext, onPrev }) => {
         // Simple validation
         const isValid = travelers.every(t => t.name.trim() !== '' && t.age !== '');
         if (!isValid) {
-            alert('Please fill in Name and Age for all travelers.');
+            toast.warning('Please fill in Name and Age for all travelers.');
             return;
         }
 

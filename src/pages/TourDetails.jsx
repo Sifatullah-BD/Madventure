@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Clock, Star, Check, Shield, MessageCircle, ArrowLeft, Users, Heart, Loader2, Wifi, Truck, Coffee, UserCheck, Ticket, HeartPulse } from 'lucide-react';
 import { agencies } from '../data/tourData';
@@ -8,11 +8,14 @@ import { addToWishlist, removeFromWishlist, getWishlist } from '../services/comm
 import { useAuth } from '../hooks/useAuth';
 import ReviewSection from '../components/reviews/ReviewSection';
 import InteractiveMap from '../components/map/InteractiveMap';
+import { useToast } from '../components/ui/Toast';
+import SEO from '../components/SEO';
 
 const TourDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const toast = useToast();
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -45,7 +48,7 @@ const TourDetails = () => {
 
     const toggleWishlist = async () => {
         if (!user) {
-            alert("Please login to add to wishlist.");
+            toast.warning("Please login to add to wishlist.");
             return;
         }
         setWishlisting(true);
@@ -66,6 +69,10 @@ const TourDetails = () => {
     if (loading) return <div className="flex justify-center items-center min-h-screen"><Loader2 className="animate-spin text-primary" size={40}/></div>;
     if (!event) return <div className="pt-24 text-center">Event not found</div>;
 
+    const seoTitle = event.title || event.name || 'Tour Details';
+    const seoDesc = event.description || `Discover ${seoTitle} in Bangladesh with Madventure. Book now for the best experience.`;
+    const seoImage = event.featured_image || event.image;
+
     // Handle Supabase snake_case keys
     const agencyId = event.agencyId || event.agency_id;
     const agency = agencies.find(a => a.id === agencyId) || { name: 'Verified Agency', rating: 4.8, logo: 'https://ui-avatars.com/api/?name=Agency&background=random' };
@@ -74,15 +81,16 @@ const TourDetails = () => {
     const bookingMoney = event.bookingMoney || 1000;
     const images = event.images || (event.image_url ? [event.image_url] : ['https://via.placeholder.com/800x400']);
 
-    const handleBookingConfirm = (bookingData) => {
+    const handleBookingComplete = (bookingData) => {
         setShowBookingModal(false);
         // Simulate booking success
-        alert(`Booking Confirmed! Paid: ৳${bookingData.amount}. You have been added to the Trip Chat Group.`);
+        toast.success(`Booking Confirmed! Paid: ৳${bookingData.amount}. You have been added to the Trip Chat Group.`);
         navigate('/tours'); // Or to a "My Bookings" page
     };
 
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+            <SEO title={seoTitle} description={seoDesc} image={seoImage} keywords={`${seoTitle}, Bangladesh tour, travel, Madventure`} />
             <div className="max-w-6xl mx-auto">
                 {/* Hero Section */}
                 <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 mb-8">
@@ -312,7 +320,7 @@ const TourDetails = () => {
                 event={event}
                 isOpen={showBookingModal}
                 onClose={() => setShowBookingModal(false)}
-                onConfirm={handleBookingConfirm}
+                onConfirm={handleBookingComplete}
             />
         </div>
     );

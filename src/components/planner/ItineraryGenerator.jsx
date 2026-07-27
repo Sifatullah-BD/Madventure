@@ -8,6 +8,7 @@ import {
 import { Link } from 'react-router-dom';
 import { saveItinerary, generateItinerary } from '../../services/plannerService';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../ui/Toast';
 
 const GROUP_TYPES = [
   { id: 'solo', label: 'সলো ট্রাভেলার', icon: Users, multiplier: 1 },
@@ -26,6 +27,7 @@ const INTERESTS = [
 
 const ItineraryGenerator = () => {
   const { user } = useAuth();
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     destinationId: '',
@@ -65,8 +67,8 @@ const ItineraryGenerator = () => {
   };
 
   const handleGenerate = () => {
-    if (!formData.destinationId) return alert("গন্তব্য নির্বাচন করুন!");
-    if (!formData.startDate) return alert("যাত্রার তারিখ দিন!");
+    if (!formData.destinationId) return toast.warning("গন্তব্য নির্বাচন করুন!");
+    if (!formData.startDate) return toast.warning("যাত্রার তারিখ দিন!");
     
     setIsGenerating(true);
 
@@ -129,7 +131,7 @@ const ItineraryGenerator = () => {
 
   const handleSaveToCloud = async () => {
     if (!user) {
-      alert("Please login to save your plan.");
+      toast.warning("Please login to save your plan.");
       return;
     }
     setIsSaving(true);
@@ -146,10 +148,10 @@ const ItineraryGenerator = () => {
 
     const { error } = await saveItinerary(itineraryData);
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
     } else {
       setSaved(true);
-      alert("Plan saved successfully to your profile!");
+      toast.success("Plan saved successfully to your profile!");
     }
     setIsSaving(false);
   };
@@ -175,7 +177,7 @@ const ItineraryGenerator = () => {
 
   if (step === 6 && result) {
     return (
-      <div className="bg-white dark:bg-gray-850 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden" id="itinerary-result">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden" id="itinerary-result">
         {/* Result Header */}
         <div className="bg-[#1B5E20] p-8 text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-20 bg-cover bg-center" style={{ backgroundImage: `url(${result.district.heroImage})` }} />
@@ -209,7 +211,7 @@ const ItineraryGenerator = () => {
           </div>
         </div>
 
-        <div className="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <h3 className="text-xl font-bold flex items-center gap-2 text-gray-800 border-b pb-4">
               <Calendar className="text-primary" /> দিনভিত্তিক রূপরেখা
@@ -217,36 +219,40 @@ const ItineraryGenerator = () => {
             
             <div className="space-y-4">
               {result.days.map((day) => (
-                <div key={day.day} className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                <div key={day.day} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
                   <button 
                     onClick={() => setActiveDay(activeDay === day.day ? null : day.day)}
-                    className={`w-full flex items-center justify-between p-4 font-bold text-left transition-colors ${activeDay === day.day ? 'bg-green-50 dark:bg-green-900/30 text-primary dark:text-green-400' : 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                    className={`w-full flex items-center justify-between px-4 py-3 font-bold text-left transition-colors text-sm ${
+                      activeDay === day.day 
+                        ? 'bg-green-50 dark:bg-green-900/40 text-green-700 dark:text-green-400' 
+                        : 'bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    }`}
                   >
-                    <span>দিন {day.day}</span>
-                    {activeDay === day.day ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    <span className="font-bold">দিন {day.day}</span>
+                    {activeDay === day.day ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
                   
                   {activeDay === day.day && (
-                    <div className="p-6 bg-white dark:bg-gray-900 space-y-6">
-                      <div className="flex gap-4">
-                        <div className="bg-orange-100 dark:bg-orange-950 p-3 rounded-full h-fit text-orange-600 dark:text-orange-400"><Sun size={20}/></div>
+                    <div className="px-5 py-4 bg-white dark:bg-gray-800 space-y-4">
+                      <div className="flex gap-3">
+                        <div className="bg-orange-100 dark:bg-orange-900/50 p-2.5 rounded-full h-fit text-orange-600 dark:text-orange-400"><Sun size={16}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">সকাল</h4>
-                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.morning}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-0.5 text-sm">সকাল</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">{day.morning}</p>
                         </div>
                       </div>
-                      <div className="flex gap-4">
-                        <div className="bg-yellow-100 dark:bg-yellow-950 p-3 rounded-full h-fit text-yellow-600 dark:text-yellow-400"><Sun size={20}/></div>
+                      <div className="flex gap-3">
+                        <div className="bg-yellow-100 dark:bg-yellow-900/50 p-2.5 rounded-full h-fit text-yellow-600 dark:text-yellow-400"><Sun size={16}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">দুপুর</h4>
-                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.afternoon}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-0.5 text-sm">দুপুর</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">{day.afternoon}</p>
                         </div>
                       </div>
-                      <div className="flex gap-4">
-                        <div className="bg-indigo-100 dark:bg-indigo-950 p-3 rounded-full h-fit text-indigo-600 dark:text-indigo-400"><Sunset size={20}/></div>
+                      <div className="flex gap-3">
+                        <div className="bg-indigo-100 dark:bg-indigo-900/50 p-2.5 rounded-full h-fit text-indigo-600 dark:text-indigo-400"><Sunset size={16}/></div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-gray-800 dark:text-white mb-1">সন্ধ্যা</h4>
-                          <p className="text-gray-600 dark:text-gray-300 text-sm">{day.evening}</p>
+                          <h4 className="font-bold text-gray-800 dark:text-gray-100 mb-0.5 text-sm">সন্ধ্যা</h4>
+                          <p className="text-gray-600 dark:text-gray-300 text-xs leading-relaxed">{day.evening}</p>
                         </div>
                       </div>
                     </div>

@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { paymentService } from '../services/paymentService';
 import { bookingService } from '../services/bookingService';
 import useWalletStore from '../store/useWalletStore';
+import AddMoneyModal from '../components/wallet/AddMoneyModal';
 
 const DEMO_TRANSACTIONS = [
     { id: 1, desc: 'Added Money (Bkash)', date: '2025-12-01', amount: '+5000 BDT', type: 'credit' },
@@ -26,6 +27,7 @@ const Wallet = () => {
     const [loadingRemote, setLoadingRemote] = useState(false);
     const [dbBookings, setDbBookings] = useState([]);
     const [paymentTxns, setPaymentTxns] = useState([]);
+    const [showAddMoney, setShowAddMoney] = useState(false);
 
     // Use Zustand wallet store for optimistic updates
     const { balance, ledgerRows, fetchWallet } = useWalletStore();
@@ -144,7 +146,10 @@ const Wallet = () => {
                                 <span className="text-lg text-gray-400 font-normal">BDT</span>
                             </h2>
 
-                            <button className="w-full bg-primary hover:bg-green-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-900/20">
+                            <button 
+                                onClick={() => setShowAddMoney(true)}
+                                className="w-full bg-primary hover:bg-green-600 text-white py-3 rounded-xl font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-900/20"
+                            >
                                 <PlusCircle size={20} /> Add Money
                             </button>
                         </div>
@@ -326,6 +331,14 @@ const Wallet = () => {
                         <p className="text-xs text-gray-400">Your file is being downloaded...</p>
                     </div>
                 </div>
+            )}
+
+            {showAddMoney && (
+                <AddMoneyModal 
+                    isOpen={showAddMoney} 
+                    onClose={() => setShowAddMoney(false)} 
+                    onSuccess={() => fetchWallet(user?.id)}
+                />
             )}
         </div>
     );

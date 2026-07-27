@@ -4,10 +4,12 @@ import { CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { bookingService } from '../../services/bookingService';
 import { analytics } from '../../services/analyticsService';
+import { useToast } from '../ui/Toast';
 
 const Step3Summary = ({ tourData, formData, onPrev }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const toast = useToast();
     const [submitting, setSubmitting] = useState(false);
     
     // Calculate totals
@@ -48,7 +50,7 @@ const Step3Summary = ({ tourData, formData, onPrev }) => {
             navigate('/checkout', { state: { booking: checkoutPayload } });
         } catch (e) {
             console.error(e);
-            window.alert(e.message || 'Could not create booking. Please try again.');
+            toast.error(e.message || 'Could not create booking. Please try again.');
         } finally {
             setSubmitting(false);
         }

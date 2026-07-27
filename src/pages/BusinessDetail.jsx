@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Phone, MessageCircle, Globe, Facebook, Star, BadgeCheck, Sparkles, Clock, Users, ChevronLeft, Share2, Heart, ExternalLink, ArrowRight, Loader2 } from 'lucide-react';
 import { businessService } from '../services/businessService';
@@ -10,10 +10,12 @@ import LoadingSkeleton from '../components/ui/LoadingSkeleton';
 import ReviewSection from '../components/reviews/ReviewSection';
 import { addToWishlist, removeFromWishlist, getWishlist } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../components/ui/Toast';
 
 const BusinessDetail = () => {
     const { slug } = useParams();
     const { user } = useAuth();
+    const toast = useToast();
     const [business, setBusiness] = useState(null);
     const [listings, setListings] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -62,7 +64,7 @@ const BusinessDetail = () => {
 
     const toggleWishlist = async () => {
         if (!user) {
-            alert("Please login to add to wishlist.");
+            toast.warning("Please login to add to wishlist.");
             return;
         }
         setWishlisting(true);

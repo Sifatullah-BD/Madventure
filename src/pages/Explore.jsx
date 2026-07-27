@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, SlidersHorizontal, X, MapPin, Layers, Map as MapIcon, Home, Store, LayoutGrid } from 'lucide-react';
 import InteractiveMap from '../components/map/InteractiveMap';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -13,9 +13,10 @@ import { businessService } from '../services/businessService';
 import districtsList from '../data/districts_list.json';
 import upazilasData from '../data/upazilas.json';
 import MapDiscovery from '../components/home/MapDiscovery';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
+import SEO from '../components/SEO';
 
 // Map and sort all 64 districts from JSON
 const allDistricts = districtsList.districts.map(d => ({
@@ -247,6 +248,7 @@ const Explore = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#020d06] pt-24 pb-12 transition-colors duration-300">
+            <SEO title="Explore Bangladesh" description="Search tours, hotels, and local businesses across all 64 districts of Bangladesh. Powered by Madventure Travel OS." keywords="explore Bangladesh, tours, hotels, travel search, Madventure" />
             <div className="max-w-[1140px] mx-auto px-4">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-black font-heading text-gray-900 dark:text-white mb-2">

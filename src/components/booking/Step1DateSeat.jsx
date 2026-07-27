@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Users } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 const Step1DateSeat = ({ tourData, departures, formData, setFormData, onNext }) => {
+    const toast = useToast();
     // Fallback dates if no real departures found (or in mock mode)
     const today = new Date();
     const fallbackDates = [
@@ -22,7 +24,7 @@ const Step1DateSeat = ({ tourData, departures, formData, setFormData, onNext }) 
 
     const handleNext = () => {
         if (!selectedDate) {
-            alert("Please select a departure date.");
+            toast.error("Please select a departure date.");
             return;
         }
         setFormData({ ...formData, date: selectedDate, seats: selectedSeats });

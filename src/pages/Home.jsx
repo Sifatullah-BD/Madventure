@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { MapPin, Calendar, DollarSign, Star, Quote, ArrowRight, Tent, Map as MapIcon, Ticket } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import SEO from '../components/SEO';
 import { useLanguage } from '../context/LanguageContext';
 import { districtsData } from '../data/districts';
+import { supabaseService } from '../services/supabaseService';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -24,40 +25,26 @@ const Home = () => {
         navigate(`/destinations?${queryParams.toString()}`);
     };
 
-    const trendingTours = [
-        { 
-            id: 1, 
-            title: language === 'bn' ? 'সাজেক মেঘকন্যা রিলাক্স ট্যুর' : 'Sajek Valley Relax Tour', 
-            image: '/images/destinations_hero_1_1778975470949.png', 
-            price: language === 'bn' ? '৳৫,৫০০' : '৳5,500', 
-            agency: 'Green Valley Tours', 
-            rating: 4.8 
-        },
-        { 
-            id: 2, 
-            title: language === 'bn' ? 'সুন্দরবন এডভেঞ্চার ক্রুজ' : 'Sundarban Adventure Cruise', 
-            image: '/images/destinations_hero_2_1778975509415.png', 
-            price: language === 'bn' ? '৳১২,০০০' : '৳12,000', 
-            agency: 'River Trips BD', 
-            rating: 4.9 
-        },
-        { 
-            id: 3, 
-            title: language === 'bn' ? 'সেন্টমার্টিন স্পেশাল প্যাকেজ' : 'Saint Martin Special Package', 
-            image: '/images/destinations_hero_3_1778975530619.png', 
-            price: language === 'bn' ? '৳৬,২০০' : '৳6,200', 
-            agency: 'Ocean Travels', 
-            rating: 4.7 
-        },
-        { 
-            id: 4, 
-            title: language === 'bn' ? 'সিলেট-শ্রীমঙ্গল এক্সপ্লোর' : 'Sylhet-Srimangal Explore', 
-            image: '/images/home_dest_1_1778976669789.png', 
-            price: language === 'bn' ? '৳৪,৫০০' : '৳4,500', 
-            agency: 'Sylhet Guides', 
-            rating: 4.6 
-        },
-    ];
+    const [trendingTours, setTrendingTours] = useState([]);
+    const [loadingTours, setLoadingTours] = useState(true);
+
+    React.useEffect(() => {
+        let mounted = true;
+        const fetchTours = async () => {
+            try {
+                const data = await supabaseService.getTours();
+                if (mounted && data) {
+                    setTrendingTours(data.slice(0, 4));
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (mounted) setLoadingTours(false);
+            }
+        };
+        fetchTours();
+        return () => { mounted = false; };
+    }, []);
 
     const reviews = [
         { 
@@ -153,14 +140,14 @@ const Home = () => {
             </section>
 
             {/* 2. Beautiful Destinations */}
-            <section className="py-24 bg-white dark:bg-[#050f08] text-gray-900 dark:text-gray-100 transition-colors">
+            <section className="py-12 bg-white dark:bg-[#050f08] text-gray-900 dark:text-gray-100 transition-colors">
                 <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-16 items-center">
                     <div className="flex-1 relative">
                         <div className="grid grid-cols-2 gap-4">
-                            <motion.div initial={{ y: 20 }} whileInView={{ y: 0 }} className="rounded-3xl overflow-hidden h-80 shadow-xl border-4 border-white dark:border-gray-800">
+                            <motion.div initial={{ y: 20 }} whileInView={{ y: 0 }} viewport={{ once: true, margin: "-50px" }} className="rounded-3xl overflow-hidden h-64 shadow-xl border-4 border-white dark:border-gray-800">
                                 <img src="/images/home_dest_1_1778976669789.png" className="w-full h-full object-cover" alt="" />
                             </motion.div>
-                            <motion.div initial={{ y: -20 }} whileInView={{ y: 0 }} className="rounded-3xl overflow-hidden h-80 mt-12 shadow-xl border-4 border-white dark:border-gray-800">
+                            <motion.div initial={{ y: -20 }} whileInView={{ y: 0 }} viewport={{ once: true, margin: "-50px" }} className="rounded-3xl overflow-hidden h-64 mt-12 shadow-xl border-4 border-white dark:border-gray-800">
                                 <img src="/images/home_dest_2_1778976690365.png" className="w-full h-full object-cover" alt="" />
                             </motion.div>
                         </div>
@@ -196,10 +183,10 @@ const Home = () => {
             </section>
 
             {/* 3. Features Section */}
-            <section className="py-24 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-center transition-colors">
+            <section className="py-12 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-center transition-colors">
                 <div className="max-w-7xl mx-auto px-6">
                     <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">Services ——</span>
-                    <h2 className="text-4xl md:text-5xl font-black mt-4 mb-16">{language === 'bn' ? 'আপনার জন্য সেরা সব ফিচার' : 'Best Features For You'}</h2>
+                    <h2 className="text-3xl md:text-4xl font-black mt-4 mb-12">{language === 'bn' ? 'আপনার জন্য সেরা সব ফিচার' : 'Best Features For You'}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             { icon: "⛺", title: language === 'bn' ? "অজস্র পছন্দ" : "Lots of Choices", desc: language === 'bn' ? "আমরা বিভিন্ন ধরনের গন্তব্য এবং ট্রাভেল প্যাকেজ সরবরাহ করি।" : "We provide several choices of destinations and travelling packages." },
@@ -209,11 +196,11 @@ const Home = () => {
                             <motion.div 
                                 key={i} 
                                 whileHover={{ y: -10 }}
-                                className="bg-white dark:bg-gray-800 p-10 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center space-y-6 transition-all group"
+                                className="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col items-center text-center space-y-4 transition-all group"
                             >
-                                <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">{f.icon}</div>
-                                <h4 className="text-xl font-black">{f.title}</h4>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{f.desc}</p>
+                                <div className="w-14 h-14 bg-orange-50 dark:bg-orange-950 rounded-2xl flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">{f.icon}</div>
+                                <h4 className="text-lg font-black text-gray-900 dark:text-gray-100">{f.title}</h4>
+                                <p className="text-gray-500 dark:text-gray-300 text-sm leading-relaxed">{f.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -221,60 +208,72 @@ const Home = () => {
             </section>
 
             {/* 4. Top Destinations */}
-            <section className="py-24 bg-white dark:bg-[#050f08] text-gray-900 dark:text-gray-100 text-center transition-colors">
+            <section className="py-12 bg-white dark:bg-[#050f08] text-gray-900 dark:text-gray-100 text-center transition-colors">
                 <div className="max-w-7xl mx-auto px-6">
                     <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">Trending ——</span>
-                    <h2 className="text-4xl md:text-5xl font-black mt-4 mb-4">{language === 'bn' ? 'আপনার পছন্দের গন্তব্যটি খুঁজে নিন' : "Explore Your Dream Destination!"}</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto mb-16">{language === 'bn' ? 'আমরা প্রতি সপ্তাহে জনপ্রিয় সব ট্যুর প্যাকেজ সাজিয়ে থাকি।' : "Popular destinations recommended every week just for you."}</p>
+                    <h2 className="text-3xl md:text-4xl font-black mt-4 mb-3">{language === 'bn' ? 'আপনার পছন্দের গন্তব্যটি খুঁজে নিন' : "Explore Your Dream Destination!"}</h2>
+                    <p className="text-gray-400 max-w-2xl mx-auto mb-8 text-sm">{language === 'bn' ? 'আমরা প্রতি সপ্তাহে জনপ্রিয় সব ট্যুর প্যাকেজ সাজিয়ে থাকি।' : "Popular destinations recommended every week just for you."}</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {trendingTours.map((tour) => (
-                            <motion.div 
-                                key={tour.id} 
-                                whileHover={{ scale: 1.02 }}
-                                className="bg-white dark:bg-gray-800 rounded-[2rem] overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 group transition-all"
-                            >
-                                <div className="h-64 relative overflow-hidden">
-                                    <img src={tour.image} alt={tour.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    <div className="absolute top-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-orange-500">
-                                        ⭐ {tour.rating}
+                        {loadingTours ? (
+                            Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-3xl h-64 animate-pulse" />
+                            ))
+                        ) : trendingTours.length === 0 ? (
+                            <div className="col-span-4 text-center text-gray-400 py-12">
+                                <Tent size={40} className="mx-auto mb-3 opacity-40" />
+                                <p>No tours yet. Be the first to add one!</p>
+                            </div>
+                        ) : (
+                            trendingTours.map((tour) => (
+                                <motion.div 
+                                    key={tour.id} 
+                                    whileHover={{ scale: 1.02 }}
+                                    onClick={() => navigate(`/tours/${tour.id}`)}
+                                    className="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg border border-gray-100 dark:border-gray-700 group transition-all cursor-pointer"
+                                >
+                                    <div className="h-48 relative overflow-hidden">
+                                        <img src={tour.images?.[0] || tour.image || 'https://placehold.co/400x300/1B5E20/white?text=Tour'} alt={tour.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        <div className="absolute top-3 right-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-black text-orange-500 shadow-sm">
+                                            ⭐ {tour.rating || 4.5}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="p-6 text-left flex justify-between items-center">
-                                    <div className="flex-1 pr-2">
-                                        <h4 className="font-black text-lg truncate">{tour.title}</h4>
-                                        <p className="text-gray-400 text-xs flex items-center gap-1 mt-1"><MapPin size={12} /> Bangladesh</p>
+                                    <div className="p-5 text-left flex justify-between items-center">
+                                        <div className="flex-1 pr-2">
+                                            <h4 className="font-black text-base truncate text-gray-900 dark:text-gray-100">{tour.title}</h4>
+                                            <p className="text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1 mt-1"><MapPin size={12} /> {tour.location || 'Bangladesh'}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <span className="bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400 px-3 py-1.5 rounded-xl font-black text-xs whitespace-nowrap">৳{tour.price || tour.booking_money || 5000}</span>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-xl font-black text-sm whitespace-nowrap">{tour.price}</span>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
+                                </motion.div>
+                            ))
+                        )}
                     </div>
-                    <button onClick={() => navigate('/destinations')} className="mt-16 bg-orange-500 text-white px-10 py-4 rounded-2xl font-black hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/30">
+                    <button onClick={() => navigate('/tour-plans')} className="mt-10 bg-orange-500 text-white px-10 py-3 rounded-2xl font-black hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/30 text-sm">
                         {language === 'bn' ? 'আরও দেখুন' : 'View More'}
                     </button>
                 </div>
             </section>
 
-            {/* 5. Testimonials - Traver Style */}
-            <section className="py-24 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-                <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-24 items-center">
-                    <div className="flex-1 space-y-8">
+            {/* 5. Testimonials */}
+            <section className="py-12 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+                <div className="max-w-6xl mx-auto px-6 flex flex-col lg:flex-row gap-12 items-center">
+                    <div className="flex-1 space-y-6">
                         <span className="text-orange-500 font-bold uppercase tracking-widest text-sm">{language === 'bn' ? 'মতামত' : 'What They Say'} ——</span>
-                        <h2 className="text-4xl md:text-5xl font-black">{language === 'bn' ? <>আমাদের গ্রাহকরা <br /> কী বলেন</> : <>What Our Customers <br /> Say About Us</>}</h2>
-                        <div className="bg-white dark:bg-gray-800 p-10 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 relative">
-                            <Quote className="text-orange-100 dark:text-orange-900/30 absolute top-8 right-8" size={80} />
-                            <div className="flex gap-1 mb-6">
-                                {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FFD700" className="text-yellow-400" />)}
+                        <h2 className="text-3xl md:text-4xl font-black">{language === 'bn' ? <>আমাদের গ্রাহকরা <br /> কী বলেন</> : <>What Our Customers <br /> Say About Us</>}</h2>
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 relative max-w-md">
+                            <Quote className="text-orange-100 dark:text-orange-900/30 absolute top-6 right-6" size={60} />
+                            <div className="flex gap-1 mb-4">
+                                {[...Array(5)].map((_, i) => <Star key={i} size={14} fill="#FFD700" className="text-yellow-400" />)}
                             </div>
-                            <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed italic mb-8 relative z-10">"{reviews[0].text}"</p>
-                            <div className="flex items-center gap-4">
-                                <img src={reviews[0].avatar} className="w-14 h-14 rounded-full border-2 border-orange-500" alt="" />
+                            <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed italic mb-6 relative z-10">"{reviews[0].text}"</p>
+                            <div className="flex items-center gap-3">
+                                <img src={reviews[0].avatar} className="w-10 h-10 rounded-full border-2 border-orange-500" alt="" />
                                 <div>
-                                    <h4 className="font-black">{reviews[0].name}</h4>
-                                    <p className="text-xs text-gray-400 font-bold">{language === 'bn' ? 'ভ্রমণ উৎসাহী' : 'Travel Enthusiast'}</p>
+                                    <h4 className="font-black text-sm">{reviews[0].name}</h4>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase">{language === 'bn' ? 'ভ্রমণ উৎসাহী' : 'Travel Enthusiast'}</p>
                                 </div>
                             </div>
                         </div>
@@ -289,7 +288,7 @@ const Home = () => {
                                 '/images/home_dest_2_1778976690365.png',
                                 '/images/home_hero_1778976642283.png'
                             ].map((url, i) => (
-                                <div key={i} className={`rounded-2xl overflow-hidden h-40 ${i % 2 === 0 ? 'mt-8' : ''}`}>
+                                <div key={i} className={`rounded-2xl overflow-hidden h-32 ${i % 2 === 0 ? 'mt-6' : ''}`}>
                                     <img src={url} className="w-full h-full object-cover" alt="" />
                                 </div>
                             ))}
@@ -298,28 +297,29 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* 6. Blog - Vertical Cinematic Cards */}
-            <section className="py-32 bg-[#08140c]">
+            {/* 6. Blog - Cinematic Cards */}
+            <section className="py-16 bg-[#08140c]">
                 <div className="max-w-7xl mx-auto px-6">
-                    <div className="flex justify-between items-end mb-24">
+                    <div className="flex justify-between items-end mb-12">
                         <div>
                             <span className="text-forest-light font-black tracking-[0.5em] uppercase text-xs mb-4 block">Travel Guides</span>
-                            <h2 className="text-5xl md:text-6xl font-black text-white">{language === 'bn' ? 'ভ্রমণ ডায়েরি' : 'Travel Diary'}</h2>
+                            <h2 className="text-4xl md:text-5xl font-black text-white">{language === 'bn' ? 'ভ্রমণ ডায়েরি' : 'Travel Diary'}</h2>
                         </div>
                         <button onClick={() => navigate('/blog')} className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black hover:bg-forest-light transition-all flex items-center gap-3">
                             {language === 'bn' ? 'সব পড়ুন' : 'Read All'} <ArrowRight size={20} />
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
-                            { id: 1, title: language === 'bn' ? 'সাজেক ভ্যালি ভ্রমণের সঠিক সময় এবং টিপস' : 'Best Time & Tips for Sajek Valley', image: '/images/destinations_hero_1_1778975470949.png', date: language === 'bn' ? '১২ মে, ২০২৪' : 'May 12, 2024', category: 'Guide' },
-                            { id: 2, title: language === 'bn' ? 'সুন্দরবনে কি কি দেখবেন? পূর্ণাঙ্গ গাইডলাইন' : 'What to see in Sundarbans? Complete Guideline', image: '/images/destinations_hero_2_1778975509415.png', date: language === 'bn' ? '১০ মে, ২০২৪' : 'May 10, 2024', category: 'Adventure' },
-                            { id: 3, title: language === 'bn' ? 'কক্সবাজার ভ্রমণে খরচ বাঁচানোর ৫টি উপায়' : '5 Ways to Save Money on Cox\'s Bazar Trip', image: '/images/destinations_hero_3_1778975530619.png', date: language === 'bn' ? '০৫ মে, ২০২৪' : 'May 5, 2024', category: 'Budget' }
+                            { id: 1, title: language === 'bn' ? 'সাজেক ভ্যালি ভ্রমণের সঠিক সময় এবং টিপস' : 'Best Time & Tips for Sajek Valley', image: '/images/destinations_hero_1_1778975470949.png', date: language === 'bn' ? '১২ মে, ২০২৪' : 'May 12, 2024', category: 'Guide', slug: 'sajek-valley-tips' },
+                            { id: 2, title: language === 'bn' ? 'সুন্দরবনে কি কি দেখবেন? পূর্ণাঙ্গ গাইডলাইন' : 'What to see in Sundarbans? Complete Guideline', image: '/images/destinations_hero_2_1778975509415.png', date: language === 'bn' ? '১০ মে, ২০২৪' : 'May 10, 2024', category: 'Adventure', slug: 'sundarbans-guide' },
+                            { id: 3, title: language === 'bn' ? 'কক্সবাজার ভ্রমণে খরচ বাঁচানোর ৫টি উপায়' : '5 Ways to Save Money on Cox\'s Bazar Trip', image: '/images/destinations_hero_3_1778975530619.png', date: language === 'bn' ? '০৫ মে, ২০২৪' : 'May 5, 2024', category: 'Budget', slug: 'coxs-bazar-budget' }
                         ].map(post => (
                             <motion.div 
                                 key={post.id} 
-                                whileHover={{ y: -15 }}
+                                whileHover={{ y: -10 }}
+                                onClick={() => navigate(`/blog/${post.slug}`)}
                                 className="group cursor-pointer relative"
                             >
                                 <div className="h-[550px] rounded-[3.5rem] overflow-hidden relative shadow-2xl border border-white/5">

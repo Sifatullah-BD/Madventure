@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Users, DoorClosed, Check } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 const Step2Guests = ({ hotelRooms, formData, setFormData, onNext, onPrev }) => {
+    const toast = useToast();
     // Fallback if no rooms provided (mock mode)
     const displayRooms = (hotelRooms && hotelRooms.length > 0) 
         ? hotelRooms 
@@ -17,12 +19,12 @@ const Step2Guests = ({ hotelRooms, formData, setFormData, onNext, onPrev }) => {
 
     const handleNext = () => {
         if (!selectedRoomId) {
-            alert("Please select a room type.");
+            toast.warning("Please select a room type.");
             return;
         }
         const room = displayRooms.find(r => r.id === selectedRoomId);
         if (adults < roomsCount) {
-            alert("You must have at least 1 adult per room.");
+            toast.warning("You must have at least 1 adult per room.");
             return;
         }
         setFormData({ 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import districtsData from '../../data/districts_list.json';
 import ThreadCard from './ThreadCard';
 import { Search, Filter, MessageSquarePlus, X, Loader2 } from 'lucide-react';
@@ -6,6 +6,7 @@ import { getForumThreads, createThread } from '../../services/communityService';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../context/LanguageContext';
 import useRealtime from '../../hooks/useRealtime';
+import { useToast } from '../ui/Toast';
 
 const CATEGORIES = [
     { id: 'all', label: 'সব' },
@@ -18,6 +19,7 @@ const CATEGORIES = [
 const Forum = ({ onSelectThread, onLoginRequired }) => {
     const { user } = useAuth();
     const { language } = useLanguage();
+    const toast = useToast();
     const [threads, setThreads] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
@@ -31,20 +33,29 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
     // Form states
     const [newThreadData, setNewThreadData] = useState({ title: '', category: 'question', content: '', tags: '' });
 
-    const fetchThreads = useCallback(async () => {
+    const mountedRef = useRef(true);
+    useEffect(() => {
+        mountedRef.current = true;
+        return () => { mountedRef.current = false; };
+    }, []);
+
+    const fetchThreads = async () => {
+
         setLoading(true);
         try {
             const data = await getForumThreads();
-            if (data) setThreads(data);
+            if (mountedRef.current && data) setThreads(data);
         } catch (e) {
             console.warn('fetchThreads error', e);
+        } finally {
+            if (mountedRef.current) setLoading(false);
         }
-        setLoading(false);
-    }, []);
+    };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchThreads();
-    }, [fetchThreads]);
+    }, []);
 
     // Live feed: new threads appear at the top instantly
     useRealtime({
@@ -62,7 +73,7 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
     const handleCreateThread = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert("Please login to post a thread.");
+            toast.warning("Please login to post a thread.");
             return;
         }
         setSubmitting(true);
@@ -75,8 +86,9 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
             setNewThreadData({ title: '', category: 'question', content: '', tags: '' });
             // Realtime will push new thread, but also refresh to get profile join
             fetchThreads();
+            toast.success("Thread posted successfully!");
         } catch (error) {
-            alert(error.message);
+            toast.error(error.message);
         }
         setSubmitting(false);
     };

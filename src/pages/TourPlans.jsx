@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { Map, Calendar, Plus, Trash2, Save, Share2, Download, DollarSign, MapPin, Clock, FileText, MoreVertical, CheckCircle, GripVertical, X } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../hooks/useAuth';
+import { supabaseService } from '../services/supabaseService';
 
 const TourPlans = () => {
+    const { user } = useAuth();
     const { language } = useLanguage();
     const [showToast, setShowToast] = useState(null);
     const [activePlan, setActivePlan] = useState(null);
@@ -28,57 +31,20 @@ const TourPlans = () => {
                 console.error("Error parsing saved plans, using fallbacks:", e);
             }
         }
-        return [
-            { 
-                id: 1, 
-                title: language === 'bn' ? 'সাজেক ভ্যালি ট্যুর' : 'Sajek Valley Trip', 
-                date: '2025-12-15', 
-                duration: '3 Days', 
-                budget: 5000, 
-                status: 'Draft',
-                notes: 'Don\'t forget to pack sunscreen, extra power bank, and mosquito repellents!',
-                itinerary: [
-                    {
-                        day: 1,
-                        title: 'Journey & Arrival',
-                        activities: [
-                            { id: 1, time: '10:00 PM', title: 'Bus from Dhaka to Khagrachari', type: 'Transport', cost: 800 },
-                            { id: 2, time: '07:00 AM', title: 'Breakfast at Khagrachari System Restaurant', type: 'Food', cost: 150 },
-                            { id: 3, time: '10:00 AM', title: 'Chander Gari mountain road to Sajek', type: 'Transport', cost: 300 },
-                        ]
-                    },
-                    {
-                        day: 2,
-                        title: 'Exploring Sajek',
-                        activities: [
-                            { id: 4, time: '05:30 AM', title: 'Sunrise view at Konglak Helipad', type: 'Sightseeing', cost: 0 },
-                            { id: 5, time: '09:00 AM', title: 'Konglak Para cloud trekking', type: 'Adventure', cost: 50 },
-                        ]
-                    }
-                ]
-            },
-            { 
-                id: 2, 
-                title: language === 'bn' ? 'সিলেট চা বাগান ভ্রমণ' : 'Sylhet Tea Gardens', 
-                date: '2026-01-20', 
-                duration: '3 Days', 
-                budget: 6500, 
-                status: 'Planned',
-                notes: 'Hire local boat for Ratargul Swamp Forest early in the morning.',
-                itinerary: [
-                    {
-                        day: 1,
-                        title: 'Tea Garden & Lake Tour',
-                        activities: [
-                            { id: 1, time: '08:00 AM', title: 'Arrival in Sylhet Town', type: 'Transport', cost: 700 },
-                            { id: 2, time: '11:00 AM', title: 'Explore Lakkatura Tea Estate', type: 'Sightseeing', cost: 50 },
-                            { id: 3, time: '02:00 PM', title: 'Boat ride in Lalakhal emerald river', type: 'Adventure', cost: 400 }
-                        ]
-                    }
-                ]
-            },
-        ];
+        return []; // Start empty if no local data
     });
+
+    // Fetch from Supabase on mount if logged in
+    useEffect(() => {
+        if (user?.id) {
+            supabaseService.getUserPlans(user.id).then(plans => {
+                if (plans && plans.length > 0) {
+                    setMyPlans(plans);
+                    localStorage.setItem('madventure_tours_plans', JSON.stringify(plans));
+                }
+            });
+        }
+    }, [user?.id]);
 
     const handleAction = (action) => {
         setShowToast(action);
@@ -182,8 +148,8 @@ const TourPlans = () => {
         handleAction(language === 'bn' ? 'কার্যক্রম মুছে ফেলা হয়েছে' : 'Removed Activity');
     };
 
-    // Save plan to localStorage
-    const handleSavePlan = () => {
+    // Save plan to localStorage and Supabase
+    const handleSavePlan = async () => {
         const totalSpent = calculateTotalSpent();
         const finalPlan = {
             ...activePlan,
@@ -197,17 +163,20 @@ const TourPlans = () => {
             const newPlanObj = {
                 ...finalPlan,
                 id: nextId,
-                status: 'Planned'
+                status: 'Planned',
+                user_id: user?.id
             };
             updatedPlans = [...myPlans, newPlanObj];
             setActivePlan(newPlanObj);
+            if (user?.id) await supabaseService.saveUserPlan(newPlanObj);
         } else {
             updatedPlans = myPlans.map(p => p.id === activePlan.id ? finalPlan : p);
+            if (user?.id) await supabaseService.saveUserPlan(finalPlan);
         }
 
         setMyPlans(updatedPlans);
         localStorage.setItem('madventure_tours_plans', JSON.stringify(updatedPlans));
-        handleAction(language === 'bn' ? 'পরিকল্পনা সফলভাবে সংরক্ষণ করা হয়েছে' : 'Saved Plan Successfully');
+        handleAction(language === 'bn' ? 'ট্যুর প্ল্যান সেভ হয়েছে' : 'Saved Plan Successfully');
     };
 
     // Export PDF

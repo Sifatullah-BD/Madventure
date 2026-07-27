@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Save, Send, Image as ImageIcon, Settings, X, Loader2 } from 'lucide-react';
 import { blogService } from '../features/blog/blogService';
 import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../components/ui/Toast';
 
 const CATEGORIES = ['Destination Guide', 'Budget Travel', 'Travel Tips', 'News', 'Stories'];
 
@@ -10,6 +11,7 @@ const BlogEditor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const toast = useToast();
     
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -63,7 +65,7 @@ const BlogEditor = () => {
 
     const handleSave = async (statusToSave) => {
         if (!post.title || !post.content) {
-            alert('Title and Content are required!');
+            toast.warning('Title and Content are required!');
             return;
         }
 
@@ -79,11 +81,11 @@ const BlogEditor = () => {
             };
 
             await blogService.savePost(postData);
-            alert(`Post ${statusToSave === 'published' ? 'published' : 'saved'} successfully!`);
+            toast.success(`Post ${statusToSave === 'published' ? 'published' : 'saved'} successfully!`);
             navigate('/blog'); // Redirect to blog list for all users
         } catch (err) {
             console.error("Save error:", err);
-            alert("Error saving post.");
+            toast.error("Error saving post.");
         } finally {
             setSaving(false);
         }

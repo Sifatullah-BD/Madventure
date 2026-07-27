@@ -1,6 +1,8 @@
 import PartnerCard from './PartnerCard';
+import { useToast } from '../ui/Toast';
 
 const TravelPartner = () => {
+    const toast = useToast();
     const { user } = useAuth();
     const [districtId, setDistrictId] = useState('');
     const [genderPref, setGenderPref] = useState('');
@@ -32,7 +34,7 @@ const TravelPartner = () => {
 
     const handleWhatsApp = (phone) => {
         if (!phone) {
-            alert("মোবাইল নম্বর পাওয়া যায়নি।");
+            toast.warning("ব্যবহারকারী নাম্বার যুক্ত করেননি");
             return;
         }
         const cleanPhone = phone.replace(/\D/g, '');
@@ -42,7 +44,7 @@ const TravelPartner = () => {
     const handleCreateRequest = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert("লগইন করুন!");
+            toast.warning("লগিন করুন!");
             return;
         }
         
@@ -54,9 +56,9 @@ const TravelPartner = () => {
         });
 
         if (error) {
-            alert(error.message);
+            toast.error(error.message);
         } else {
-            alert("রিকোয়েস্ট পোস্ট হয়েছে!");
+            toast.success("নতুন ট্রাভেলার রিকোয়েস্ট যুক্ত হয়েছে!");
             setShowAddForm(false);
             fetchPartners();
         }
@@ -139,7 +141,7 @@ const TravelPartner = () => {
                                     key={p.id} 
                                     partner={p} 
                                     onWhatsApp={handleWhatsApp} 
-                                    onJoin={() => alert('Join request sent!')} 
+                                    onJoin={() => toast.success('Join request sent!')} 
                                 />
                             ))}
                             

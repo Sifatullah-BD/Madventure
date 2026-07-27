@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, Moon } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 const Step1Dates = ({ hotelData, formData, setFormData, onNext }) => {
+    const toast = useToast();
     // Basic calendar mock using inputs
     const [checkIn, setCheckIn] = useState(formData.checkIn || '');
     const [checkOut, setCheckOut] = useState(formData.checkOut || '');
 
     const handleNext = () => {
         if (!checkIn || !checkOut) {
-            alert("Please select both check-in and check-out dates.");
+            toast.warning("Please select both check-in and check-out dates.");
             return;
         }
         
@@ -16,7 +18,7 @@ const Step1Dates = ({ hotelData, formData, setFormData, onNext }) => {
         const outDate = new Date(checkOut);
         
         if (outDate <= inDate) {
-            alert("Check-out date must be after check-in date.");
+            toast.warning("Check-out date must be after check-in date.");
             return;
         }
 

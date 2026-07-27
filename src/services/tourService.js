@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { TOURS } from '../data/madventure-data';
+import { TOURS, DISTRICTS } from '../data/madventure-data';
 
 class TourService {
     async getTours() {
@@ -68,3 +68,18 @@ export const getTourById = (...args) => tourService.getTourById(...args);
 export const createTour = (...args) => tourService.createTour(...args);
 export const getTourDepartures = (...args) => tourService.getTourDepartures(...args);
 export const checkTourAvailability = (...args) => tourService.checkTourAvailability(...args);
+
+// Alias helpers for Destinations page
+export const getDistricts = async () => {
+    if (!isSupabaseConfigured) return DISTRICTS;
+    const { data, error } = await supabase.from('districts').select('*');
+    if (error) return DISTRICTS; // fallback to static data
+    return data?.length ? data : DISTRICTS;
+};
+
+export const getPlaces = async (districtId) => {
+    if (!isSupabaseConfigured) return [];
+    const { data, error } = await supabase.from('places').select('*').eq('district_id', districtId);
+    if (error) return [];
+    return data || [];
+};

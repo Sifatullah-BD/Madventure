@@ -121,5 +121,52 @@ export const supabaseService = {
             .single();
         if (error) throw error;
         return data;
+    },
+
+    async getUserPlans(userId) {
+        if (!isSupabaseConfigured || !userId) return null;
+        try {
+            const { data, error } = await supabase
+                .from('user_plans')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            return data;
+        } catch (e) {
+            console.warn('Error fetching user plans:', e);
+            return null;
+        }
+    },
+
+    async saveUserPlan(planData) {
+        if (!isSupabaseConfigured) return null;
+        try {
+            const { data, error } = await supabase
+                .from('user_plans')
+                .upsert(planData, { onConflict: 'id' })
+                .select()
+                .single();
+            if (error) throw error;
+            return data;
+        } catch (e) {
+            console.warn('Error saving plan to supabase:', e);
+            return null;
+        }
+    },
+
+    async deleteUserPlan(planId) {
+        if (!isSupabaseConfigured) return false;
+        try {
+            const { error } = await supabase
+                .from('user_plans')
+                .delete()
+                .eq('id', planId);
+            if (error) throw error;
+            return true;
+        } catch (e) {
+            console.warn('Error deleting plan:', e);
+            return false;
+        }
     }
 };

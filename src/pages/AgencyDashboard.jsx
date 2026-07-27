@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, LayoutDashboard, List, Users } from 'lucide-react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import CreateTripForm from '../components/tours/CreateTripForm';
@@ -6,8 +6,10 @@ import BookingManagement from '../components/tours/BookingManagement';
 import { bookings as mockBookings } from '../data/tourData';
 import { supabaseService } from '../services/supabaseService';
 import { getAgencyBookings } from '../services/bookingService';
+import { useToast } from '../components/ui/Toast';
 
 const AgencyDashboard = () => {
+    const toast = useToast();
     const [activeTab, setActiveTab] = useState('dashboard');
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [tours, setTours] = useState([]);
@@ -83,12 +85,12 @@ const AgencyDashboard = () => {
             };
 
             await supabaseService.createTour(newTour);
-            alert('Trip Created Successfully!');
+            toast.success('Trip Created Successfully!');
             setShowCreateForm(false);
             fetchTours();
         } catch (error) {
             console.error("Error creating trip:", error);
-            alert('Failed to create trip. Please try again.');
+            toast.error('Failed to create trip. Please try again.');
         }
     };
 

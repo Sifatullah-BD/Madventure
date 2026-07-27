@@ -1,12 +1,14 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { getReviews } from '../../services/communityService';
 import { uploadImages } from '../../services/storageService';
 import { unicornService } from '../../services/unicornService';
 import { Star, Image as ImageIcon, CheckCircle, Upload, ShieldCheck, BadgeCheck, Loader2, XCircle, MessageSquare } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 const ReviewSection = ({ entityType, entityId }) => {
     const { user } = useAuth();
+    const toast = useToast();
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ const ReviewSection = ({ entityType, entityId }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert('Please login to submit a review.');
+            toast.warning('Please login to submit a review.');
             return;
         }
 
@@ -70,10 +72,10 @@ const ReviewSection = ({ entityType, entityId }) => {
                 setComment('');
                 setRating(5);
                 setFiles([]);
-                alert("Review published successfully!");
+                toast.success("Review published successfully!");
             }
         } catch (err) {
-            alert(err.message || "Failed to submit review.");
+            toast.error(err.message || "Failed to submit review.");
         } finally {
             setSubmitting(false);
         }

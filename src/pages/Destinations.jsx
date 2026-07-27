@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Filter, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -32,8 +32,8 @@ const Destinations = () => {
                     getPlaces(),
                     getDistricts()
                 ]);
-                setPlaces(placesRes.data || []);
-                setDistricts(districtsRes.data || []);
+                setPlaces(placesRes || []);
+                setDistricts(districtsRes || []);
             } catch (err) {
                 console.error("Failed to load destinations:", err);
             } finally {

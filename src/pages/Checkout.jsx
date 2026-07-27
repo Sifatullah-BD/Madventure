@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ShieldCheck, Lock, Tag, CreditCard, ChevronRight, CheckCircle2 } from 'lucide-react';
@@ -7,13 +7,18 @@ import { unicornService } from '../services/unicornService';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { notificationService } from '../services/notificationService';
 import { paymentService } from '../services/paymentService';
+import useWalletStore from '../store/useWalletStore';
+import { useToast } from '../components/ui/Toast';
+import { Wallet } from 'lucide-react';
 
 const Checkout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [mfsModal, setMfsModal] = useState({ open: false, type: 'bkash' });
+    const { balance, fetchWallet } = useWalletStore();
     
     // Coupon States
     const [couponCode, setCouponCode] = useState('');
@@ -31,6 +36,12 @@ const Checkout = () => {
 
     const [finalAmount, setFinalAmount] = useState(bookingDetails.amount);
     const [isStudent, setIsStudent] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            fetchWallet(user.id);
+        }
+    }, [user?.id]);
 
     useEffect(() => {
         let total = bookingDetails.amount || 0;
@@ -134,6 +145,27 @@ const Checkout = () => {
         }
     };
 
+    const handleWalletPayment = async () => {
+        if (balance < finalAmount) {
+            toast.error(`Insufficient wallet balance. You have ৳${balance}.`);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // In a real app, call paymentService.payWithWallet or a backend RPC
+            // For now, simulate success:
+            setTimeout(() => {
+                toast.success('Paid successfully from Wallet!');
+                navigate('/payment-success', { state: { booking_id: bookingDetails.id, amount: finalAmount, method: 'wallet', isStudent } });
+                setLoading(false);
+            }, 1000);
+        } catch (error) {
+            toast.error(error.message);
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-4 flex justify-center items-center">
             <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
@@ -192,33 +224,12 @@ const Checkout = () => {
                         </div>
                     </div>
 
-                    {/* Student / Group Discount */}
-                    <div className="mb-6 flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                        <input 
-                            type="checkbox" 
-                            id="studentCheck" 
-                            checked={isStudent} 
-                            onChange={(e) => setIsStudent(e.target.checked)}
-                            className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <div>
-                            <label htmlFor="studentCheck" className="text-sm font-bold text-blue-900 cursor-pointer">
-                                Apply Student Discount (10%)
-                            </label>
-                            <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
-                                You must present a valid student ID during the tour. <br/>
-                                <span className="font-semibold">(Groups of 5+ get automatic 10% discount)</span>
-                            </p>
-                        </div>
-                    </div>
-
                     {/* Payment Options */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
                         <button 
                             onClick={() => setMfsModal({ open: true, type: 'bkash' })}
                             className="bg-[#E2136E] text-white p-4 rounded-2xl font-bold flex flex-col items-center gap-2 hover:scale-[1.02] transition-transform shadow-md"
                         >
-                            <img src="/bkash-icon.png" className="w-8 h-8 hidden" alt=""/>
                             <span className="text-2xl font-black">b</span>
                             <span className="text-xs">bKash</span>
                         </button>
@@ -230,6 +241,15 @@ const Checkout = () => {
                             <span className="text-xs">Nagad</span>
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleWalletPayment}
+                        disabled={loading}
+                        className={`w-full bg-primary hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 mb-4 ${loading ? 'opacity-70' : ''}`}
+                    >
+                        <Wallet size={20} />
+                        Pay from Wallet (Bal: ৳{balance})
+                    </button>
 
                     {/* SSLCommerz Fallback */}
                     <button

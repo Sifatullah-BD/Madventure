@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
     User, Settings, Shield, LogOut, RefreshCw, Camera, 
     Trash2, Save, X, Loader2, Award, Users, TrendingUp,
@@ -41,10 +41,10 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
     });
 
     // Social & Gamification State
-    const [socialStats, setSocialStats] = useState({ followers: 124, following: 45 });
+    const [socialStats, setSocialStats] = useState({ followers: 0, following: 0 });
     const [achievements, setAchievements] = useState([]);
     const [leaderboard, setLeaderboard] = useState([]);
-    const [profileData, setProfileData] = useState({ xp: 1250, level: 5 });
+    const [profileData, setProfileData] = useState({ xp: 0, level: 1, totalTrips: 0 });
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -64,6 +64,19 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
                         bio: data.bio || '',
                         location: data.district ? `${data.district}, ${data.division}` : '',
                         avatar: data.avatar_url || user.avatar || null
+                    });
+                    
+                    setProfileData({
+                        xp: data.travel_score || 0,
+                        level: Math.floor((data.travel_score || 0) / 100) + 1,
+                        totalTrips: data.total_trips || 0
+                    });
+
+                    // In a full implementation, followers would come from a social graph query.
+                    // For now, we initialize from DB if present, otherwise 0.
+                    setSocialStats({
+                        followers: data.followers_count || 0,
+                        following: data.following_count || 0
                     });
                 }
             } catch (err) {

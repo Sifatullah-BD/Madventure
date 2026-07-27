@@ -16,10 +16,12 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { bookingService } from '../services/bookingService';
+import { useToast } from '../components/ui/Toast';
 
 const BookingHistory = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const toast = useToast();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // all, upcoming, completed, cancelled
@@ -61,12 +63,12 @@ const BookingHistory = () => {
             if (error) throw error;
             
             // Update booking status to 'refund_pending' or similar if needed
-            alert('Refund request submitted successfully!');
+            toast.success('Refund request submitted successfully!');
             setRefundModal({ open: false, bookingId: null, amount: 0 });
             setRefundReason('');
             fetchBookings();
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         } finally {
             setSubmittingRefund(false);
         }

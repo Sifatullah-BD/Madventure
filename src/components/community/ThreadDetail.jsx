@@ -3,9 +3,11 @@ import { ArrowLeft, CheckCircle2, Flag, Heart, MessageSquare, Share2, MoreVertic
 import { getThreadDetails, postReply } from '../../services/communityService';
 import { useAuth } from '../../hooks/useAuth';
 import useRealtime from '../../hooks/useRealtime';
+import { useToast } from '../ui/Toast';
 
 const ThreadDetail = ({ threadId, onBack }) => {
     const { user } = useAuth();
+    const toast = useToast();
     const [thread, setThread] = useState(null);
     const [loading, setLoading] = useState(true);
     const [hasLiked, setHasLiked] = useState(false);
@@ -43,7 +45,7 @@ const ThreadDetail = ({ threadId, onBack }) => {
     const handleReply = async (e) => {
         e.preventDefault();
         if (!user) {
-            alert("Please login to post a reply.");
+            toast.warning("Please login to post a reply.");
             return;
         }
         if (!replyText.trim()) return;
@@ -54,8 +56,9 @@ const ThreadDetail = ({ threadId, onBack }) => {
             // Optimistically add our reply immediately (Realtime will handle dedup)
             setThread(prev => prev ? { ...prev, replies: [...(prev.replies || []), reply] } : prev);
             setReplyText('');
+            toast.success("Reply posted!");
         } catch (err) {
-            alert(err.message);
+            toast.error(err.message);
         }
         setSubmitting(false);
     };

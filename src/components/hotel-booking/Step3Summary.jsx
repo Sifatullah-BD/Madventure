@@ -1,12 +1,14 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Info } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { createPendingBooking } from '../../services/bookingService';
+import { useToast } from '../ui/Toast';
 
 const Step3Summary = ({ hotelData, formData, onPrev, districtId }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const toast = useToast();
     const [submitting, setSubmitting] = useState(false);
     
     const pricePerNight = formData.roomPrice || parseFloat(hotelData.price_per_night || hotelData.price) || 0;
@@ -56,7 +58,7 @@ const Step3Summary = ({ hotelData, formData, onPrev, districtId }) => {
             navigate('/checkout', { state: { booking: checkoutPayload } });
         } catch (e) {
             console.error(e);
-            window.alert(e.message || 'Could not create booking. Please try again.');
+            toast.error(e.message || 'Could not create booking. Please try again.');
         } finally {
             setSubmitting(false);
         }
