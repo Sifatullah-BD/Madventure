@@ -228,6 +228,28 @@ class CommunityService {
         if (error) throw error;
         return data;
     }
+
+    // --------------------------------------------------------
+    // Achievements & Leaderboard
+    // --------------------------------------------------------
+    async getUserAchievements(userId) {
+        const { data, error } = await supabase
+            .from('user_achievements')
+            .select(`earned_at, achievements (*)`)
+            .eq('user_id', userId);
+        if (error) throw error;
+        return data || [];
+    }
+
+    async getLeaderboard(limit = 10) {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar, level, xp')
+            .order('xp', { ascending: false })
+            .limit(limit);
+        if (error) throw error;
+        return data || [];
+    }
 }
 
 export const communityService = new CommunityService();
@@ -250,3 +272,5 @@ export const unfollowUser = (...args) => communityService.unfollowUser(...args);
 export const getFollowStats = (...args) => communityService.getFollowStats(...args);
 export const getReviews = (...args) => communityService.getReviews(...args);
 export const addReview = (...args) => communityService.addReview(...args);
+export const getUserAchievements = (...args) => communityService.getUserAchievements(...args);
+export const getLeaderboard = (...args) => communityService.getLeaderboard(...args);
