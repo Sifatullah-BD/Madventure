@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { HelpCircle, MapPin, Briefcase, Camera, TrendingUp, Users } from 'lucide-react';
 
 const CommunitySidebar = ({ onAction }) => {
