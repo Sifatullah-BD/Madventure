@@ -7,6 +7,7 @@ import { supabaseService } from '../services/supabaseService';
 import { addToWishlist, removeFromWishlist, getWishlist } from '../services/communityService';
 import { useAuth } from '../hooks/useAuth';
 import ReviewSection from '../components/reviews/ReviewSection';
+import WishlistButton from '../components/common/WishlistButton';
 import InteractiveMap from '../components/map/InteractiveMap';
 import { useToast } from '../components/ui/Toast';
 import SEO from '../components/SEO';
@@ -19,9 +20,6 @@ const TourDetails = () => {
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [event, setEvent] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [isWishlisted, setIsWishlisted] = useState(false);
-    const [wishlistId, setWishlistId] = useState(null);
-    const [wishlisting, setWishlisting] = useState(false);
 
     useEffect(() => {
         const fetchTour = async () => {
@@ -29,14 +27,7 @@ const TourDetails = () => {
                 const data = await supabaseService.getTourById(id);
                 setEvent(data);
                 
-                if (user) {
-                    const { data: wishlist } = await getWishlist(user.id);
-                    const item = wishlist?.find(w => w.item_id === id && w.item_type === 'tour');
-                    if (item) {
-                        setIsWishlisted(true);
-                        setWishlistId(item.id);
-                    }
-                }
+                // Wishlist is handled by WishlistButton component
             } catch (error) {
                 console.error("Error fetching tour:", error);
             } finally {
@@ -46,26 +37,7 @@ const TourDetails = () => {
         fetchTour();
     }, [id, user]);
 
-    const toggleWishlist = async () => {
-        if (!user) {
-            toast.warning("Please login to add to wishlist.");
-            return;
-        }
-        setWishlisting(true);
-        if (isWishlisted) {
-            await removeFromWishlist(wishlistId);
-            setIsWishlisted(false);
-            setWishlistId(null);
-        } else {
-            const { data } = await addToWishlist(user.id, 'tour', id);
-            if (data) {
-                setIsWishlisted(true);
-                setWishlistId(data.id);
-            }
-        }
-        setWishlisting(false);
-    };
-
+    // toggleWishlist handled by WishlistButton
     if (loading) return <div className="flex justify-center items-center min-h-screen"><Loader2 className="animate-spin text-primary" size={40}/></div>;
     if (!event) return <div className="pt-24 text-center">Event not found</div>;
 
@@ -106,13 +78,7 @@ const TourDetails = () => {
                             >
                                 <ArrowLeft size={24} />
                             </button>
-                            <button
-                                onClick={toggleWishlist}
-                                disabled={wishlisting}
-                                className={`p-2.5 rounded-full backdrop-blur-md transition-all ${isWishlisted ? 'bg-red-500 text-white shadow-lg' : 'bg-white/20 text-white hover:bg-white/30'}`}
-                            >
-                                <Heart size={24} className={isWishlisted ? 'fill-current' : ''} />
-                            </button>
+                            <WishlistButton itemType="tour" itemId={id} className="p-2.5" />
                         </div>
 
                         <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white">
@@ -313,7 +279,7 @@ const TourDetails = () => {
                 </div>
 
                 {/* Reviews Section */}
-                <ReviewSection entityType="tour" entityId={id} />
+                <ReviewSection tourId={id} />
             </div>
 
             <TourBookingModal

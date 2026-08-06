@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactionPicker from './ReactionPicker';
+import { useAuth } from '../../hooks/useAuth';
 import { Heart, MessageSquare, Share2, Bookmark, MapPin, MoreHorizontal } from 'lucide-react';
 
 const PostCard = ({ post, onLike, onComment, onShare, onSave }) => {
@@ -62,15 +64,15 @@ const PostCard = ({ post, onLike, onComment, onShare, onSave }) => {
             {/* Footer / Actions */}
             <div className="px-5 py-4 flex items-center justify-between border-t border-gray-50 bg-gray-50/50">
                 <div className="flex items-center gap-6">
-                    <button
-                        onClick={() => onLike(post.id)}
-                        className={`flex items-center gap-2 transition-all group ${isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}`}
-                    >
-                        <div className={`p-2 rounded-full group-hover:bg-red-50 transition-colors ${isLiked ? 'bg-red-50' : ''}`}>
-                            <Heart size={20} className={isLiked ? 'fill-current' : ''} />
-                        </div>
-                        <span className="font-bold text-sm">{likes}</span>
-                    </button>
+                    <ReactionPicker
+                        postId={post.id}
+                        userId={user?.id}
+                        currentReactions={post.reactions || []}
+                        setReactions={(newReactions) => {
+                          // Optimistic UI: could update local state or refetch post
+                          // For now, no‑op as likes count is handled elsewhere
+                        }}
+                    />
 
                     <button
                         onClick={() => onComment(post.id)}

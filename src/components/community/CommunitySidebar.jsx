@@ -4,7 +4,7 @@ import { HelpCircle, MapPin, Briefcase, Camera, TrendingUp, Users } from 'lucide
 
 const CommunitySidebar = ({ onAction }) => {
     return (
-        <div className="space-y-6">
+        <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {/* Quick Tools */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">

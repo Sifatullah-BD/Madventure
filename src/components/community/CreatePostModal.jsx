@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { X, Image, MapPin, Smile, Send, Tag } from 'lucide-react';
 
 const CreatePostModal = ({ isOpen, onClose, onSubmit, user }) => {

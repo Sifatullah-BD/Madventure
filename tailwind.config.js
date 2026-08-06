@@ -8,7 +8,12 @@ export default {
     theme: {
       extend: {
         colors: {
-          primary: "var(--primary)",
+          primary: {
+            50: '#EFF6FF',
+            100: '#DBEAFE',
+            500: '#2563EB',
+            DEFAULT: '#2563EB',
+          },
           secondary: "var(--secondary)",
           
           background: {
@@ -39,6 +44,13 @@ export default {
             primary: "var(--text-primary)",
             secondary: "var(--text-secondary)",
             muted: "var(--text-muted)",
+          },
+          
+          status: {
+            success: '#10B981',
+            warning: '#F59E0B',
+            error: '#EF4444',
+            info: '#3B82F6'
           },
           
           forest: {

@@ -7,37 +7,30 @@ export const AuthContext = createContext();
 
 async function fetchProfileRow(userId) {
     const { data, error } = await supabase
-        .from('profiles')
-        .select('app_role, full_name')
+        .from('user_profiles')
+        .select('role, full_name, status, avatar_url')
         .eq('id', userId)
         .maybeSingle();
     if (error && error.code !== 'PGRST116') {
-        console.warn('[auth] profiles lookup failed', error.message);
+        console.warn('[auth] user_profiles lookup failed', error.message);
     }
     return data;
 }
 
 function shapeSupabaseSessionUser(authUser, profile) {
     const meta = authUser.user_metadata || {};
-    const app_role =
-        (profile?.app_role && String(profile.app_role).toLowerCase()) ||
-        (meta.app_role && String(meta.app_role).toLowerCase()) ||
-        (meta.role && String(meta.role).toLowerCase()) ||
-        'traveler';
-    const name =
-        profile?.full_name ||
-        meta.full_name ||
-        authUser.email?.split('@')[0] ||
-        'Traveler';
-    const avatar =
-        meta.avatar_url ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1B5E20&color=fff`;
+    const app_role = profile?.role || meta.app_role || 'traveler';
+    const name = profile?.full_name || meta.full_name || authUser.email?.split('@')[0] || 'Traveler';
+    const avatar = profile?.avatar_url || meta.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1B5E20&color=fff`;
+    const status = profile?.status || 'active';
+    
     return {
         id: authUser.id,
         email: authUser.email,
         name,
         avatar,
         app_role,
+        status,
         role: displayRoleFromAppRole(app_role),
         user_metadata: authUser.user_metadata,
     };

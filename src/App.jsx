@@ -4,12 +4,19 @@ import { Facebook, Instagram, Youtube, Loader2, ArrowRight } from 'lucide-react'
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import LoginModal from './components/LoginModal';
+import ErrorBoundary from "./components/ErrorBoundary";
 import SocialProofToast from './components/SocialProofToast';
 import VerticalFab from './components/VerticalFab';
-import ErrorBoundary from './components/ErrorBoundary';
+import ReactGA from 'react-ga4';
+import * as Sentry from '@sentry/react';
 import { ToastProvider, useToast } from './components/ui/Toast';
 
-// Lazy load all pages
+if (import.meta.env.VITE_GA_MEASUREMENT_ID) {
+  ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
+}
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({ dsn: import.meta.env.VITE_SENTRY_DSN, tracesSampleRate: 1.0 });
+}
 const Home = lazy(() => import('./pages/Home'));
 const Destinations = lazy(() => import('./pages/Destinations'));
 const DistrictDetails = lazy(() => import('./pages/DistrictDetails'));
@@ -56,7 +63,7 @@ const TourBookingFlow = lazy(() => import('./pages/TourBookingFlow'));
 const HotelBookingFlow = lazy(() => import('./pages/HotelBookingFlow'));
 const BookingConfirmation = lazy(() => import('./pages/BookingConfirmation'));
 const BookingHistory = lazy(() => import('./pages/BookingHistory'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 
 // Marketplace Routes
 const MarketplaceHome = lazy(() => import('./features/marketplace/pages/MarketplaceHome'));

@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
-import { TOURS, DISTRICTS } from '../data/madventure-data';
+import { TOURS, DISTRICTS, HOTELS } from '../data/madventure-data';
 
 class TourService {
     async getTours() {
@@ -58,6 +58,43 @@ class TourService {
         const available = (data.capacity || 0) - (data.booked_seats || 0);
         return available >= seats;
     }
+
+    async getHotels() {
+        if (!isSupabaseConfigured) return HOTELS || [];
+        const { data, error } = await supabase.from('hotels').select('*');
+        if (error) return HOTELS || [];
+        return data || [];
+    }
+
+    async getHotelById(id) {
+        if (!isSupabaseConfigured) {
+            const hotel = HOTELS?.find(h => h.id === id || h.id === Number(id));
+            return hotel || { id, name: 'Grand Deluxe Resort', price_per_night: 4500, rating: 4.8 };
+        }
+        const { data, error } = await supabase.from('hotels').select('*').eq('id', id).single();
+        if (error) {
+            const hotel = HOTELS?.find(h => h.id === id || h.id === Number(id));
+            return hotel || { id, name: 'Grand Deluxe Resort', price_per_night: 4500, rating: 4.8 };
+        }
+        return data;
+    }
+
+    async getHotelRooms(hotelId) {
+        if (!isSupabaseConfigured) {
+            return [
+                { id: 'room_1', room_type: 'Deluxe Couple Room', price_per_night: 4500, capacity: 2 },
+                { id: 'room_2', room_type: 'Family Suite', price_per_night: 7500, capacity: 4 }
+            ];
+        }
+        const { data, error } = await supabase.from('hotel_rooms').select('*').eq('hotel_id', hotelId);
+        if (error) {
+            return [
+                { id: 'room_1', room_type: 'Deluxe Couple Room', price_per_night: 4500, capacity: 2 },
+                { id: 'room_2', room_type: 'Family Suite', price_per_night: 7500, capacity: 4 }
+            ];
+        }
+        return data || [];
+    }
 }
 
 export const tourService = new TourService();
@@ -68,6 +105,9 @@ export const getTourById = (...args) => tourService.getTourById(...args);
 export const createTour = (...args) => tourService.createTour(...args);
 export const getTourDepartures = (...args) => tourService.getTourDepartures(...args);
 export const checkTourAvailability = (...args) => tourService.checkTourAvailability(...args);
+export const getHotels = (...args) => tourService.getHotels(...args);
+export const getHotelById = (...args) => tourService.getHotelById(...args);
+export const getHotelRooms = (...args) => tourService.getHotelRooms(...args);
 
 // Alias helpers for Destinations page
 export const getDistricts = async () => {

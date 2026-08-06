@@ -1,15 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { services } from '@/lib/initServices';
 
 const BookingSlip = ({ bookingId, paymentMode = 'SSLCommerz Digital Gateway', status = 'PAID' }) => {
+    useEffect(() => {
+        // Request FCM token and store in Supabase
+        const getTokenAndSave = async () => {
+            const token = await services.firebaseMessaging.requestForToken();
+            if (token && services.isSupabaseConfigured) {
+                const { error } = await services.supabase
+                    .from('device_tokens')
+                    .insert([{ token, created_at: new Date().toISOString() }]);
+                if (error) console.warn('Failed to store FCM token:', error);
+            }
+        };
+        getTokenAndSave();
+    }, []);
+    const serial = bookingId?.split('-')[1] || 'XXXXXX';
     return (
-        <div className="p-8 pb-4">
+                <div className="p-8 pb-4 bg-gradient-to-br from-green-900 via-green-800 to-green-700 rounded-2xl backdrop-blur-lg border border-green-800/30 shadow-xl animate-fade-in duration-500 ease-out">
             <div className="flex flex-col md:flex-row gap-6 items-center border-b border-gray-100 pb-6 mb-6 border-dashed">
                 <div className="flex-1 w-full text-center md:text-left">
                     <span className="text-gray-500 text-xs uppercase tracking-wider block mb-1">Booking Reference</span>
                     <span className="font-mono text-xl font-bold text-gray-900 bg-gray-100 px-3 py-1 rounded inline-block">
                         {bookingId || 'MDV-XXXXXX'}
                     </span>
+                    <p className="text-sm text-gray-600 mt-1">Serial: {serial}</p>
                     <p className="text-xs text-gray-400 mt-2">Issued on: {new Date().toLocaleDateString()}</p>
                 </div>
 

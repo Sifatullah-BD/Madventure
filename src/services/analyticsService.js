@@ -24,7 +24,7 @@ export async function trackEvent(eventName, eventData = {}) {
     // Never throw – analytics must not break the user experience
   }
 }
-
+export const logEvent = trackEvent;
 /**
  * Common event helpers
  */

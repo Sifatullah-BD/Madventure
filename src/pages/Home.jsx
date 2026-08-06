@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { MapPin, Calendar, DollarSign, Star, Quote, ArrowRight, Tent, Map as MapIcon, Ticket } from 'lucide-react';
+import BlogPosts from '../components/home/BlogPosts';
 import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import SEO from '../components/SEO';
 import { useLanguage } from '../context/LanguageContext';
@@ -297,7 +298,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* 6. Blog - Cinematic Cards */}
             <section className="py-16 bg-[#08140c]">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex justify-between items-end mb-12">

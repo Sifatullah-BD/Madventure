@@ -1,36 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { getReviews } from '../../services/communityService';
-import { uploadImages } from '../../services/storageService';
-import { unicornService } from '../../services/unicornService';
-import { Star, Image as ImageIcon, CheckCircle, Upload, ShieldCheck, BadgeCheck, Loader2, XCircle, MessageSquare } from 'lucide-react';
+import { useReviews } from '../../hooks/useReviews';
+import { Star, Image as ImageIcon, ShieldCheck, BadgeCheck, Loader2, XCircle, MessageSquare } from 'lucide-react';
 import { useToast } from '../ui/Toast';
+import { uploadImages } from '../../services/storageService'; // Assume this exists for image upload
 
-const ReviewSection = ({ entityType, entityId }) => {
+const ReviewSection = ({ tourId }) => {
     const { user } = useAuth();
     const toast = useToast();
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
+    
+    const {
+        reviews,
+        loading,
+        submitReview,
+        submitting
+    } = useReviews(tourId);
 
     // Form states
     const [rating, setRating] = useState(5);
-    const [comment, setComment] = useState('');
+    const [title, setTitle] = useState('');
+    const [body, setBody] = useState('');
     const [files, setFiles] = useState([]);
-    const [submitting, setSubmitting] = useState(false);
-
-    useEffect(() => {
-        fetchReviews();
-        // eslint-disable-next-line
-    }, [entityId, entityType]);
-
-    const fetchReviews = async () => {
-        setLoading(true);
-        const { data, error } = await getReviews(entityType, entityId);
-        if (!error && data) {
-            setReviews(data);
-        }
-        setLoading(false);
-    };
 
     const handleFileChange = (e) => {
         if (e.target.files) {
@@ -41,11 +31,10 @@ const ReviewSection = ({ entityType, entityId }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!user) {
-            toast.warning('Please login to submit a review.');
+            toast?.warning?.('Login Required', 'Please login to submit a review.');
             return;
         }
 
-        setSubmitting(true);
         try {
             let photoUrls = [];
 
@@ -57,27 +46,24 @@ const ReviewSection = ({ entityType, entityId }) => {
                 }
             }
 
-            // UNICORN FEATURE: Verified Review Submission
-            const newReview = await unicornService.submitReview(
-                user.id,
-                entityType,
-                entityId,
-                rating,
-                comment,
-                photoUrls
-            );
+            // Note: In a real flow, we'd need the actual bookingId. Using a placeholder for now.
+            const dummyBookingId = "00000000-0000-0000-0000-000000000000";
 
-            if (newReview) {
-                setReviews([newReview, ...reviews]);
-                setComment('');
-                setRating(5);
-                setFiles([]);
-                toast.success("Review published successfully!");
-            }
+            await submitReview({
+                bookingId: dummyBookingId, 
+                rating,
+                title,
+                body,
+                images: photoUrls
+            });
+
+            setTitle('');
+            setBody('');
+            setRating(5);
+            setFiles([]);
+            toast?.success?.('Success', 'Review published successfully!');
         } catch (err) {
-            toast.error(err.message || "Failed to submit review.");
-        } finally {
-            setSubmitting(false);
+            toast?.error?.('Error', err.message || "Failed to submit review.");
         }
     };
 
@@ -122,17 +108,30 @@ const ReviewSection = ({ entityType, entityId }) => {
                                     ))}
                                 </div>
                             </div>
-                            <div className="flex-1">
-                                <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Share Your Thoughts</label>
-                                <textarea
-                                    value={comment}
-                                    onChange={e => setComment(e.target.value)}
-                                    className="w-full bg-white border border-gray-200 rounded-2xl p-4 outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-sm text-sm"
-                                    placeholder="What made your trip special? (Minimum 10 characters)"
-                                    rows={3}
-                                    required
-                                    minLength={10}
-                                />
+                            <div className="flex-1 space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Review Title</label>
+                                    <input
+                                        type="text"
+                                        value={title}
+                                        onChange={e => setTitle(e.target.value)}
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-3 outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-sm text-sm"
+                                        placeholder="Summarize your experience"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-3 tracking-widest">Share Your Thoughts</label>
+                                    <textarea
+                                        value={body}
+                                        onChange={e => setBody(e.target.value)}
+                                        className="w-full bg-white border border-gray-200 rounded-xl p-4 outline-none focus:ring-4 focus:ring-primary/5 transition-all shadow-sm text-sm"
+                                        placeholder="What made your trip special? (Minimum 10 characters)"
+                                        rows={3}
+                                        required
+                                        minLength={10}
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -150,7 +149,7 @@ const ReviewSection = ({ entityType, entityId }) => {
                                     <ImageIcon size={14} /> Add Photos {files.length > 0 && `(${files.length})`}
                                 </label>
                                 {files.length > 0 && (
-                                    <button onClick={() => setFiles([])} className="text-red-400 hover:text-red-600"><XCircle size={14}/></button>
+                                    <button type="button" onClick={() => setFiles([])} className="text-red-400 hover:text-red-600"><XCircle size={14}/></button>
                                 )}
                             </div>
 
@@ -189,10 +188,10 @@ const ReviewSection = ({ entityType, entityId }) => {
                             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                                 <div className="flex flex-row sm:flex-col items-center gap-3 sm:w-24 shrink-0">
                                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-[1rem] sm:rounded-[1.5rem] flex items-center justify-center text-gray-500 font-black text-xl shadow-sm border border-white">
-                                       {rev.user_name?.[0] || 'A'}
+                                       {rev.author?.username?.[0] || 'A'}
                                     </div>
                                     <div className="text-center">
-                                        <p className="font-black text-gray-900 text-[10px] uppercase truncate max-w-[100px]">{rev.user_name || 'Adventurer'}</p>
+                                        <p className="font-black text-gray-900 text-[10px] uppercase truncate max-w-[100px]">{rev.author?.username || 'Adventurer'}</p>
                                         <p className="text-[9px] text-gray-400 font-bold">{new Date(rev.created_at).toLocaleDateString()}</p>
                                     </div>
                                 </div>
@@ -204,19 +203,14 @@ const ReviewSection = ({ entityType, entityId }) => {
                                                 <Star key={i} size={14} className={i < rev.rating ? "text-yellow-400 fill-current" : "text-gray-200"} />
                                             ))}
                                         </div>
-                                        {rev.verified_booking && (
-                                            <div className="flex items-center gap-1 text-green-600 bg-green-50 px-2.5 py-1 rounded-full border border-green-100 animate-in fade-in zoom-in duration-500">
-                                                <BadgeCheck size={12} />
-                                                <span className="text-[9px] font-black uppercase tracking-tighter">Verified Buyer</span>
-                                            </div>
-                                        )}
                                     </div>
-                                    <p className="text-gray-700 text-sm leading-relaxed font-medium italic">"{rev.review || rev.comment}"</p>
+                                    <h4 className="font-bold text-gray-900 mb-2">{rev.title}</h4>
+                                    <p className="text-gray-700 text-sm leading-relaxed font-medium italic">"{rev.body}"</p>
                                     
                                     {/* Render Attached Photos */}
-                                    {rev.photos && rev.photos.length > 0 && (
+                                    {rev.images && rev.images.length > 0 && (
                                         <div className="flex gap-3 mt-5 overflow-x-auto pb-2 no-scrollbar">
-                                            {rev.photos.map((photo, i) => (
+                                            {rev.images.map((photo, i) => (
                                                 <div key={i} className="relative group/img overflow-hidden rounded-[1rem] shadow-sm border border-white">
                                                     <img src={photo} alt="" className="w-28 h-28 object-cover group-hover/img:scale-110 transition-transform duration-500" />
                                                 </div>

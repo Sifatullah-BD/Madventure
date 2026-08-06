@@ -8,6 +8,7 @@ import TravelPartner from '../components/community/TravelPartner';
 import { Users, MessagesSquare } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import LoginModal from '../components/LoginModal';
+import DistrictDropdown from '../components/community/DistrictDropdown';
 
 
 const Community = () => {
@@ -58,6 +59,7 @@ const Community = () => {
                         {language === 'bn' ? 'অন্যান্য ট্রাভেলারদের সাথে কানেক্ট করুন, অভিজ্ঞতা শেয়ার করুন এবং আপনার পরবর্তী ট্রিপের জন্য সঙ্গী খুঁজুন।' : 'Connect with other travelers, share experiences, and find a companion for your next trip.'}
                     </p>
                 </div>
+                <DistrictDropdown />
             </div>
 
             {/* Custom Tab Navigation - Scandi Style */}

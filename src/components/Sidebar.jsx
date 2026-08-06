@@ -1,5 +1,6 @@
-import { Home, Map, Compass, Shield, LayoutDashboard, Users, Ticket, Calendar, Briefcase, Wallet, Mountain, Settings, ShoppingBag, ShieldAlert } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Home, Compass, Shield, Users, Ticket, Calendar, Briefcase, Wallet, Mountain, ShoppingBag, AlertTriangle } from 'lucide-react';
+import NotificationBell from './common/NotificationBell';
+import { NavLink, useLocation } from 'react-router-dom';
 import { hasAdminAccess, hasAgencyPortalAccess } from '../utils/appRole';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -7,8 +8,6 @@ import { useLanguage } from '../context/LanguageContext';
 const Sidebar = ({ user }) => {
     const location = useLocation();
     const { language } = useLanguage();
-
-    const isActive = (path) => location.pathname === path;
 
     const navItems = [
         { path: user ? '/dashboard' : '/', label: language === 'bn' ? 'হোম' : 'Home', icon: Home },
@@ -20,7 +19,7 @@ const Sidebar = ({ user }) => {
         { path: '/community', label: language === 'bn' ? 'কমিউনিটি' : 'Community', icon: Users },
         { path: '/bookings', label: language === 'bn' ? 'বুকিং ও ওয়ালেট' : 'My Bookings / Wallet', icon: Wallet, private: true },
         { path: '/safety', label: language === 'bn' ? 'ইমার্জেন্সি ম্যাপ' : 'Emergency Map', icon: Shield },
-        { path: '/admin', label: language === 'bn' ? 'কন্ট্রোল প্যানেল' : 'Control Panel', icon: ShieldAlert, adminOnly: true },
+        { path: '/admin', label: language === 'bn' ? 'কন্ট্রোল প্যানেল' : 'Control Panel', icon: AlertTriangle, adminOnly: true },
         { path: '/agency/dashboard', label: language === 'bn' ? 'এজেন্সি ড্যাশবোর্ড' : 'Manage Tours / Agency', icon: Briefcase, agencyOnly: true },
     ];
 
@@ -38,25 +37,36 @@ const Sidebar = ({ user }) => {
     });
 
     return (
-        <div className="hidden md:flex flex-col w-20 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 min-h-screen sticky top-16 items-center py-6 z-20 transition-colors duration-300">
-            <nav className="space-y-4">
-                {filteredNavItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        className={`relative group flex items-center justify-center w-12 h-12 rounded-2xl transition-all duration-300 transform hover:-translate-y-1 hover:-translate-x-0.5 hover:shadow-[0_4px_10px_rgba(34,197,94,0.2)] ${isActive(item.path)
-                            ? 'bg-primary text-white shadow-md'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-950/20 hover:text-primary bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700'
-                            }`}
-                    >
-                        <item.icon size={22} strokeWidth={isActive(item.path) ? 2.5 : 2} />
-                        <span className="absolute left-16 top-1/2 transform -translate-y-1/2 bg-gray-900 dark:bg-slate-700 text-white text-[11px] px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none shadow-xl scale-95 group-hover:scale-100 origin-left z-[60]">
-                            {item.label}
-                        </span>
-                    </Link>
-                ))}
-            </nav>
-        </div>
+        <aside className="w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col justify-between py-6 px-4 shrink-0 transition-colors">
+            <div className="space-y-6">
+                <div className="px-3 flex items-center justify-between">
+                    <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Navigation</span>
+                    <NotificationBell />
+                </div>
+
+                <nav className="space-y-1">
+                    {filteredNavItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+                                        isActive
+                                            ? 'bg-[#1B5E20] text-white shadow-md shadow-green-900/20'
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                                    }`
+                                }
+                            >
+                                <Icon size={18} />
+                                <span>{item.label}</span>
+                            </NavLink>
+                        );
+                    })}
+                </nav>
+            </div>
+        </aside>
     );
 };
 
