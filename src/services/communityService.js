@@ -210,8 +210,25 @@ class CommunityService {
     // Social / Follow Operations
     // --------------------------------------------------------
     async followUser(followerId, followingId) {
-        const { data, error } = await supabase.from('follows').insert([{ follower_id: followerId, following_id: followingId }]);
+        if (!followerId || !followingId || followerId === followingId) throw new Error('You cannot follow this profile.');
+        const { data, error } = await supabase.from('follows').insert([{ follower_id: followerId, following_id: followingId }]).select().single();
         if (error) throw error;
+        await supabase.from('notifications').insert({
+            user_id: followingId,
+            actor_id: followerId,
+            type: 'community',
+            title: 'New follower',
+            body: 'A traveler started following you.',
+            payload: { action: 'new_follower', actor_id: followerId, target_type: 'user', target_id: followerId },
+            action_url: `/profile/${followerId}`,
+        });
+        await supabase.from('activity_events').insert({
+            actor_id: followerId,
+            event_type: 'followed_user',
+            entity_type: 'user',
+            entity_id: followingId,
+            metadata: { following_id: followingId },
+        });
         return data;
     }
 
@@ -229,6 +246,38 @@ class CommunityService {
         if (followers.error) throw followers.error;
         if (following.error) throw following.error;
         return { followers: followers.count || 0, following: following.count || 0 };
+    }
+
+    async getConnectionStatus(userId, otherUserId) {
+        if (!userId || !otherUserId || userId === otherUserId) return 'self';
+        const [block, connection, outgoing, incoming] = await Promise.all([
+            supabase.from('user_blocks').select('blocker_id').or(`and(blocker_id.eq.${userId},blocked_id.eq.${otherUserId}),and(blocker_id.eq.${otherUserId},blocked_id.eq.${userId})`).maybeSingle(),
+            supabase.from('connections').select('id').or(`and(user_id.eq.${userId},connected_user_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},connected_user_id.eq.${userId})`).maybeSingle(),
+            supabase.from('connection_requests').select('id').eq('sender_id', userId).eq('receiver_id', otherUserId).eq('status', 'pending').maybeSingle(),
+            supabase.from('connection_requests').select('id').eq('sender_id', otherUserId).eq('receiver_id', userId).eq('status', 'pending').maybeSingle(),
+        ]);
+        if (block.data) return 'blocked';
+        if (connection.data) return 'connected';
+        if (outgoing.data) return 'request_sent';
+        if (incoming.data) return 'request_received';
+        return 'none';
+    }
+
+    async requestConnection(senderId, receiverId) {
+        const status = await this.getConnectionStatus(senderId, receiverId);
+        if (status !== 'none') throw new Error(`Connection action unavailable while status is ${status}.`);
+        const { data, error } = await supabase.from('connection_requests').insert({ sender_id: senderId, receiver_id: receiverId }).select().single();
+        if (error) throw error;
+        await supabase.from('notifications').insert({
+            user_id: receiverId,
+            actor_id: senderId,
+            type: 'community',
+            title: 'New connection request',
+            body: 'A traveler wants to connect with you.',
+            payload: { action: 'connection_request', request_id: data.id, actor_id: senderId },
+            action_url: '/profile?tab=connections',
+        });
+        return data;
     }
 
     // --------------------------------------------------------
@@ -289,6 +338,8 @@ export const addToWishlist = (...args) => communityService.addToWishlist(...args
 export const removeFromWishlist = (...args) => communityService.removeFromWishlist(...args);
 export const followUser = (...args) => communityService.followUser(...args);
 export const unfollowUser = (...args) => communityService.unfollowUser(...args);
+export const getConnectionStatus = (...args) => communityService.getConnectionStatus(...args);
+export const requestConnection = (...args) => communityService.requestConnection(...args);
 export const getFollowStats = (...args) => communityService.getFollowStats(...args);
 export const getReviews = (...args) => communityService.getReviews(...args);
 export const addReview = (...args) => communityService.addReview(...args);
