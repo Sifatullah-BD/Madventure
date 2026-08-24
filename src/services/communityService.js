@@ -290,6 +290,63 @@ class CommunityService {
         return data;
     }
 
+    async respondToConnectionRequest(requestId, receiverId, accept) {
+        const { data: request, error: requestError } = await supabase
+            .from('connection_requests')
+            .select('id, sender_id, receiver_id')
+            .eq('id', requestId)
+            .eq('receiver_id', receiverId)
+            .eq('status', 'pending')
+            .single();
+        if (requestError) throw requestError;
+
+        const status = accept ? 'accepted' : 'declined';
+        const { error: updateError } = await supabase
+            .from('connection_requests')
+            .update({ status, responded_at: new Date().toISOString() })
+            .eq('id', requestId);
+        if (updateError) throw updateError;
+
+        if (accept) {
+            const [userId, connectedUserId] = [request.sender_id, request.receiver_id].sort();
+            const { error: connectionError } = await supabase
+                .from('connections')
+                .insert({ user_id: userId, connected_user_id: connectedUserId });
+            if (connectionError) throw connectionError;
+            await supabase.from('notifications').insert({
+                user_id: request.sender_id,
+                actor_id: receiverId,
+                type: 'community',
+                title: 'Connection accepted',
+                body: 'Your connection request was accepted.',
+                payload: { action: 'connection_accepted', actor_id: receiverId },
+                action_url: `/profile/${receiverId}`,
+            });
+        }
+        return { ...request, status };
+    }
+
+    async blockUser(blockerId, blockedId) {
+        const { error } = await supabase.from('user_blocks').upsert({ blocker_id: blockerId, blocked_id: blockedId });
+        if (error) throw error;
+        await Promise.all([
+            supabase.from('follows').delete().or(`and(follower_id.eq.${blockerId},following_id.eq.${blockedId}),and(follower_id.eq.${blockedId},following_id.eq.${blockerId})`),
+            supabase.from('connection_requests').update({ status: 'cancelled', responded_at: new Date().toISOString() }).or(`and(sender_id.eq.${blockerId},receiver_id.eq.${blockedId},status.eq.pending),and(sender_id.eq.${blockedId},receiver_id.eq.${blockerId},status.eq.pending)`),
+        ]);
+        return true;
+    }
+
+    async reportContent(reporterId, entityType, entityId, reason = 'Inappropriate content') {
+        const { data, error } = await supabase.from('content_reports').insert({
+            reporter_id: reporterId,
+            entity_type: entityType,
+            entity_id: entityId,
+            reason,
+        }).select().single();
+        if (error) throw error;
+        return data;
+    }
+
     // --------------------------------------------------------
     // Review Operations
     // --------------------------------------------------------
@@ -350,6 +407,9 @@ export const followUser = (...args) => communityService.followUser(...args);
 export const unfollowUser = (...args) => communityService.unfollowUser(...args);
 export const getConnectionStatus = (...args) => communityService.getConnectionStatus(...args);
 export const requestConnection = (...args) => communityService.requestConnection(...args);
+export const respondToConnectionRequest = (...args) => communityService.respondToConnectionRequest(...args);
+export const blockUser = (...args) => communityService.blockUser(...args);
+export const reportContent = (...args) => communityService.reportContent(...args);
 export const getFollowStats = (...args) => communityService.getFollowStats(...args);
 export const getPublicProfile = (...args) => communityService.getPublicProfile(...args);
 export const getReviews = (...args) => communityService.getReviews(...args);
