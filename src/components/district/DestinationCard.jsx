@@ -1,7 +1,6 @@
 import React from 'react';
 import { MapPin, ArrowRight, Star, Mountain, Waves } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 const DestinationCard = ({ place }) => {
     return (
@@ -60,7 +59,7 @@ const DestinationCard = ({ place }) => {
                 </p>
 
                 <Link 
-                    to={`/place/${place.id}`}
+                    to={`/destination/${place.id}`}
                     className="inline-flex items-center gap-3 px-6 py-3 bg-white text-black rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-cyan-400 hover:text-black transition-all group/btn"
                 >
                     Explore Now

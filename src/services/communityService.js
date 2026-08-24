@@ -1,6 +1,25 @@
 import { supabase } from '../lib/supabase';
 import { FORUM_THREADS } from '../data/madventure-data';
 
+export async function listCommunityPosts({ type = 'ALL', query = '', limit = 40 } = {}) {
+    let request = supabase.from('community_posts').select('*').eq('visibility', 'public').order('created_at', { ascending: false }).limit(limit);
+    if (type !== 'ALL') request = request.eq('post_type', type);
+    if (query.trim()) request = request.or(`title.ilike.%${query.trim()}%,content.ilike.%${query.trim()}%,destination_text.ilike.%${query.trim()}%`);
+    const { data, error } = await request;
+    if (error?.code === 'PGRST205') return [];
+    if (error) throw error;
+    return data || [];
+}
+
+export async function createCommunityPost(payload) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Please log in to post.');
+    const { data, error } = await supabase.from('community_posts').insert({ ...payload, author_id: user.id }).select().single();
+    if (error?.code === 'PGRST205') throw new Error('Community video database is not set up yet. Run 08_community_video_posts.sql in Supabase SQL Editor.');
+    if (error) throw error;
+    return data;
+}
+
 class CommunityService {
     // --------------------------------------------------------
     // Forum Operations
@@ -19,14 +38,14 @@ class CommunityService {
                 query = query.eq('district_id', districtId);
             }
 
-            const { data, error } = await query;
+            const { data } = await query;
             if (!data || data.length === 0) {
                 let mockData = FORUM_THREADS;
                 if (category && category !== 'all') mockData = mockData.filter(t => t.category === category);
                 return mockData;
             }
             return data;
-        } catch (err) {
+        } catch {
             return FORUM_THREADS;
         }
     }
@@ -52,16 +71,16 @@ class CommunityService {
                 .order('created_at', { ascending: true });
 
             return { ...thread, replies: replies || [] };
-        } catch (err) {
+        } catch {
             const mockThread = FORUM_THREADS.find(t => t.id === threadId || t.id === Number(threadId));
             return mockThread ? { ...mockThread, replies: [] } : null;
         }
     }
 
-    async createThread(userId, title, body, category = 'tips', districtId = null) {
+    async createThread(userId, title, body, category = 'tips', districtId = null, mediaUrls = null) {
         const { data, error } = await supabase
             .from('forum_threads')
-            .insert([{ user_id: userId, title, body, category, district_id: districtId }])
+            .insert([{ user_id: userId, title, body, category, district_id: districtId, media_urls: mediaUrls }])
             .select()
             .single();
         if (error) throw error;
@@ -131,6 +150,7 @@ class CommunityService {
             .order('created_at', { ascending: false });
 
         if (filters.destination) query = query.ilike('destination', `%${filters.destination}%`);
+        if (filters.gender) query = query.eq('gender', filters.gender);
         const { data, error } = await query;
         if (error) throw error;
         return data || [];

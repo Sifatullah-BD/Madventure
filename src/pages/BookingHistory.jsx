@@ -29,12 +29,6 @@ const BookingHistory = () => {
     const [refundReason, setRefundReason] = useState('');
     const [submittingRefund, setSubmittingRefund] = useState(false);
 
-    useEffect(() => {
-        if (user) {
-            fetchBookings();
-        }
-    }, [user]);
-
     const fetchBookings = async () => {
         setLoading(true);
         try {
@@ -46,6 +40,12 @@ const BookingHistory = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (user) {
+            fetchBookings();
+        }
+    }, [user]);
 
     const handleRequestRefund = async (e) => {
         e.preventDefault();

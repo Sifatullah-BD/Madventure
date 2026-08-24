@@ -50,9 +50,9 @@ export const uploadMedia = async (supabase, file, fileName, bucket = 'media') =>
   }
 
   // ----- Public URL -----
-  const { publicURL, error: urlError } = supabase.storage.from(bucket).getPublicUrl(uploadData.path);
-  if (urlError) {
-    throw new Error(`Unable to get public URL: ${urlError.message}`);
+  const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(uploadData.path);
+  if (!urlData?.publicUrl) {
+    throw new Error('Unable to get public URL');
   }
-  return publicURL;
+  return urlData.publicUrl;
 };

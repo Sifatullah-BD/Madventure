@@ -2,9 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { HelpCircle, MapPin, Briefcase, Camera, TrendingUp, Users } from 'lucide-react';
 
-const CommunitySidebar = ({ onAction }) => {
+const CommunitySidebar = ({ onAction = () => { } }) => {
     return (
-        <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <motion.div
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
             {/* Quick Tools */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
                 <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -60,9 +65,13 @@ const CommunitySidebar = ({ onAction }) => {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                     {['#SajekValley', '#CoxsBazar', '#SoloTrip', '#Foodie', '#BudgetTravel'].map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-full cursor-pointer transition-colors">
+                        <button
+                            key={tag}
+                            onClick={() => onAction('tag', tag)}
+                            className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-bold rounded-full cursor-pointer transition-colors active:scale-95"
+                        >
                             {tag}
-                        </span>
+                        </button>
                     ))}
                 </div>
             </div>
@@ -77,10 +86,10 @@ const CommunitySidebar = ({ onAction }) => {
                         { name: 'Sarah Khan', role: 'Explorer', color: 'bg-green-100 text-green-700' },
                         { name: 'Rahim Ahmed', role: 'Guide', color: 'bg-blue-100 text-blue-700' },
                         { name: 'Travel Pro', role: 'Photographer', color: 'bg-purple-100 text-purple-700' }
-                    ].map((expert, i) => (
-                        <div key={i} className="flex items-center justify-between">
+                    ].map((expert) => (
+                        <div key={expert.name} className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs">
+                                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs text-gray-700">
                                     {expert.name[0]}
                                 </div>
                                 <div>
@@ -90,12 +99,17 @@ const CommunitySidebar = ({ onAction }) => {
                                     </span>
                                 </div>
                             </div>
-                            <button className="text-xs font-bold text-primary hover:underline">Follow</button>
+                            <button
+                                onClick={() => onAction('follow', expert.name)}
+                                className="text-xs font-bold text-primary hover:underline active:scale-95 transition-transform"
+                            >
+                                Follow
+                            </button>
                         </div>
                     ))}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 

@@ -4,10 +4,13 @@ import { Map, Calendar, Plus, Trash2, Save, Share2, Download, DollarSign, MapPin
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../hooks/useAuth';
 import { supabaseService } from '../services/supabaseService';
+import { useSearchParams } from 'react-router-dom';
 
 const TourPlans = () => {
     const { user } = useAuth();
     const { language } = useLanguage();
+    const [searchParams] = useSearchParams();
+    const destinationFromHub = searchParams.get('destination') || '';
     const [showToast, setShowToast] = useState(null);
     const [activePlan, setActivePlan] = useState(null);
     const [isEditingHeader, setIsEditingHeader] = useState(false);
@@ -227,12 +230,13 @@ const TourPlans = () => {
                             <button
                                 onClick={() => setActivePlan({ 
                                     id: 'new', 
-                                    title: language === 'bn' ? 'নতুন ভ্রমণ' : 'New Trip', 
+                                    title: destinationFromHub || (language === 'bn' ? 'নতুন ভ্রমণ' : 'New Trip'), 
                                     date: new Date().toISOString().split('T')[0], 
                                     duration: '1 Day', 
                                     budget: 5000, 
                                     status: 'Draft',
                                     notes: '',
+                                    destination: destinationFromHub,
                                     itinerary: [{ day: 1, title: language === 'bn' ? 'ভ্রমণ শুরু ও আগমন' : 'Arrival & Exploration', activities: [] }]
                                 })}
                                 className="bg-[#1B5E20] text-white px-6 py-3 rounded-2xl font-bold hover:bg-green-700 transition-colors flex items-center gap-2 shadow-lg hover:scale-105 active:scale-95 transition-all"

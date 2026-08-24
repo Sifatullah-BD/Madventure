@@ -60,7 +60,7 @@ const MapDiscovery = () => {
     const active = discoveries[activeIndex];
 
     return (
-        <section className="py-20 bg-[#f8fafc] dark:bg-slate-900/50 overflow-hidden transition-colors duration-300">
+        <section className="py-12 bg-[#f8fafc] dark:bg-slate-900/50 overflow-hidden transition-colors duration-300">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                     
@@ -75,23 +75,23 @@ const MapDiscovery = () => {
                                 transition={{ duration: 0.5 }}
                                 className="space-y-6"
                             >
-                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-forest-light dark:text-green-400 rounded-full text-xs font-bold uppercase tracking-wider">
-                                    <Sparkles size={14} />
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-100 dark:bg-green-900/30 text-forest-light dark:text-green-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                    <Sparkles size={12} />
                                     {language === 'bn' ? 'স্থাপত্য ও প্রকৃতি' : 'Architecture & Nature'}
                                 </div>
                                 
-                                <h2 className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white leading-tight">
+                                <h2 className="text-3xl md:text-4xl font-black text-gray-900 dark:text-white leading-tight">
                                     {active.name} <br />
                                     <span className="text-forest-light dark:text-green-500">{active.title}</span>
                                 </h2>
                                 
-                                <p className="text-gray-600 dark:text-gray-400 text-lg leading-relaxed max-w-md">
+                                <p className="text-gray-600 dark:text-gray-400 text-base leading-relaxed max-w-md">
                                     {active.description}
                                 </p>
 
-                                <div className="space-y-4 pt-4">
-                                    <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                                        <MapPin size={18} className="text-forest-light dark:text-green-500" />
+                                <div className="space-y-3 pt-3">
+                                    <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5 text-sm">
+                                        <MapPin size={16} className="text-forest-light dark:text-green-500" />
                                         {language === 'bn' ? 'প্রধান দর্শনীয় স্থানসমূহ:' : 'Primary Attractions:'}
                                     </h4>
                                     <div className="flex flex-wrap gap-2">

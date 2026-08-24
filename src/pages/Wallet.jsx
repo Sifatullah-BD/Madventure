@@ -30,7 +30,7 @@ const Wallet = () => {
     const [showAddMoney, setShowAddMoney] = useState(false);
 
     // Use Zustand wallet store for optimistic updates
-    const { balance, ledgerRows, fetchWallet } = useWalletStore();
+    const { balance, transactions: ledgerRows, fetchWallet } = useWalletStore();
 
     const staticTransactions = DEMO_TRANSACTIONS;
     const staticBookings = DEMO_BOOKINGS;
@@ -160,33 +160,54 @@ const Wallet = () => {
                                 <History size={20} className="text-gray-400" /> Recent Transactions
                             </h3>
                             <div className="space-y-4">
-                                {transactions.length === 0 && isSupabaseConfigured && !loadingRemote && (
-                                    <p className="text-sm text-gray-500">No ledger entries yet. Top-ups and refunds will appear here.</p>
-                                )}
-                                {transactions.map(tx => (
-                                    <div key={tx.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
-                                                {tx.type === 'credit' ? <PlusCircle size={20} /> : <CreditCard size={20} />}
-                                            </div>
-                                            <div>
-                                                <p className="font-bold text-gray-800">{tx.desc}</p>
-                                                <p className="text-xs text-gray-500">{tx.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className={`font-bold block ${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                                                {tx.amount}
-                                            </span>
-                                            <button
-                                                onClick={handleDownload}
-                                                className="text-xs text-gray-400 hover:text-primary flex items-center gap-1 justify-end mt-1"
-                                            >
-                                                <FileText size={12} /> Invoice
-                                            </button>
-                                        </div>
+                                {loadingRemote ? (
+                                    <div className="space-y-3">
+                                        {[0, 1, 2].map(i => (
+                                            <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse"></div>
+                                        ))}
                                     </div>
-                                ))}
+                                ) : transactions.length === 0 && isSupabaseConfigured ? (
+                                    <div className="text-center py-10">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <WalletIcon size={28} className="text-gray-400" />
+                                        </div>
+                                        <h4 className="font-bold text-gray-800 mb-1">Your wallet is ready</h4>
+                                        <p className="text-sm text-gray-500 mb-4">
+                                            No transactions yet. Bookings, refunds and wallet activity will appear here.
+                                        </p>
+                                        <a
+                                            href="/explore"
+                                            className="inline-block bg-primary text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-green-700 transition-colors"
+                                        >
+                                            Explore Tours
+                                        </a>
+                                    </div>
+                                ) : (
+                                    transactions.map(tx => (
+                                        <div key={tx.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${tx.type === 'credit' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                                    {tx.type === 'credit' ? <PlusCircle size={20} /> : <CreditCard size={20} />}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-gray-800">{tx.desc}</p>
+                                                    <p className="text-xs text-gray-500">{tx.date}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className={`font-bold block ${tx.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {tx.amount}
+                                                </span>
+                                                <button
+                                                    onClick={handleDownload}
+                                                    className="text-xs text-gray-400 hover:text-primary flex items-center gap-1 justify-end mt-1"
+                                                >
+                                                    <FileText size={12} /> Invoice
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
@@ -197,53 +218,77 @@ const Wallet = () => {
                     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-fade-in">
                         <h3 className="text-lg font-bold text-gray-800 mb-6">Your Bookings</h3>
                         <div className="space-y-4">
-                            {bookings.map(booking => (
-                                <div key={booking.id} className="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-100 rounded-xl hover:shadow-md transition-shadow bg-white">
-                                    <div className="flex items-center gap-4 mb-4 md:mb-0 w-full md:w-auto">
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${booking.status === 'Cancelled' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-600'
-                                            }`}>
-                                            <Ticket size={24} />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-800">{booking.title}</h4>
-                                            <p className="text-sm text-gray-500">{booking.date} • {booking.price}</p>
+                            {loadingRemote ? (
+                                <div className="space-y-3">
+                                    {[0, 1, 2].map(i => (
+                                        <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse"></div>
+                                    ))}
+                                </div>
+                            ) : bookings.length === 0 ? (
+                                <div className="text-center py-14">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <Ticket size={28} className="text-gray-400" />
+                                    </div>
+                                    <h4 className="font-bold text-gray-800 mb-1">No bookings yet</h4>
+                                    <p className="text-sm text-gray-500 mb-4">
+                                        Your tour, hotel and transport bookings will appear here.
+                                    </p>
+                                    <a
+                                        href="/tours"
+                                        className="inline-block bg-primary text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-green-700 transition-colors"
+                                    >
+                                        Find Tours
+                                    </a>
+                                </div>
+                            ) : (
+                                bookings.map(booking => (
+                                    <div key={booking.id} className="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-100 rounded-xl hover:shadow-md transition-shadow bg-white">
+                                        <div className="flex items-center gap-4 mb-4 md:mb-0 w-full md:w-auto">
+                                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${booking.status === 'Cancelled' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-600'
+                                                }`}>
+                                                <Ticket size={24} />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-800">{booking.title}</h4>
+                                                <p className="text-sm text-gray-500">{booking.date} • {booking.price}</p>
 
-                                            {/* Partial Payment / Refund Status */}
-                                            <div className="flex items-center gap-2 mt-1">
-                                                {booking.paid.includes('Partial') && (
-                                                    <span className="text-xs font-bold text-orange-500 flex items-center gap-1">
-                                                        <AlertCircle size={12} /> {booking.paid}
-                                                    </span>
-                                                )}
-                                                {booking.status === 'Cancelled' && (
-                                                    <span className="text-xs font-bold text-green-600 flex items-center gap-1">
-                                                        <RefreshCcw size={12} /> Refund: {booking.refundStatus}
-                                                    </span>
-                                                )}
+                                                {/* Partial Payment / Refund Status */}
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    {booking.paid.includes('Partial') && (
+                                                        <span className="text-xs font-bold text-orange-500 flex items-center gap-1">
+                                                            <AlertCircle size={12} /> {booking.paid}
+                                                        </span>
+                                                    )}
+                                                    {booking.status === 'Cancelled' && (
+                                                        <span className="text-xs font-bold text-green-600 flex items-center gap-1">
+                                                            <RefreshCcw size={12} /> Refund: {booking.refundStatus}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-700' :
-                                                booking.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                                    'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {booking.status}
-                                        </span>
+                                        <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-700' :
+                                                    booking.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                {booking.status}
+                                            </span>
 
-                                        {booking.ticketAvailable && (
-                                            <button
-                                                onClick={handleDownload}
-                                                className="text-gray-400 hover:text-primary transition-colors p-2 hover:bg-gray-50 rounded-full"
-                                                title="Download Ticket"
-                                            >
-                                                <Download size={20} />
-                                            </button>
-                                        )}
+                                            {booking.ticketAvailable && (
+                                                <button
+                                                    onClick={handleDownload}
+                                                    className="text-gray-400 hover:text-primary transition-colors p-2 hover:bg-gray-50 rounded-full"
+                                                    title="Download Ticket"
+                                                >
+                                                    <Download size={20} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </div>
                 )}

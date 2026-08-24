@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, SlidersHorizontal, X, MapPin, Layers, Map as MapIcon, Home, Store, LayoutGrid } from 'lucide-react';
 import InteractiveMap from '../components/map/InteractiveMap';
+import GoogleMapPreview from '../components/map/GoogleMapPreview';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { CardSkeleton } from '../components/ui/LoadingSkeleton';
@@ -17,6 +18,7 @@ import { AnimatePresence } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
 import SEO from '../components/SEO';
+import { handleImageError } from '../utils/imageFallback';
 
 // Map and sort all 64 districts from JSON
 const allDistricts = districtsList.districts.map(d => ({
@@ -47,8 +49,10 @@ const Explore = () => {
 
     const [results, setResults] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [isMapView, setIsMapView] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     // Memoize upazilas matching the selected district
     const filteredUpazilas = useMemo(() => {
@@ -93,17 +97,32 @@ const Explore = () => {
     useEffect(() => {
         const fetchAll = async () => {
             setIsLoading(true);
+            setError(null);
             try {
-                const [toursRes, hotelsRes, bizRes] = await Promise.all([
-                    activeTab === 'ALL' || activeTab === 'TOURS' ? getTours() : { data: [] },
-                    activeTab === 'ALL' || activeTab === 'HOTELS' ? getHotels() : { data: [] },
-                    activeTab === 'ALL' || activeTab === 'BUSINESSES' ? businessService.getBusinesses() : []
+                const wanted = {
+                    tours: activeTab === 'ALL' || activeTab === 'TOURS',
+                    hotels: activeTab === 'ALL' || activeTab === 'HOTELS',
+                    biz: activeTab === 'ALL' || activeTab === 'BUSINESSES',
+                };
+
+                // Use allSettled so one failed API doesn't blank the whole search page
+                const [toursRes, hotelsRes, bizRes] = await Promise.allSettled([
+                    wanted.tours ? getTours() : Promise.resolve([]),
+                    wanted.hotels ? getHotels() : Promise.resolve([]),
+                    wanted.biz ? businessService.getBusinesses() : Promise.resolve([])
                 ]);
 
+                const settledValue = (r) => (r && r.status === 'fulfilled' ? r.value : []);
+                const wantedFlags = [wanted.tours, wanted.hotels, wanted.biz];
+                const failures = [toursRes, hotelsRes, bizRes]
+                    .filter((r, i) => r.status === 'rejected' && wantedFlags[i]).length;
+                const requestedCount = wantedFlags.filter(Boolean).length;
+                const allFailed = failures > 0 && failures === requestedCount;
+
                 let aggregated = [
-                    ...(toursRes.data || []).map(t => ({ ...t, _type: 'TOURS', _price: t.price_per_person || t.price })),
-                    ...(hotelsRes.data || []).map(h => ({ ...h, _type: 'HOTELS', _price: h.price_per_night || h.price })),
-                    ...(Array.isArray(bizRes) ? bizRes : []).map(b => ({ ...b, _type: 'BUSINESSES', _price: 0 }))
+                    ...(Array.isArray(settledValue(toursRes)) ? settledValue(toursRes) : []).map(t => ({ ...t, _type: 'TOURS', _price: t.price_per_person || t.price })),
+                    ...(Array.isArray(settledValue(hotelsRes)) ? settledValue(hotelsRes) : []).map(h => ({ ...h, _type: 'HOTELS', _price: h.price_per_night || h.price })),
+                    ...(Array.isArray(settledValue(bizRes)) ? settledValue(bizRes) : []).map(b => ({ ...b, _type: 'BUSINESSES', _price: 0 }))
                 ];
 
                 // Text query filtering
@@ -166,8 +185,14 @@ const Explore = () => {
                 }
 
                 setResults(aggregated);
+                if (allFailed) {
+                    console.error('Global search: all requested data sources failed');
+                    setError('Something went wrong while searching. Please try again.');
+                }
             } catch (err) {
                 console.error("Global search error:", err);
+                setError(err?.message || 'Something went wrong while searching.');
+                setResults([]);
             } finally {
                 setIsLoading(false);
             }
@@ -178,7 +203,7 @@ const Explore = () => {
         }, 300);
 
         return () => clearTimeout(delay);
-    }, [searchTerm, activeTab, selectedDistrict, selectedUpazila, selectedUnion, sortBy, maxPrice, filteredUpazilas]);
+    }, [searchTerm, activeTab, selectedDistrict, selectedUpazila, selectedUnion, sortBy, maxPrice, filteredUpazilas, refreshKey]);
 
     const clearFilters = () => {
         setSearchTerm('');
@@ -191,18 +216,19 @@ const Explore = () => {
     };
 
     const hasActiveFilters = activeTab !== 'ALL' || selectedDistrict || selectedUpazila || selectedUnion || searchTerm || maxPrice;
+    const mapQuery = searchTerm || selectedUnion || selectedUpazila || selectedDistrict || 'Bangladesh';
 
     const renderCard = (item) => {
         if (item._type === 'TOURS') {
             return (
                 <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition">
-                    <img src={item.featured_image || item.image || '/assets/tours/placeholder.jpg'} alt={item.title} className="w-full h-48 object-cover" />
+                    <img src={item.featured_image || item.image || '/assets/tours/placeholder.jpg'} alt={item.title} onError={handleImageError} className="w-full h-48 object-cover" />
                     <div className="p-4">
                         <div className="text-xs text-primary font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><MapIcon size={12}/> TOUR</div>
                         <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.title}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.duration} • {item.difficulty}</p>
                         <div className="flex justify-between items-center border-t border-gray-100 dark:border-slate-800 pt-3">
-                            <span className="font-bold text-primary">৳{item._price.toLocaleString()}</span>
+                            <span className="font-bold text-primary">৳{Number(item._price || 0).toLocaleString()}</span>
                             <button onClick={() => navigate(`/tours/${item.id}`)} className="text-sm bg-gray-100 dark:bg-slate-800 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 font-medium dark:text-white transition-colors">View</button>
                         </div>
                     </div>
@@ -211,13 +237,13 @@ const Explore = () => {
         } else if (item._type === 'HOTELS') {
             return (
                 <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition">
-                    <img src={item.image || '/assets/hotels/placeholder.jpg'} alt={item.name} className="w-full h-48 object-cover" />
+                    <img src={item.image || '/assets/hotels/placeholder.jpg'} alt={item.name} onError={handleImageError} className="w-full h-48 object-cover" />
                     <div className="p-4">
                         <div className="text-xs text-blue-500 font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><Home size={12}/> HOTEL</div>
                         <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.name}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.type || 'Accommodation'}</p>
                         <div className="flex justify-between items-center border-t border-gray-100 dark:border-slate-800 pt-3">
-                            <span className="font-bold text-blue-600">৳{item._price.toLocaleString()}/night</span>
+                            <span className="font-bold text-blue-600">৳{Number(item._price || 0).toLocaleString()}/night</span>
                             <button 
                                 onClick={() => navigate(`/hotels/${item.district_id || 'unknown'}/${item.id}/book`)} 
                                 className="text-sm bg-gray-100 dark:bg-slate-800 px-3 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 font-medium dark:text-white transition-colors"
@@ -231,7 +257,7 @@ const Explore = () => {
         } else {
             return (
                 <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition">
-                    <img src={item.logo || item.coverImage || '/api/placeholder/400/300'} alt={item.name} className="w-full h-48 object-cover opacity-80" />
+                    <img src={item.logo || item.coverImage || '/api/placeholder/400/300'} alt={item.name} onError={handleImageError} className="w-full h-48 object-cover opacity-80" />
                     <div className="p-4">
                         <div className="text-xs text-orange-500 font-bold mb-1 tracking-wider uppercase flex items-center gap-1"><Store size={12}/> {item.category}</div>
                         <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-1 truncate">{item.name}</h3>
@@ -428,7 +454,7 @@ const Explore = () => {
                 <div className="flex items-center justify-between mb-6">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                         {language === 'bn' ? 'মোট ' : 'Showing '} 
-                        <span className="font-black text-gray-900 dark:text-white">{results.length}</span> 
+                        <span className="font-black text-gray-900 dark:text-white">{isLoading ? '…' : error ? '0' : results.length}</span> 
                         {language === 'bn' ? 'টি ফলাফল পাওয়া গেছে' : ' verified results'}
                     </p>
                     <button 
@@ -444,6 +470,10 @@ const Explore = () => {
                     <MapDiscovery />
                 </div>
 
+                <div className="mb-10">
+                    <GoogleMapPreview query={mapQuery} height={420} />
+                </div>
+
                 {/* Results */}
                 {isMapView ? (
                     <div className="animate-in fade-in duration-500 rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-900">
@@ -453,6 +483,16 @@ const Explore = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {isLoading ? (
                             <CardSkeleton count={8} />
+                        ) : error ? (
+                            <div className="col-span-full">
+                                <EmptyState
+                                    icon="search"
+                                    title={language === 'bn' ? 'সার্চ করা যায়নি' : "We couldn't load results"}
+                                    description={language === 'bn' ? 'ইন্টারনেট বা সার্ভার সমস্যার কারণে ফলাফল আনা যায়নি। আবার চেষ্টা করুন।' : 'A connection or server problem prevented us from loading results. Please try again.'}
+                                    actionLabel={language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try Again'}
+                                    onAction={() => setRefreshKey(k => k + 1)}
+                                />
+                            </div>
                         ) : results.length === 0 ? (
                             <div className="col-span-full">
                                 <EmptyState

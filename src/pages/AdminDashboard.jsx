@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Users, Briefcase, Calendar, DollarSign, TrendingUp, 
     ArrowUpRight, ArrowDownRight, Package, Hotel, 
@@ -15,7 +15,11 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { getAllUsers, getPendingAgencies, setAgencyStatus, getSystemAuditLogs, updateUserRole } from '../services/adminService';
 import { unicornService } from '../services/unicornService';
 import { useToast } from '../components/ui/Toast';
-
+import AdminSidebar from '../components/admin/AdminSidebar';
+import StatCard from '../components/admin/StatCard';
+import QuickAction from '../components/admin/QuickAction';
+import LiveActivityPanel from '../components/admin/LiveActivityPanel';
+import PendingTasksTable from '../components/admin/PendingTasksTable';
 const AdminDashboard = () => {
     const toast = useToast();
     const [activeTab, setActiveTab] = useState('overview');
@@ -105,28 +109,11 @@ const AdminDashboard = () => {
         { name: 'Thu', rev: 61000 }, { name: 'Fri', rev: 75000 }, { name: 'Sat', rev: 92000 }, { name: 'Sun', rev: 88000 },
     ];
 
-    const StatCard = ({ title, value, icon: Icon, color, trend }) => (
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-[1.5rem] shadow-sm border border-gray-100 dark:border-gray-800 group hover:shadow-xl transition-all duration-300">
-            <div className="flex justify-between items-center mb-4">
-                <div className={`p-3 rounded-2xl ${color} bg-opacity-10 text-${color.split('-')[1]}-600`}>
-                    <Icon size={24} />
-                </div>
-                {trend && (
-                    <span className={`flex items-center gap-1 text-[10px] font-black ${trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {trend > 0 ? <ArrowUpRight size={14}/> : <ArrowDownRight size={14}/>} {Math.abs(trend)}%
-                    </span>
-                )}
-            </div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{title}</p>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white mt-1">
-                {typeof value === 'number' && title.includes('Revenue') ? `৳${value.toLocaleString()}` : value}
-            </h3>
-        </div>
-    );
-
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 p-6 md:p-10">
-            <div className="max-w-[1400px] mx-auto space-y-10">
+        <div className="flex min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <AdminSidebar user={null} />
+      <div className="flex-1 p-6 md:p-10">
+        <div className="max-w-[1400px] mx-auto space-y-10">
                 
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -176,10 +163,10 @@ const AdminDashboard = () => {
                         {activeTab === 'overview' && (
                             <div className="space-y-10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    <StatCard title="Total Revenue" value={stats.totalRevenue} icon={DollarSign} color="bg-blue-600" trend={12} />
-                                    <StatCard title="Total Users" value={stats.totalUsers} icon={Users} color="bg-purple-600" trend={8} />
-                                    <StatCard title="Active Partners" value={stats.activeAgencies} icon={Briefcase} color="bg-orange-600" trend={-2} />
-                                    <StatCard title="Pending Refunds" value={stats.pendingRefunds} icon={RefreshCcw} color="bg-red-600" />
+                                    <StatCard title="Total Revenue" value={stats.totalRevenue} icon={DollarSign} colorClass="bg-forest-600" trend={12} />
+                                    <StatCard title="Total Users" value={stats.totalUsers} icon={Users} colorClass="bg-brightgreen-600" trend={8} />
+                                    <StatCard title="Active Partners" value={stats.activeAgencies} icon={Briefcase} colorClass="bg-orange-600" trend={-2} />
+                                    <StatCard title="Pending Refunds" value={stats.pendingRefunds} icon={RefreshCcw} colorClass="bg-red-600" />
                                 </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -243,7 +230,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </div></div>
     );
 };
 

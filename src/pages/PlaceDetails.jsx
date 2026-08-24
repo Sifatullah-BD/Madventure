@@ -47,7 +47,7 @@ const PlaceDetails = () => {
     return (
         <div className="min-h-screen bg-gray-50 pb-16 font-sans">
             {/* Hero Banner */}
-            <div className="relative h-[60vh] w-full">
+            <div className="relative h-[45vh] min-h-[300px] w-full">
                 <img
                     src={place.image}
                     alt={place.name}

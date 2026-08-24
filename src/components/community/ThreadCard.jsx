@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { DISTRICTS } from '../../data/madventure-data';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../ui/Toast';
-
 const CategoryDetails = {
     tips: { label: 'TIPS', color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-emerald-500/10' },
     question: { label: 'QUESTION', color: 'text-cyan-400', border: 'border-cyan-500/30', bg: 'bg-cyan-500/10' },

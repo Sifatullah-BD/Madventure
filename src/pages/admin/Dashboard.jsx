@@ -6,9 +6,10 @@ import AnalyticsChart from '../../components/admin/AnalyticsChart';
 import AdminUserTable from '../../components/admin/AdminUserTable';
 import AuditLogTable from '../../components/admin/AuditLogTable';
 import { useToast } from '../../components/ui/Toast';
+import { hasAdminAccess } from '../../utils/appRole';
 
 const Dashboard = () => {
-    const { user, profile, loading: authLoading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const toast = useToast();
     
     const [analytics, setAnalytics] = useState([]);
@@ -16,12 +17,6 @@ const Dashboard = () => {
     const [auditLogs, setAuditLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [exporting, setExporting] = useState(false);
-
-    useEffect(() => {
-        if (!authLoading && profile?.role && ['admin', 'super_admin'].includes(profile.role)) {
-            fetchDashboardData();
-        }
-    }, [authLoading, profile]);
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -51,6 +46,12 @@ const Dashboard = () => {
         }
     };
 
+    useEffect(() => {
+        if (!authLoading && hasAdminAccess(user)) {
+            fetchDashboardData();
+        }
+    }, [authLoading, user]);
+
     const handleExport = async (type) => {
         setExporting(true);
         try {
@@ -72,7 +73,7 @@ const Dashboard = () => {
     if (authLoading) return <div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="animate-spin text-primary" size={40}/></div>;
     
     // Role Check
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!hasAdminAccess(user)) {
         return <Navigate to="/" replace />;
     }
 

@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { Clock, Eye, Share2, Facebook, Twitter, Link as LinkIcon, User } from 'lucide-react';
+import { Clock, Eye, Share2, Facebook, Twitter, Link as LinkIcon, User, Heart, Plane } from 'lucide-react';
 import { blogService } from './blogService';
 import BlogCard from './BlogCard';
+import { useToast } from '../../components/ui/Toast';
 
-const BlogDetail = () => {
+const BlogDetail = ({ user, onOpenLogin }) => {
     const { slug } = useParams();
-    const { i18n } = useTranslation();
+    const toast = useToast();
     
     const [post, setPost] = useState(null);
     const [relatedPosts, setRelatedPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [likes, setLikes] = useState(0);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -27,6 +29,9 @@ const BlogDetail = () => {
                     const related = await blogService.getRelatedPosts(data.id, data.category);
                     setRelatedPosts(related);
                 }
+                
+                // Set mock likes for UI demonstration
+                setLikes(Math.floor(Math.random() * 100) + 10);
             } catch (error) {
                 console.error("Failed to load post:", error);
             } finally {
@@ -72,6 +77,8 @@ const BlogDetail = () => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString(post.language === 'bn' ? 'bn-BD' : 'en-US', options);
     };
+
+    const canUseAsPlan = /itinerary|ভ্রমণসূচি|travel plan/i.test(`${post.category || ''} ${post.title || ''} ${post.content || ''}`);
 
     return (
         <div className="bg-white min-h-screen pt-20 pb-16 font-sans">
@@ -121,6 +128,13 @@ const BlogDetail = () => {
                 {/* Main Article */}
                 <article className="lg:w-3/4 prose prose-lg md:prose-xl prose-green max-w-none prose-img:rounded-xl prose-headings:font-bold prose-a:text-[#1B5E20]" style={{ fontFamily: post.language === 'bn' ? "'Hind Siliguri', sans-serif" : "Inter, sans-serif" }}>
                     <div dangerouslySetInnerHTML={{ __html: post.content }} />
+
+                    {canUseAsPlan && (
+                        <Link to={`/tour-plans?destination=${encodeURIComponent(post.title)}`} className="mt-8 flex items-center gap-3 rounded-2xl bg-[#1B5E20] p-5 text-white hover:bg-green-800 transition-colors">
+                            <Plane size={21} />
+                            <span><strong className="block">Use This Plan</strong><span className="text-sm text-white/75">Start a trip plan from this guide.</span></span>
+                        </Link>
+                    )}
                     
                     {/* Tags */}
                     {post.tags && post.tags.length > 0 && (
@@ -136,9 +150,39 @@ const BlogDetail = () => {
                 </article>
 
                 {/* Sidebar */}
-                <aside className="lg:w-1/4">
-                    {/* Share Widget */}
+                <aside className="lg:w-1/4 space-y-6">
+                    {/* Reaction Widget */}
                     <div className="sticky top-28 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <Heart size={18} /> React to this post
+                        </h3>
+                        <div className="flex items-center gap-4">
+                            <button 
+                                onClick={() => {
+                                    if (!user && onOpenLogin) {
+                                        onOpenLogin();
+                                    } else {
+                                        if (liked) {
+                                            setLiked(false);
+                                            setLikes(prev => prev - 1);
+                                            toast?.success?.('Like removed');
+                                        } else {
+                                            setLiked(true);
+                                            setLikes(prev => prev + 1);
+                                            toast?.success?.('Post Liked! ❤️');
+                                        }
+                                    }
+                                }}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-colors ${liked ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-white border border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-200'}`}
+                            >
+                                <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
+                                <span>{likes} {liked ? 'Liked' : 'Like'}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Share Widget */}
+                    <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                         <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <Share2 size={18} /> Share this guide
                         </h3>

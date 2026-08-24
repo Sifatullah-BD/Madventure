@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, DollarSign, Loader2, ArrowRight } from 'lucide-react';
 import { useToast } from '../ui/Toast';
 import { useAuth } from '../../hooks/useAuth';
-import { paymentService } from '../../services/paymentService';
 import useWalletStore from '../../store/useWalletStore';
 
 const AddMoneyModal = ({ isOpen, onClose, onSuccess }) => {
@@ -11,6 +10,20 @@ const AddMoneyModal = ({ isOpen, onClose, onSuccess }) => {
     const [amount, setAmount] = useState('');
     const [loading, setLoading] = useState(false);
     const { fetchWallet } = useWalletStore();
+
+    // Close on Escape + lock body scroll while open
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleEscape = (e) => {
+            if (e.key === 'Escape' && !loading) onClose();
+        };
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = '';
+        };
+    }, [isOpen, onClose, loading]);
 
     if (!isOpen) return null;
 
@@ -46,7 +59,7 @@ const AddMoneyModal = ({ isOpen, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 animate-fade-in" onClick={() => { if (!loading) onClose(); }}>
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <button 
                     onClick={onClose}

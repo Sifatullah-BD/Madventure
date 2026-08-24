@@ -34,25 +34,33 @@ const LostFound = () => {
         verificationQuestion: ''
     });
 
-    const fetchItems = async () => {
-        setLoading(true);
-        const { data, error } = await getLostFoundItems();
-        if (data) {
-            setItems(data.map(i => ({
-                ...i,
-                item: i.title,
-                status: i.item_type,
-                date: i.created_at,
-                image: i.image_url,
-                isChatEnabled: true,
-                contact: i.contact_number
-            })));
+    const fetchItems = async (showLoader = false) => {
+        if (showLoader) setLoading(true);
+        try {
+            const { data, error } = await getLostFoundItems();
+            if (data) {
+                setItems(data.map(i => ({
+                    ...i,
+                    item: i.title,
+                    status: i.item_type,
+                    date: i.created_at,
+                    image: i.image_url,
+                    isChatEnabled: true,
+                    contact: i.contact_number
+                })));
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     useEffect(() => {
-        fetchItems();
+        const timer = setTimeout(() => {
+            fetchItems(false);
+        }, 0);
+        return () => clearTimeout(timer);
     }, []);
 
     const handleInputChange = (e) => {
@@ -95,7 +103,7 @@ const LostFound = () => {
         } else {
             setNewItem({ item: '', location: '', date: '', description: '', image: null, reward: '', verificationQuestion: '' });
             setShowForm(false);
-            fetchItems();
+            fetchItems(true);
             toast.success(`${activeTab === 'lost' ? 'Lost' : 'Found'} item reported successfully!`);
         }
         setSubmitting(false);

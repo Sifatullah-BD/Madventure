@@ -15,6 +15,14 @@ const STYLES = [
     { id: 'camping', label: 'Camping', icon: Camera }
 ];
 
+const ACCOUNT_TYPES = [
+    { id: 'traveler', label: 'Traveler', description: 'Plan trips and discover Bangladesh' },
+    { id: 'guide', label: 'Local Guide', description: 'Offer local knowledge and guided trips' },
+    { id: 'agency', label: 'Tour Agency', description: 'Publish tours and manage bookings' },
+    { id: 'hotel_owner', label: 'Hotel / Resort', description: 'List stays for travelers' },
+    { id: 'partner', label: 'Business Partner', description: 'Offer travel services and products' },
+];
+
 const LoginModal = ({ isOpen, onClose, onLogin }) => {
     const { login, register, signInWithGoogle } = useAuth();
     const toast = useToast();
@@ -27,18 +35,32 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     const [phone, setPhone] = useState('');
     const [gender, setGender] = useState('');
     const [selectedStyles, setSelectedStyles] = useState([]);
+    const [accountType, setAccountType] = useState('traveler');
     const [loading, setLoading] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState(0);
 
-    useEffect(() => {
-        // Password strength logic
+    // Password strength derived during render (no effect needed)
+    const passwordStrength = (() => {
         let strength = 0;
         if (password.length > 6) strength += 25;
         if (/[A-Z]/.test(password)) strength += 25;
         if (/[0-9]/.test(password)) strength += 25;
         if (/[^A-Za-z0-9]/.test(password)) strength += 25;
-        setPasswordStrength(strength);
-    }, [password]);
+        return strength;
+    })();
+
+    // Close on Escape + lock body scroll while open
+    useEffect(() => {
+        if (!isOpen) return;
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = '';
+        };
+    }, [isOpen, onClose]);
 
     if (!isOpen) return null;
 
@@ -66,7 +88,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                     onLogin(user);
                 }
             } else {
-                const { user, error } = await register(email, password, { name, phone, gender, styles: selectedStyles });
+                const { user, error } = await register(email, password, { name, phone, gender, styles: selectedStyles, accountType });
                 if (error) throw error;
                 if (user) {
                     trackEvent('user_register', { method: 'email' });
@@ -83,11 +105,12 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-[100] p-4 sm:p-6 overflow-hidden">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-[100] p-4 sm:p-6 overflow-hidden" onClick={onClose}>
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                className="bg-[#0a140d] rounded-[2.5rem] shadow-[0_0_100px_rgba(34,197,94,0.1)] w-full max-w-4xl h-[600px] flex overflow-hidden border border-white/5 relative"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-[#0a140d] rounded-[2.5rem] shadow-[0_0_100px_rgba(34,197,94,0.1)] w-full max-w-4xl min-h-[600px] max-h-[90vh] flex overflow-hidden border border-white/5 relative"
             >
                 {/* Close Button */}
                 <button 
@@ -150,7 +173,7 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                 </div>
 
                 {/* Right Side: Glassmorphic Form */}
-                <div className="w-full lg:w-1/2 p-6 sm:p-10 flex flex-col justify-center relative bg-[#0a140d]">
+                <div className="w-full lg:w-1/2 p-6 sm:p-10 flex flex-col justify-center relative bg-[#0a140d] overflow-y-auto">
                     <AnimatePresence mode="wait">
                         {step === 1 ? (
                             <motion.div 
@@ -312,6 +335,19 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                                                 placeholder="Phone Number"
                                                 className="w-full bg-white/5 border border-white/5 rounded-2xl py-3 pl-12 pr-4 outline-none focus:border-forest-light/30 text-white text-sm transition-all"
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-3 px-1">Account Type</label>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {ACCOUNT_TYPES.map(type => (
+                                                <button key={type.id} type="button" onClick={() => setAccountType(type.id)}
+                                                    className={`text-left p-3 rounded-xl border transition-all ${accountType === type.id ? 'bg-forest-light/15 border-forest-light/60' : 'bg-white/5 border-white/5'}`}>
+                                                    <span className={`block text-xs font-black ${accountType === type.id ? 'text-white' : 'text-gray-400'}`}>{type.label}</span>
+                                                    <span className="block text-[10px] text-gray-500 mt-1">{type.description}</span>
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
 

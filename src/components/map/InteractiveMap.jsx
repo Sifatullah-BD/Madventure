@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Navigation, MapPin } from 'lucide-react';
 
 // Fix for default Leaflet icon not appearing in React
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -29,6 +28,16 @@ const RecenterMap = ({ coords }) => {
 
 const InteractiveMap = ({ items, height = "400px", initialCenter = [23.8103, 90.4125] }) => {
     const [userLocation, setUserLocation] = useState(null);
+    const [boundary, setBoundary] = useState(null);
+
+    useEffect(() => {
+        let mounted = true;
+        fetch('/data/bd-geojson/bangladesh.geojson')
+            .then(response => response.ok ? response.json() : null)
+            .then(data => { if (mounted) setBoundary(data); })
+            .catch(() => {});
+        return () => { mounted = false; };
+    }, []);
 
     useEffect(() => {
         if (navigator.geolocation) {
@@ -46,13 +55,21 @@ const InteractiveMap = ({ items, height = "400px", initialCenter = [23.8103, 90.
             <MapContainer center={initialCenter} zoom={13} style={{ height: '100%', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Boundaries © geoBoundaries CC BY 4.0'
                 />
+
+                {boundary && (
+                    <GeoJSON
+                        data={boundary}
+                        style={{ color: '#1B5E20', weight: 1, fillColor: '#43A047', fillOpacity: 0.06 }}
+                    />
+                )}
                 
                 {items && items.map((item) => {
                     // Extract coordinates (mocking if not present)
-                    const lat = item.latitude || (23.8103 + (Math.random() - 0.5) * 0.1);
-                    const lng = item.longitude || (90.4125 + (Math.random() - 0.5) * 0.1);
+                    const lat = Number(item.latitude || item.lat || item.latitude_deg);
+                    const lng = Number(item.longitude || item.lng || item.long || item.longitude_deg);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
                     
                     return (
                         <Marker key={item.id} position={[lat, lng]}>
@@ -68,7 +85,7 @@ const InteractiveMap = ({ items, height = "400px", initialCenter = [23.8103, 90.
                             </Popup>
                         </Marker>
                     );
-                })}
+                }).filter(Boolean)}
 
                 {userLocation && (
                     <>

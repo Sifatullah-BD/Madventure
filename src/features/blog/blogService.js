@@ -58,6 +58,8 @@ export const blogService = {
 
         if (error) {
             console.error("Error fetching blog posts:", error);
+            if (error.code === 'PGRST205') return MOCK_POSTS.filter(p => p.language === lang).length
+                ? MOCK_POSTS.filter(p => p.language === lang) : MOCK_POSTS;
             throw error;
         }
         return data;
@@ -95,6 +97,17 @@ export const blogService = {
         return data;
     },
 
+    async getPostById(id) {
+        if (!isSupabaseConfigured) {
+            const post = MOCK_POSTS.find(item => item.id === id);
+            if (!post) throw new Error('Post not found');
+            return post;
+        }
+        const { data, error } = await supabase.from('blog_posts').select('*').eq('id', id).single();
+        if (error) throw error;
+        return data;
+    },
+
     /**
      * Get posts by category
      */
@@ -113,6 +126,7 @@ export const blogService = {
 
         if (error) {
             console.error("Error fetching category posts:", error);
+            if (error.code === 'PGRST205') return MOCK_POSTS.filter(p => p.category === category && p.language === lang);
             throw error;
         }
         return data;
@@ -140,9 +154,30 @@ export const blogService = {
     },
 
     /**
+     * Get posts by user (author)
+     */
+    async getUserPosts(userId, lang = 'bn') {
+        if (!isSupabaseConfigured) {
+            return MOCK_POSTS.filter(p => p.author_id === userId && p.language === lang);
+        }
+
+        const { data, error } = await supabase
+            .from('blog_posts')
+            .select('*')
+            .eq('author_id', userId)
+            .order('published_at', { ascending: false });
+
+        if (error) {
+            console.error("Error fetching user posts:", error);
+            throw error;
+        }
+        return data;
+    },
+
+    /**
      * Save or Update a blog post (Admin only)
      */
-    async savePost(postData) {
+    async savePost(postData, id = null) {
         if (!isSupabaseConfigured) {
             console.log("Simulating post save:", postData);
             return { id: `mock_${Date.now()}`, ...postData };
@@ -154,12 +189,12 @@ export const blogService = {
             postData.reading_time = Math.ceil(wordCount / 200);
         }
 
-        if (postData.id) {
+        if (postData.id || id) {
             // Update
             const { data, error } = await supabase
                 .from('blog_posts')
                 .update({ ...postData, updated_at: new Date().toISOString() })
-                .eq('id', postData.id)
+                .eq('id', postData.id || id)
                 .select()
                 .single();
             if (error) throw error;

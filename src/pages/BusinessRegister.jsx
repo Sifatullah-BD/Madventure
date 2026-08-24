@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Store, MapPin, Phone, Camera, DollarSign, Check, ArrowRight, ArrowLeft, CheckCircle, Building2, Globe, MessageCircle } from 'lucide-react';
+import { Store, MapPin, Phone, Camera, DollarSign, Check, ArrowRight, ArrowLeft, CheckCircle, Building2, Globe, MessageCircle, Loader2 } from 'lucide-react';
 import { BUSINESS_CATEGORIES } from '../data/businessData';
 import { businessService } from '../services/businessService';
 import { useToast } from '../components/ui/Toast';
@@ -7,6 +7,10 @@ import { useToast } from '../components/ui/Toast';
 // Import the new comprehensive location data
 import bdDivisions from '../data/bd-geojson/bd-divisions.json';
 import bdDistricts from '../data/bd-geojson/bd-districts.json';
+
+const FieldError = ({ message }) => (
+    message ? <p className="mt-1 text-xs font-bold text-red-500">{message}</p> : null
+);
 
 const STEPS = [
     { id: 1, label: 'মৌলিক তথ্য', icon: Store },
@@ -19,6 +23,7 @@ const BusinessRegister = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
     const [form, setForm] = useState({
         name: '',
         category: '',
@@ -35,23 +40,58 @@ const BusinessRegister = () => {
         amenities: [],
     });
 
-    const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
-
     // Memoized filtered districts based on selected division
     const filteredDistricts = useMemo(() => {
         if (!form.division_id) return [];
         return bdDistricts.districts.filter(d => d.division_id === form.division_id);
     }, [form.division_id]);
 
-    const canProceed = () => {
-        switch (currentStep) {
-            case 1: return form.name && form.category && form.description;
-            case 2: return form.division_id && form.district_id && form.phone;
-            default: return true;
+    const update = (field, value) => {
+        setForm(prev => ({ ...prev, [field]: value }));
+        // Clear the field's error as the user fixes it
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        }
+    };
+
+    const PHONE_RE = /^(\+?880|0)1[3-9]\d{8}$/;
+    const normalizePhone = (value) => (value || '').trim().replace(/[\s-]/g, '');
+
+    const validateStep = (step) => {
+        const errs = {};
+        if (step === 1) {
+            if (!form.name.trim()) errs.name = 'ব্যবসার নাম প্রয়োজন';
+            else if (form.name.trim().length < 2) errs.name = 'নাম কমপক্ষে ২ অক্ষরের হতে হবে';
+            if (!form.category) errs.category = 'ক্যাটেগরি নির্বাচন করুন';
+            if (!form.description.trim()) errs.description = 'বিবরণ প্রয়োজন';
+            else if (form.description.trim().length < 10) errs.description = 'বিবরণ কমপক্ষে ১০ অক্ষরের হতে হবে';
+        }
+        if (step === 2) {
+            if (!form.division_id) errs.division_id = 'বিভাগ নির্বাচন করুন';
+            if (!form.district_id) errs.district_id = 'জেলা নির্বাচন করুন';
+            if (!form.phone.trim()) errs.phone = 'ফোন নম্বর প্রয়োজন';
+            else if (!PHONE_RE.test(normalizePhone(form.phone))) errs.phone = 'সঠিক বাংলাদেশি মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)';
+            if (form.whatsapp.trim() && !PHONE_RE.test(normalizePhone(form.whatsapp))) errs.whatsapp = 'সঠিক মোবাইল নম্বর দিন';
+        }
+        return errs;
+    };
+
+    const goNext = () => {
+        const errs = validateStep(currentStep);
+        setErrors(errs);
+        if (Object.keys(errs).filter(k => errs[k]).length === 0) {
+            setCurrentStep(prev => prev + 1);
         }
     };
 
     const handleSubmit = async () => {
+        const errs = validateStep(2);
+        setErrors(errs);
+        if (Object.keys(errs).filter(k => errs[k]).length > 0) {
+            setCurrentStep(2);
+            toast.error('দয়া করে লাল চিহ্নিত ফিল্ডগুলো ঠিক করুন।');
+            return;
+        }
         setIsSubmitting(true);
         try {
             const selectedDivision = bdDivisions.divisions.find(d => d.id === form.division_id)?.name;
@@ -92,6 +132,7 @@ const BusinessRegister = () => {
     }
 
     const inputClass = "w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-gray-800 dark:text-white placeholder-gray-400 transition-all";
+    const errorInputClass = "w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-red-400 dark:border-red-500 rounded-xl text-sm focus:ring-2 focus:ring-red-200 outline-none text-gray-800 dark:text-white placeholder-gray-400 transition-all";
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-8">
@@ -134,7 +175,8 @@ const BusinessRegister = () => {
                             <h2 className="text-lg font-bold text-gray-800 dark:text-white">মৌলিক তথ্য</h2>
                             <div>
                                 <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ব্যবসার নাম *</label>
-                                <input type="text" value={form.name} onChange={e => update('name', e.target.value)} className={inputClass} placeholder="যেমন: সী পার্ল বিচ রিসোর্ট" />
+                                <input type="text" value={form.name} onChange={e => update('name', e.target.value)} className={errors.name ? errorInputClass : inputClass} placeholder="যেমন: সী পার্ল বিচ রিসোর্ট" />
+                                <FieldError message={errors.name} />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ক্যাটেগরি *</label>
@@ -154,10 +196,12 @@ const BusinessRegister = () => {
                                         </button>
                                     ))}
                                 </div>
+                                <FieldError message={errors.category} />
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">বিবরণ *</label>
-                                <textarea value={form.description} onChange={e => update('description', e.target.value)} rows={4} className={`${inputClass} resize-none`} placeholder="আপনার ব্যবসা সম্পর্কে বিস্তারিত লিখুন..." />
+                                <textarea value={form.description} onChange={e => update('description', e.target.value)} rows={4} className={`${errors.description ? errorInputClass : inputClass} resize-none`} placeholder="আপনার ব্যবসা সম্পর্কে বিস্তারিত লিখুন..." />
+                                <FieldError message={errors.description} />
                             </div>
                         </div>
                     )}
@@ -169,34 +213,38 @@ const BusinessRegister = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">বিভাগ *</label>
-                                    <select value={form.division_id} onChange={e => { update('division_id', e.target.value); update('district_id', ''); }} className={inputClass}>
+                                    <select value={form.division_id} onChange={e => { update('division_id', e.target.value); update('district_id', ''); }} className={errors.division_id ? errorInputClass : inputClass}>
                                         <option value="">বিভাগ নির্বাচন করুন</option>
                                         {bdDivisions.divisions.map((d) => (
                                             <option key={d.id} value={d.id}>{d.bn_name} ({d.name})</option>
                                         ))}
                                     </select>
+                                    <FieldError message={errors.division_id} />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">জেলা *</label>
-                                    <select value={form.district_id} onChange={e => update('district_id', e.target.value)} className={inputClass} disabled={!form.division_id}>
+                                    <select value={form.district_id} onChange={e => update('district_id', e.target.value)} className={errors.district_id ? errorInputClass : inputClass} disabled={!form.division_id}>
                                         <option value="">জেলা নির্বাচন করুন</option>
                                         {filteredDistricts.map((d) => (
                                             <option key={d.id} value={d.id}>{d.bn_name} ({d.name})</option>
                                         ))}
                                     </select>
+                                    <FieldError message={errors.district_id} />
                                 </div>
                             </div>
                             
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">ফোন নম্বর *</label>
-                                    <input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} className={inputClass} placeholder="+880 1XXX-XXXXXX" />
+                                    <input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} className={errors.phone ? errorInputClass : inputClass} placeholder="+880 1XXX-XXXXXX" />
+                                    <FieldError message={errors.phone} />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-bold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
                                         <MessageCircle size={12} className="inline mr-1" /> WhatsApp নম্বর
                                     </label>
-                                    <input type="tel" value={form.whatsapp} onChange={e => update('whatsapp', e.target.value)} className={inputClass} placeholder="8801XXXXXXXXX" />
+                                    <input type="tel" value={form.whatsapp} onChange={e => update('whatsapp', e.target.value)} className={errors.whatsapp ? errorInputClass : inputClass} placeholder="8801XXXXXXXXX" />
+                                    <FieldError message={errors.whatsapp} />
                                 </div>
                             </div>
                         </div>
@@ -235,9 +283,8 @@ const BusinessRegister = () => {
 
                         {currentStep < 3 ? (
                             <button
-                                onClick={() => setCurrentStep(prev => prev + 1)}
-                                disabled={!canProceed()}
-                                className="bg-primary text-white px-6 py-2.5 rounded-full font-bold hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                onClick={goNext}
+                                className="bg-primary text-white px-6 py-2.5 rounded-full font-bold hover:bg-green-700 transition-all flex items-center gap-2"
                             >
                                 পরবর্তী <ArrowRight size={18} />
                             </button>
@@ -245,9 +292,10 @@ const BusinessRegister = () => {
                             <button
                                 onClick={handleSubmit}
                                 disabled={isSubmitting}
-                                className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg"
+                                className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg"
                             >
-                                {isSubmitting ? 'জমা দেওয়া হচ্ছে...' : 'সাবমিট করুন'} <CheckCircle size={18} />
+                                {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+                                {isSubmitting ? 'জমা দেওয়া হচ্ছে...' : 'সাবমিট করুন'} {!isSubmitting && <CheckCircle size={18} />}
                             </button>
                         )}
                     </div>

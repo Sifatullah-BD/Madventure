@@ -1,115 +1,183 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import DashboardHeader from '../components/dashboard/DashboardHeader';
+import { AnimatePresence, motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { Users, MessagesSquare } from 'lucide-react';
+
 import Forum from '../components/community/Forum';
 import ThreadDetail from '../components/community/ThreadDetail';
 import TravelPartner from '../components/community/TravelPartner';
-import { Users, MessagesSquare } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
 import LoginModal from '../components/LoginModal';
 import DistrictDropdown from '../components/community/DistrictDropdown';
 
+import { useLanguage } from '../context/LanguageContext';
 
 const Community = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { language } = useLanguage();
-    
-    // Parse query params to set initial state gracefully
+
     const searchParams = new URLSearchParams(location.search);
     const initialTab = searchParams.get('tab') || 'forum';
     const initialThread = searchParams.get('threadId') || null;
 
-    const [activeTab, setActiveTab] = useState(initialTab); // 'forum' | 'partner'
-    const [selectedThread, setSelectedThread] = useState(initialThread); // null | threadId
+    const [activeTab, setActiveTab] = useState(initialTab);
+    const [selectedThread, setSelectedThread] = useState(initialThread);
     const [showLoginModal, setShowLoginModal] = useState(false);
 
-
-    // Sync state to URL without reloading
     useEffect(() => {
         const query = new URLSearchParams();
-        if (activeTab !== 'forum') query.set('tab', activeTab);
-        if (selectedThread) query.set('threadId', selectedThread);
-        
-        const newUrl = `${location.pathname}?${query.toString()}`;
-        if (window.location.search !== `?${query.toString()}`) {
-            navigate(newUrl, { replace: true });
-        }
-    }, [activeTab, selectedThread, navigate, location.pathname]);
 
-    // Handle view back
+        if (activeTab !== 'forum') {
+            query.set('tab', activeTab);
+        }
+
+        if (selectedThread) {
+            query.set('threadId', selectedThread);
+        }
+
+        navigate(
+            {
+                pathname: location.pathname,
+                search: query.toString(),
+            },
+            { replace: true }
+        );
+    }, [activeTab, selectedThread, location.pathname, navigate]);
+
     const handleBackToForum = () => {
         setSelectedThread(null);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#050f08] text-gray-900 dark:text-gray-100 flex flex-col transition-colors">
-            <div className="relative pt-32 pb-12 px-4 sm:px-6 lg:px-8 text-center overflow-hidden bg-white dark:bg-transparent">
-                <div className="absolute inset-0 z-0">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-forest-light/10 blur-[100px] rounded-full"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/5 blur-[100px] rounded-full"></div>
+        <div className="min-h-screen bg-gray-50 dark:bg-[#050f08] text-gray-900 dark:text-gray-100 flex flex-col">
+
+            {/* Hero */}
+            <div className="relative pt-20 md:pt-24 pb-6 md:pb-8 px-4 text-center overflow-hidden bg-white dark:bg-transparent">
+
+                <div className="absolute inset-0">
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-green-400/10 blur-[120px] rounded-full"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-400/10 blur-[120px] rounded-full"></div>
                 </div>
+
                 <div className="relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-4 tracking-tighter" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-                        {language === 'bn' ? 'ম্যাডভেঞ্চার কমিউনিটি' : 'Madventure Community'}
+                    <h1
+                        className="text-3xl md:text-5xl font-black mb-2"
+                        style={{
+                            fontFamily: "'Hind Siliguri', sans-serif",
+                        }}
+                    >
+                        {language === 'bn'
+                            ? 'ম্যাডভেঞ্চার কমিউনিটি'
+                            : 'Madventure Community'}
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-medium opacity-90">
-                        {language === 'bn' ? 'অন্যান্য ট্রাভেলারদের সাথে কানেক্ট করুন, অভিজ্ঞতা শেয়ার করুন এবং আপনার পরবর্তী ট্রিপের জন্য সঙ্গী খুঁজুন।' : 'Connect with other travelers, share experiences, and find a companion for your next trip.'}
+
+                    <p className="max-w-3xl mx-auto text-sm md:text-base text-gray-600 dark:text-gray-300">
+                        {language === 'bn'
+                            ? 'অন্যান্য ভ্রমণপ্রেমীদের সাথে সংযুক্ত হোন, অভিজ্ঞতা শেয়ার করুন এবং নতুন ট্রাভেল পার্টনার খুঁজে নিন।'
+                            : 'Connect with fellow travelers, share experiences, ask questions and find your next travel partner.'}
                     </p>
                 </div>
-                <DistrictDropdown />
+
+                <div className="mt-4"><DistrictDropdown /></div>
             </div>
 
-            {/* Custom Tab Navigation - Scandi Style */}
+            {/* Tabs */}
             {!selectedThread && (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 w-full">
-                    <div className="bg-white dark:bg-white/5 backdrop-blur-xl rounded-[2rem] border border-gray-200 dark:border-white/10 p-2 mx-auto max-w-lg flex shadow-md dark:shadow-2xl">
+                <div className="max-w-7xl mx-auto w-full px-4 mb-5">
+
+                    <div className="max-w-lg mx-auto bg-white dark:bg-white/5 rounded-2xl border border-gray-200 dark:border-white/10 p-1.5 flex">
+
                         <button
                             onClick={() => setActiveTab('forum')}
-                            className={`flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black text-sm transition-all ${activeTab === 'forum'
-                                ? 'bg-forest-light text-white shadow-lg shadow-forest-light/20 scale-[1.02]'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            className={`flex-1 py-2.5 rounded-xl flex justify-center items-center gap-2 font-bold text-sm transition ${activeTab === 'forum'
+                                    ? 'bg-green-600 text-white'
+                                    : 'text-gray-500'
                                 }`}
                         >
-                            <MessagesSquare size={18}/> {language === 'bn' ? 'ট্রাভেল ফোরাম' : 'Travel Forum'}
+                            <MessagesSquare size={18} />
+                            {language === 'bn'
+                                ? 'ট্রাভেল ফোরাম'
+                                : 'Travel Forum'}
                         </button>
+
                         <button
                             onClick={() => setActiveTab('partner')}
-                            className={`flex-1 flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black text-sm transition-all ${activeTab === 'partner'
-                                ? 'bg-[#f97316] text-white shadow-lg shadow-orange-500/20 scale-[1.02]'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                            className={`flex-1 py-2.5 rounded-xl flex justify-center items-center gap-2 font-bold text-sm transition ${activeTab === 'partner'
+                                    ? 'bg-orange-500 text-white'
+                                    : 'text-gray-500'
                                 }`}
                         >
-                            <Users size={18}/> {language === 'bn' ? 'ট্রাভেল পার্টনার' : 'Travel Partner'}
+                            <Users size={18} />
+                            {language === 'bn'
+                                ? 'ট্রাভেল পার্টনার'
+                                : 'Travel Partner'}
                         </button>
+
                     </div>
                 </div>
             )}
 
-            {/* Content Area */}
-            <div className="w-full mx-auto flex-grow px-4 sm:px-6 lg:px-8 pb-16">
+            {/* Content */}
+
+            <div className="flex-grow max-w-7xl mx-auto w-full px-4 pb-8">
+
                 <AnimatePresence mode="wait">
+
                     <motion.div
                         key={selectedThread || activeTab}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{
+                            opacity: 0,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            y: 0,
+                        }}
+                        exit={{
+                            opacity: 0,
+                            y: -20,
+                        }}
+                        transition={{
+                            duration: 0.35,
+                        }}
                     >
                         {selectedThread ? (
-                            <ThreadDetail threadId={selectedThread} onBack={handleBackToForum} />
+                            <ThreadDetail
+                                threadId={selectedThread}
+                                onBack={handleBackToForum}
+                            />
                         ) : (
                             <>
-                                {activeTab === 'forum' && <Forum onSelectThread={setSelectedThread} onLoginRequired={() => setShowLoginModal(true)} />}
-                                {activeTab === 'partner' && <TravelPartner />}
+                                {activeTab === 'forum' && (
+                                    <Forum
+                                        onSelectThread={setSelectedThread}
+                                        onLoginRequired={() =>
+                                            setShowLoginModal(true)
+                                        }
+                                    />
+                                )}
+
+                                {activeTab === 'partner' && (
+                                    <TravelPartner />
+                                )}
                             </>
                         )}
                     </motion.div>
+
                 </AnimatePresence>
+
             </div>
-            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} onLogin={() => setShowLoginModal(false)} />
+
+            <LoginModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                onLogin={() => setShowLoginModal(false)}
+            />
+
         </div>
     );
 };

@@ -19,6 +19,7 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 }
 const Home = lazy(() => import('./pages/Home'));
 const Destinations = lazy(() => import('./pages/Destinations'));
+const DestinationHub = lazy(() => import('./pages/DestinationHub'));
 const DistrictDetails = lazy(() => import('./pages/DistrictDetails'));
 const PlaceDetails = lazy(() => import('./pages/PlaceDetails'));
 const Solutions = lazy(() => import('./pages/Solutions'));
@@ -55,6 +56,7 @@ const Explore = lazy(() => import('./pages/Explore'));
 const BusinessDetail = lazy(() => import('./pages/BusinessDetail'));
 const BusinessRegister = lazy(() => import('./pages/BusinessRegister'));
 const VendorRegistration = lazy(() => import('./pages/VendorRegistration'));
+const ServiceDirectory = lazy(() => import('./pages/ServiceDirectory'));
 const BusinessDashboardPage = lazy(() => import('./pages/BusinessDashboardPage'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
@@ -64,6 +66,8 @@ const HotelBookingFlow = lazy(() => import('./pages/HotelBookingFlow'));
 const BookingConfirmation = lazy(() => import('./pages/BookingConfirmation'));
 const BookingHistory = lazy(() => import('./pages/BookingHistory'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const VideoHub = lazy(() => import('./pages/VideoHub'));
+const CommunityVideos = lazy(() => import('./pages/CommunityVideos'));
 
 // Marketplace Routes
 const MarketplaceHome = lazy(() => import('./features/marketplace/pages/MarketplaceHome'));
@@ -76,6 +80,9 @@ const VendorProfile = lazy(() => import('./features/marketplace/pages/VendorProf
 const BlogList = lazy(() => import('./features/blog/BlogList'));
 const BlogDetail = lazy(() => import('./features/blog/BlogDetail'));
 const BlogEditor = lazy(() => import('./admin/BlogEditor'));
+const ArticleEditor = lazy(() => import('./pages/ArticleEditor'));
+const MyArticles = lazy(() => import('./pages/MyArticles'));
+const AdminBlog = lazy(() => import('./pages/admin/AdminBlog'));
 
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleProtectedRoute from './components/RoleProtectedRoute';
@@ -187,6 +194,9 @@ const AppContent = () => {
       setUser(shaped);
     }
     setShowLogin(false);
+    if (location.state?.showLogin) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
     setShowWelcome(true);
   };
 
@@ -227,6 +237,14 @@ const AppContent = () => {
 
   const isDarkPage = location.pathname === '/adventures';
 
+  // A protected route may redirect here with { state: { showLogin: true } }
+  const showLoginFromRoute = location.state?.showLogin === true;
+  const clearLoginRouteState = () => {
+    if (showLoginFromRoute) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  };
+
   return (
     <div className={`font-sans text-gray-900 bg-background h-screen overflow-hidden flex flex-col ${theme === 'dark' ? 'dark' : ''} `}>
       <div id="app-scroll-root" className="flex-1 overflow-y-auto no-scrollbar flex flex-col">
@@ -241,8 +259,8 @@ const AppContent = () => {
         />
 
         <LoginModal
-          isOpen={showLogin}
-          onClose={() => setShowLogin(false)}
+          isOpen={showLogin || showLoginFromRoute}
+          onClose={() => { setShowLogin(false); clearLoginRouteState(); }}
           onLogin={handleLogin}
         />
 
@@ -257,14 +275,12 @@ const AppContent = () => {
             </div>
         )}
 
-        <SocialProofToast />
-        <VerticalFab />
-        <ChatWidget />
+
 
         <div className="flex flex-grow relative">
           {isSidebarOpen && user && <Sidebar user={user} />}
-          <main id="main-content" className={`flex-grow ${user && !isDarkPage ? 'bg-gray-50' : ''} flex flex-col`}>
-            <div className="flex-grow max-w-[1140px] mx-auto w-full">
+          <main id="main-content" className={`flex-grow ${!isDarkPage ? 'bg-gray-50 dark:bg-[#050f08]' : ''} flex flex-col w-full`}>
+            <div className="flex-grow w-full">
               <ErrorBoundary>
                 <Suspense fallback={
                   <div className="flex-grow flex items-center justify-center bg-gray-50 dark:bg-gray-950">
@@ -277,6 +293,7 @@ const AppContent = () => {
                   <Routes>
                     <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Home user={user} onOpenLogin={() => setShowLogin(true)} />} />
                     <Route path="/destinations" element={<Destinations user={user} onOpenLogin={() => setShowLogin(true)} />} />
+                    <Route path="/destination/:id" element={<DestinationHub />} />
                     <Route path="/district/:id" element={<DistrictDetails />} />
                     <Route path="/student-tours" element={<StudentTours />} />
                     <Route path="/trip-essentials" element={<TripEssentials />} />
@@ -299,6 +316,7 @@ const AppContent = () => {
                     <Route path="/agency/:id" element={<AgencyProfile />} />
                     <Route path="/about" element={<AboutUs />} />
                     <Route path="/community" element={<Community user={user} onOpenLogin={() => setShowLogin(true)} />} />
+                    <Route path="/community/videos" element={<CommunityVideos />} />
                     <Route path="/lost-found" element={<LostFound />} />
                     <Route path="/safety" element={<Emergency user={user} onOpenLogin={() => setShowLogin(true)} />} />
                     <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -322,23 +340,29 @@ const AppContent = () => {
                     <Route path="/business/dashboard" element={<BusinessDashboardPage />} />
                     <Route path="/marketplace" element={<MarketplaceHome />} />
                     <Route path="/marketplace/register" element={<VendorRegistration />} />
+                    <Route path="/services/:service" element={<ServiceDirectory />} />
                     <Route path="/marketplace/guides" element={<GuideList />} />
                     <Route path="/marketplace/transport" element={<TransportList />} />
                     <Route path="/marketplace/food" element={<FoodList />} />
                     <Route path="/marketplace/vendor/:slug" element={<VendorProfile />} />
                     <Route path="/admin" element={<ProtectedRoute><RoleProtectedRoute allowedRoles={['admin', 'super_admin']}><AdminDashboard /></RoleProtectedRoute></ProtectedRoute>} />
                     
-                    {/* Blog Routes */}
-                    <Route path="/blog" element={<BlogList />} />
-                    <Route path="/blog/:slug" element={<BlogDetail />} />
-                    <Route path="/blog/write" element={<ProtectedRoute><BlogEditor /></ProtectedRoute>} />
-                    <Route path="/blog/edit/:id" element={<ProtectedRoute><BlogEditor /></ProtectedRoute>} />
+                    {/* Video Hub */}
+                    <Route path="/videos" element={<VideoHub user={user} onOpenLogin={() => setShowLogin(true)} />} />
+                    
+                    {/* Blog Routes - write must come BEFORE :slug */}
+                    <Route path="/blog" element={<BlogList user={user} onOpenLogin={() => setShowLogin(true)} />} />
+                    <Route path="/blog/write" element={<ProtectedRoute><ArticleEditor /></ProtectedRoute>} />
+                    <Route path="/blog/edit/:id" element={<ProtectedRoute><ArticleEditor /></ProtectedRoute>} />
+                    <Route path="/blog/:slug" element={<BlogDetail user={user} onOpenLogin={() => setShowLogin(true)} />} />
+                    <Route path="/my-articles" element={<ProtectedRoute><MyArticles /></ProtectedRoute>} />
+                    <Route path="/admin/blog" element={<ProtectedRoute><AdminBlog /></ProtectedRoute>} />
                   </Routes>
                 </Suspense>
               </ErrorBoundary>
             </div>
             
-            <LiveSupportWidget />
+
           </main>
         </div>
 

@@ -54,11 +54,14 @@ export default {
           },
           
           forest: {
-             light: "#1B5E20",
-             dark: "#052e16",
+            600: "#1B5E20",
           },
-          
-          action: '#FF9800', // Alert
+          brightgreen: {
+            600: "#10B981",
+          },
+          orangeAccent: {
+            600: "#FF9800",
+          },
         },
         fontFamily: {
           sans: ['Lato', 'sans-serif'],

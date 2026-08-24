@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { FALLBACK_IMAGE } from '../../utils/imageFallback';
 
 const OptimizedImage = ({ src, alt, className, ...props }) => {
     const [loading, setLoading] = useState(true);
@@ -14,7 +15,7 @@ const OptimizedImage = ({ src, alt, className, ...props }) => {
             )}
             
             <img
-                src={error ? '/placeholder-image.png' : src}
+                src={error ? FALLBACK_IMAGE : src}
                 alt={alt}
                 className={`w-full h-full object-cover transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
                 onLoad={() => setLoading(false)}

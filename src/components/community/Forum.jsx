@@ -43,7 +43,7 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
 
         setLoading(true);
         try {
-            const data = await getForumThreads();
+                const data = await getForumThreads(category, districtId || null);
             if (mountedRef.current && data) setThreads(data);
         } catch (e) {
             console.warn('fetchThreads error', e);
@@ -55,7 +55,8 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchThreads();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [category, districtId]);
 
     // Live feed: new threads appear at the top instantly
     useRealtime({
@@ -98,8 +99,8 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
         const matchesSearch = t.title.toLowerCase().includes(search.toLowerCase()) || 
                               t.body.toLowerCase().includes(search.toLowerCase());
         const matchesCategory = category === 'all' || (t.tags && t.tags.includes(category));
-        // Add district match if district_id is in DB (optional enhancement)
-        return matchesSearch && matchesCategory;
+        const matchesDistrict = !districtId || String(t.district_id) === String(districtId);
+        return matchesSearch && matchesCategory && matchesDistrict;
     });
 
     // Sort threads
@@ -117,14 +118,14 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
     );
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6 relative min-h-screen">
+        <div className="max-w-6xl mx-auto py-3 md:py-5 px-4 sm:px-6 relative min-h-screen">
             {/* Header & Categories */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{language === 'bn' ? 'ট্রাভেলার ফোরাম' : 'Traveler Forum'}</h1>
-                    <p className="text-gray-500 dark:text-gray-400">{language === 'bn' ? 'আপনার প্রশ্ন করুন, অভিজ্ঞতা শেয়ার করুন এবং কমিউনিটির সাহায্য নিন।' : 'Ask questions, share experiences, and get help from the community.'}</p>
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">{language === 'bn' ? 'ট্রাভেলার ফোরাম' : 'Traveler Forum'}</h1>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{language === 'bn' ? 'আপনার প্রশ্ন করুন, অভিজ্ঞতা শেয়ার করুন এবং কমিউনিটির সাহায্য নিন।' : 'Ask questions, share experiences, and get help from the community.'}</p>
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto no-scrollbar">
+                <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 w-full md:w-auto no-scrollbar">
                     {CATEGORIES.map(c => (
                         <button 
                             key={c.id} 
@@ -141,7 +142,7 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
                 {/* Main Content Area */}
                 <div className="flex-1">
                     {/* Toolbar */}
-                    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                    <div className="flex flex-col sm:flex-row gap-3 mb-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input 
@@ -208,23 +209,10 @@ const Forum = ({ onSelectThread, onLoginRequired }) => {
                             />
                         </div>
 
-                        <div className="space-y-2 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                            <button 
-                                onClick={() => setDistrictId('')}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${districtId === '' ? 'bg-green-50 dark:bg-green-900/30 text-primary dark:text-green-400' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
-                            >
-                                {language === 'bn' ? 'সব জেলা' : 'All Districts'}
-                            </button>
-                            {filteredDistricts.map(d => (
-                                <button 
-                                    key={d.id}
-                                    onClick={() => setDistrictId(d.id)}
-                                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${districtId === d.id ? 'bg-green-50 dark:bg-green-900/30 text-primary dark:text-green-400' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
-                                >
-                                    {language === 'bn' ? d.bn_name : d.name}
-                                </button>
-                            ))}
-                        </div>
+                        <select value={districtId} onChange={e => setDistrictId(e.target.value)} className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 outline-none focus:border-primary dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                            <option value="">{language === 'bn' ? 'সব জেলা' : 'All Districts'}</option>
+                            {filteredDistricts.map(d => <option key={d.id} value={d.id}>{language === 'bn' ? d.bn_name : d.name}</option>)}
+                        </select>
                     </div>
                 </div>
             </div>

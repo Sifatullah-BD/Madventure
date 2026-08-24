@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ShieldCheck, Lock, Tag, CreditCard, ChevronRight, CheckCircle2 } from 'lucide-react';
@@ -26,15 +26,14 @@ const Checkout = () => {
     const [activeCoupon, setActiveCoupon] = useState(null);
     const [couponError, setCouponError] = useState('');
 
-    const bookingDetails = location.state?.booking || {
+    const [bookingDetails] = useState(() => location.state?.booking || {
         id: `mock_${Date.now()}`,
         amount: 2500,
         title: 'Sundarbans Adventure Pack',
         customerName: 'Demo User',
         customerPhone: '01711000000'
-    };
+    });
 
-    const [finalAmount, setFinalAmount] = useState(bookingDetails.amount);
     const [isStudent, setIsStudent] = useState(false);
 
     useEffect(() => {
@@ -43,7 +42,7 @@ const Checkout = () => {
         }
     }, [user?.id]);
 
-    useEffect(() => {
+    const finalAmount = useMemo(() => {
         let total = bookingDetails.amount || 0;
         
         // 1. Apply Coupon Discount
@@ -63,7 +62,7 @@ const Checkout = () => {
             total -= (total * 0.10); // 10% discount
         }
 
-        setFinalAmount(Math.max(0, total));
+        return Math.max(0, total);
     }, [activeCoupon, bookingDetails, isStudent]);
 
     const handleApplyCoupon = async () => {

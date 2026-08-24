@@ -4,6 +4,22 @@ import { displayRoleFromAppRole } from '../utils/appRole';
 import useAuthStore from '../store/useAuthStore';
 
 export const AuthContext = createContext();
+const demoAuthEnabled = import.meta.env.DEV && import.meta.env.VITE_DEMO_AUTH === 'true';
+
+function getDemoUser() {
+    const role = String(localStorage.getItem('madventure_demo_role') || 'traveler').toLowerCase();
+    const names = { traveler: 'Demo Traveler', agency: 'Demo Agency', hotel_owner: 'Demo Hotel', admin: 'Demo Admin' };
+    return {
+        id: `00000000-0000-4000-8000-${role === 'admin' ? '000000000001' : role === 'agency' ? '000000000002' : role === 'hotel_owner' ? '000000000003' : '000000000004'}`,
+        email: `${role}@demo.madventure.local`,
+        name: names[role] || 'Demo Traveler',
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(names[role] || 'Demo Traveler')}&background=1B5E20&color=fff`,
+        app_role: role,
+        role: displayRoleFromAppRole(role),
+        status: 'active',
+        user_metadata: { app_role: role },
+    };
+}
 
 async function fetchProfileRow(userId) {
     const { data, error } = await supabase
@@ -37,8 +53,8 @@ function shapeSupabaseSessionUser(authUser, profile) {
 }
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUserState] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUserState] = useState(() => demoAuthEnabled ? getDemoUser() : null);
+    const [loading, setLoading] = useState(!demoAuthEnabled);
     const { setUser: setStoreUser } = useAuthStore();
 
     // Keep Zustand store in sync when user state changes
@@ -48,7 +64,12 @@ export const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        if (!isSupabaseConfigured) {
+        let cancelled = false;
+
+        if (!isSupabaseConfigured || demoAuthEnabled) {
+            if (demoAuthEnabled) {
+                return () => { cancelled = true; };
+            }
             // Mock authentication fallback if keys aren't added yet
             const mockUserStr = localStorage.getItem('madventure_user');
             if (mockUserStr) {
@@ -63,35 +84,49 @@ export const AuthProvider = ({ children }) => {
                 }
             }
             setLoading(false);
-            return;
+            return () => { cancelled = true; };
         }
 
         // Real Supabase Auth
         const applySession = async (session) => {
+            if (cancelled) return;
             if (!session?.user) {
                 setUser(null);
                 return;
             }
             const profile = await fetchProfileRow(session.user.id);
-            setUser(shapeSupabaseSessionUser(session.user, profile));
+            if (!cancelled) setUser(shapeSupabaseSessionUser(session.user, profile));
         };
 
         const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            await applySession(session);
-            setLoading(false);
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                await applySession(session);
+            } catch (e) {
+                // Never let an auth failure leave the app stuck on the blank screen
+                console.error('[auth] getSession failed:', e);
+                if (!cancelled) setUser(null);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
         };
 
         getSession();
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (_event, session) => {
-                await applySession(session);
-                setLoading(false);
+                try {
+                    await applySession(session);
+                } catch (e) {
+                    console.error('[auth] auth state change failed:', e);
+                } finally {
+                    if (!cancelled) setLoading(false);
+                }
             }
         );
 
         return () => {
+            cancelled = true;
             if (authListener && authListener.subscription) {
                 authListener.subscription.unsubscribe();
             }
@@ -107,7 +142,18 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {loading ? (
+                <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-950">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-14 w-14 border-4 border-primary/20 border-t-primary"></div>
+                        <p className="text-sm font-bold text-gray-500 dark:text-gray-400 animate-pulse">
+                            Loading Madventure...
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                children
+            )}
         </AuthContext.Provider>
     );
 };

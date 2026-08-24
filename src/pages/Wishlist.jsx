@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import { Heart, MapPin, Calendar, ShoppingBag, Plus, Trash2, Edit3, Map as MapIcon, Grid, Download, Upload, Utensils, Hotel, MessageCircle } from 'lucide-react';
+import { handleImageError } from '../utils/imageFallback';
 
 const Wishlist = () => {
     const [activeTab, setActiveTab] = useState('places');
@@ -105,11 +106,23 @@ const Wishlist = () => {
                 ) : (
                     <div className="animate-fade-in">
                         {activeTab === 'places' && (
+                            savedPlaces.length === 0 ? (
+                                <div className="text-center py-20">
+                                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                        <MapPin size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-800 mb-2">No items saved</h3>
+                                    <p className="text-gray-500 mb-6">Start exploring to add places to your wishlist.</p>
+                                    <a href="/destinations" className="inline-block bg-primary text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-green-700 transition-colors">
+                                        Explore Destinations
+                                    </a>
+                                </div>
+                            ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {savedPlaces.map(place => (
                                     <div key={place.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group border border-gray-100">
                                         <div className="h-48 overflow-hidden relative">
-                                            <img src={place.image} alt={place.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                                            <img src={place.image} alt={place.name} onError={handleImageError} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
                                             <button className="absolute top-3 right-3 p-2 bg-white/90 rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-colors shadow-sm">
                                                 <Trash2 size={16} />
                                             </button>
@@ -144,14 +157,27 @@ const Wishlist = () => {
                                     <span className="font-bold">Explore More Places</span>
                                 </div>
                             </div>
+                            )
                         )}
 
                         {activeTab === 'tours' && (
+                            savedTours.length === 0 ? (
+                                <div className="text-center py-20">
+                                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                        <Calendar size={32} />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-800 mb-2">No tours saved</h3>
+                                    <p className="text-gray-500 mb-6">Save tours you're interested in to plan your next trip.</p>
+                                    <a href="/tours" className="inline-block bg-primary text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-green-700 transition-colors">
+                                        Find Tours
+                                    </a>
+                                </div>
+                            ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {savedTours.map(tour => (
                                     <div key={tour.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all group border border-gray-100">
                                         <div className="h-48 overflow-hidden relative">
-                                            <img src={tour.image} alt={tour.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                                            <img src={tour.image} alt={tour.name} onError={handleImageError} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
                                         </div>
                                         <div className="p-5">
                                             <h3 className="font-bold text-gray-800 text-lg mb-1">{tour.name}</h3>
@@ -165,6 +191,7 @@ const Wishlist = () => {
                                     </div>
                                 ))}
                             </div>
+                            )
                         )}
 
                         {['hotels', 'food', 'posts'].includes(activeTab) && (
@@ -173,7 +200,10 @@ const Wishlist = () => {
                                     <ShoppingBag size={32} />
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">No items saved</h3>
-                                <p className="text-gray-500">Start exploring to add items to your wishlist.</p>
+                                <p className="text-gray-500 mb-6">Start exploring to add items to your wishlist.</p>
+                                <a href="/explore" className="inline-block bg-primary text-white px-6 py-3 rounded-full font-bold text-sm hover:bg-green-700 transition-colors">
+                                    Explore
+                                </a>
                             </div>
                         )}
                     </div>

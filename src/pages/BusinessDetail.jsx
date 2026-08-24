@@ -27,10 +27,6 @@ const BusinessDetail = () => {
     const [wishlistId, setWishlistId] = useState(null);
     const [wishlisting, setWishlisting] = useState(false);
 
-    useEffect(() => {
-        loadBusiness();
-    }, [slug, user]);
-
     const loadBusiness = async () => {
         setIsLoading(true);
         try {
@@ -61,6 +57,10 @@ const BusinessDetail = () => {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadBusiness();
+    }, [slug, user]);
 
     const toggleWishlist = async () => {
         if (!user) {

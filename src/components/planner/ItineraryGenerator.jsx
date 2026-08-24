@@ -73,59 +73,76 @@ const ItineraryGenerator = () => {
     setIsGenerating(true);
 
     setTimeout(async () => {
-      const district = DISTRICTS.find(d => d.id === formData.destinationId);
-      const tours = getToursByDistrict(formData.destinationId);
-      const hotels = getHotelsByDistrict(formData.destinationId);
+      try {
+        const district = DISTRICTS.find(d => d.id === formData.destinationId);
+        const tours = getToursByDistrict(formData.destinationId);
+        const hotels = getHotelsByDistrict(formData.destinationId);
 
-      const groupMult = GROUP_TYPES.find(g => g.id === formData.groupType).multiplier;
-      const totalBudget = formData.budget * groupMult;
+        const groupMult = GROUP_TYPES.find(g => g.id === formData.groupType).multiplier;
+        const totalBudget = formData.budget * groupMult;
 
-      const transportEst = (district?.howToGet?.bus?.cost || 1000) * groupMult * 2;
-      const dailyFood = 500 * groupMult;
-      const hotelPerNight = hotels.length > 0 ? hotels[0].pricePerNight.min : 2000;
-      
-      const totalFood = dailyFood * formData.duration;
-      const totalHotel = hotelPerNight * Math.max(1, formData.duration - 1);
-      const activitiesEst = totalBudget - (transportEst + totalFood + totalHotel);
-      
-      // Call Gemini AI
-      const mappedInterests = formData.interests.map(id => INTERESTS.find(i => i.id === id).label);
-      const aiDays = await generateItinerary(district.name, formData.duration, totalBudget, mappedInterests);
+        const transportEst = (district?.howToGet?.bus?.cost || 1000) * groupMult * 2;
+        const dailyFood = 500 * groupMult;
+        const hotelPerNight = hotels.length > 0 ? hotels[0].pricePerNight.min : 2000;
+        
+        const totalFood = dailyFood * formData.duration;
+        const totalHotel = hotelPerNight * Math.max(1, formData.duration - 1);
+        const activitiesEst = totalBudget - (transportEst + totalFood + totalHotel);
+        
+        // Call Gemini AI (falls back to mock data internally on failure)
+        const mappedInterests = formData.interests
+          .map(id => INTERESTS.find(i => i.id === id))
+          .filter(Boolean)
+          .map(i => i.label);
+        const aiDays = await generateItinerary(district.name, formData.duration, totalBudget, mappedInterests);
 
-      // Adapt Gemini result to UI structure
-      const days = aiDays.map(aiDay => {
-          const m = aiDay.activities.find(a => a.time.toLowerCase().includes('morning') || a.time.includes('09:00'));
-          const a = aiDay.activities.find(a => a.time.toLowerCase().includes('afternoon') || a.time.includes('01:00') || a.time.includes('02:00'));
-          const e = aiDay.activities.find(a => a.time.toLowerCase().includes('evening') || a.time.includes('06:00'));
+        // Defend against malformed AI responses
+        if (!Array.isArray(aiDays) || aiDays.length === 0) {
+          toast.error("এআই রেসপন্স থেকে ট্রিপ তৈরি করা যায়নি। আবার চেষ্টা করুন।");
+          setIsGenerating(false);
+          return;
+        }
+
+        // Adapt Gemini result to UI structure
+        const days = aiDays.map((aiDay, i) => {
+          const activities = Array.isArray(aiDay?.activities) ? aiDay.activities : [];
+          const m = activities.find(a => a?.time?.toLowerCase().includes('morning') || a?.time?.includes('09:00'));
+          const a = activities.find(a => a?.time?.toLowerCase().includes('afternoon') || a?.time?.includes('01:00') || a?.time?.includes('02:00'));
+          const e = activities.find(a => a?.time?.toLowerCase().includes('evening') || a?.time?.includes('06:00'));
           
           return {
-              day: aiDay.day,
+              day: aiDay?.day ?? (i + 1),
               morning: m ? `${m.title}: ${m.description}` : `${district.highlights[0] || 'লোকাল সিনেরি'} ঘুরে দেখা`,
               afternoon: a ? `${a.title}: ${a.description}` : `${district.localFood[0] || 'লোকাল খাবার'} দিয়ে দুপুরের খাবার ও বিশ্রাম`,
               evening: e ? `${e.title}: ${e.description}` : `সূর্যাস্ত দেখা ও স্থানীয় বাজার ঘোরা`
           };
-      });
+        });
 
-      const generatedResult = {
-        district,
-        tours,
-        hotels,
-        costLine: {
-          transport: transportEst,
-          hotel: totalHotel,
-          food: totalFood,
-          activities: activitiesEst > 0 ? activitiesEst : 0,
-          total: transportEst + totalHotel + totalFood + Math.max(0, activitiesEst)
-        },
-        days,
-        packing: ['NID/পাসপোর্ট', 'পাওয়ার ব্যাংক', 'প্রয়োজনীয় ওষুধ', ...((formData.interests.includes('beach') || district.id === 'cox-bazar') ? ['সানস্ক্রিন SPF 50+', 'সুইমওয়্যার'] : []), ...((formData.interests.includes('mountain') || district.id === 'bandarban') ? ['ট্রেকিং জুতা', 'উষ্ণ কাপড়'] : [])]
-      };
+        const generatedResult = {
+          district,
+          tours,
+          hotels,
+          costLine: {
+            transport: transportEst,
+            hotel: totalHotel,
+            food: totalFood,
+            activities: activitiesEst > 0 ? activitiesEst : 0,
+            total: transportEst + totalHotel + totalFood + Math.max(0, activitiesEst)
+          },
+          days,
+          packing: ['NID/পাসপোর্ট', 'পাওয়ার ব্যাংক', 'প্রয়োজনীয় ওষুধ', ...((formData.interests.includes('beach') || district.id === 'cox-bazar') ? ['সানস্ক্রিন SPF 50+', 'সুইমওয়্যার'] : []), ...((formData.interests.includes('mountain') || district.id === 'bandarban') ? ['ট্রেকিং জুতা', 'উষ্ণ কাপড়'] : [])]
+        };
 
-      setResult(generatedResult);
-      localStorage.setItem('madventure-planner-v1', JSON.stringify({ formData, result: generatedResult }));
-      setIsGenerating(false);
-      setStep(6);
-      setSaved(false);
+        setResult(generatedResult);
+        localStorage.setItem('madventure-planner-v1', JSON.stringify({ formData, result: generatedResult }));
+        setIsGenerating(false);
+        setStep(6);
+        setSaved(false);
+      } catch (error) {
+        console.error("Itinerary generation error:", error);
+        toast.error("ট্রিপ প্ল্যান তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+        setIsGenerating(false);
+      }
     }, 100);
   };
 

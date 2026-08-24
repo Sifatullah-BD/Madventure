@@ -5,6 +5,7 @@
 
 const ADMIN = new Set(['admin', 'super_admin']);
 const AGENCY_PORTAL = new Set(['agency', 'admin', 'super_admin', 'hotel_owner']);
+const PARTNER_PORTAL = new Set(['partner', 'admin', 'super_admin']);
 
 export function normalizeAppRole(user) {
     if (!user) return 'traveler';
@@ -23,6 +24,10 @@ export function hasAdminAccess(user) {
 
 export function hasAgencyPortalAccess(user) {
     return AGENCY_PORTAL.has(normalizeAppRole(user));
+}
+
+export function hasPartnerPortalAccess(user) {
+    return PARTNER_PORTAL.has(normalizeAppRole(user));
 }
 
 export function displayRoleFromAppRole(appRole) {

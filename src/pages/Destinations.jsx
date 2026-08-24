@@ -8,6 +8,7 @@ import EmptyState from '../components/ui/EmptyState';
 import SEO from '../components/SEO';
 import MapDiscovery from '../components/home/MapDiscovery';
 import DestinationCard from '../components/district/DestinationCard';
+import { handleImageError } from '../utils/imageFallback';
 
 const heroImages = [
     "/images/destinations_hero_1_1778975470949.png",
@@ -86,42 +87,42 @@ const Destinations = () => {
                 description="Explore the best travel destinations in Bangladesh. From Cox's Bazar beaches to Sylhet's tea gardens."
             />
             {/* Custom Hero Section */}
-            <div className="relative h-[65vh] w-full overflow-hidden rounded-b-[4rem] shadow-2xl">
+            <div className="relative h-[45vh] min-h-[300px] w-full overflow-hidden rounded-b-[3rem] shadow-xl">
                 {/* Background Slider */}
                 {heroImages.map((img, index) => (
                     <div
                         key={index}
                         className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
                     >
-                        <img src={img} alt={`Slide ${index}`} className="w-full h-full object-cover scale-105 transition-transform duration-[10s] ease-linear" />
+                        <img src={img} alt={`Slide ${index}`} onError={handleImageError} className="w-full h-full object-cover scale-105 transition-transform duration-[10s] ease-linear" />
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-black/40 to-black/20"></div>
                     </div>
                 ))}
 
                 {/* Content Overlay */}
-                <div className="absolute inset-0 flex flex-col justify-end items-center p-8 md:p-16 text-center z-10 pb-20">
-                    <div className="max-w-3xl mb-10">
-                        <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-md text-white rounded-full text-sm font-bold uppercase tracking-widest mb-6 border border-white/20 shadow-lg">
-                            <MapPin size={18} className="text-green-400" />
+                <div className="absolute inset-0 flex flex-col justify-end items-center p-6 md:p-10 text-center z-10 pb-12">
+                    <div className="max-w-3xl mb-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md text-white rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-white/20 shadow-sm">
+                            <MapPin size={16} className="text-green-400" />
                             <span>Discover Bangladesh</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight drop-shadow-2xl mb-6 leading-[1.1]">
+                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-xl mb-4 leading-[1.1]">
                             {t('explore_bangladesh')}
                         </h1>
-                        <p className="text-lg md:text-xl text-gray-200 font-medium leading-relaxed drop-shadow-md max-w-2xl mx-auto">
+                        <p className="text-base md:text-lg text-gray-200 font-medium leading-relaxed drop-shadow-md max-w-2xl mx-auto">
                             {t('destinations_subtitle')}
                         </p>
                     </div>
 
                     <div className="w-full max-w-2xl relative z-20">
-                        <div className={`flex items-center bg-white/20 backdrop-blur-xl border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-full transition-all duration-500 overflow-hidden w-full h-16 group hover:bg-white/30 hover:border-white/50 focus-within:bg-white/30 focus-within:border-white/50 focus-within:ring-4 focus-within:ring-white/10`}>
-                            <div className="pl-6 text-white/70 group-focus-within:text-white transition-colors">
-                                <Search size={24} />
+                        <div className={`flex items-center bg-white/20 backdrop-blur-xl border border-white/30 shadow-lg rounded-full transition-all duration-500 overflow-hidden w-full h-12 group hover:bg-white/30 hover:border-white/50 focus-within:bg-white/30 focus-within:border-white/50 focus-within:ring-2 focus-within:ring-white/20`}>
+                            <div className="pl-5 text-white/70 group-focus-within:text-white transition-colors">
+                                <Search size={20} />
                             </div>
                             <input
                                 type="text"
                                 placeholder={t('search_places') || "Search destinations, cities, attractions..."}
-                                className="bg-transparent border-none outline-none text-white placeholder-white/60 ml-4 w-full text-lg font-medium"
+                                className="bg-transparent border-none outline-none text-white placeholder-white/70 ml-3 w-full text-sm font-medium"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -135,9 +136,9 @@ const Destinations = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="mb-16">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-8 flex items-center gap-2">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="mb-10">
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
                         <MapPin className="text-primary" /> {t('popular_destinations')}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -163,9 +164,9 @@ const Destinations = () => {
 
                 <MapDiscovery />
 
-                <div className="mt-20">
-                    <div className="flex flex-col mb-8 gap-6">
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                <div className="mt-12">
+                    <div className="flex flex-col mb-6 gap-4">
+                        <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
                             <Filter className="text-primary" /> {t('explore_by_district')}
                         </h2>
                         <div className="flex flex-wrap gap-3">
@@ -176,18 +177,18 @@ const Destinations = () => {
                         </div>
                     </div>
 
-                    <div className="space-y-12">
+                    <div className="space-y-8">
                         {filteredDivisions.map((divData, idx) => (
-                            <div key={idx} className="bg-white dark:bg-surface rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-800">
-                                <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-gray-800 pb-4">{divData.division}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div key={idx} className="bg-white dark:bg-surface rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+                                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 border-b dark:border-gray-800 pb-3">{divData.division}</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                     {divData.districts.map((district, dIdx) => {
                                         const spots = district.spots || district.highlights || [];
                                         return (
-                                        <Link key={dIdx} to={`/district/${(district.nameEn || district.name || '').toLowerCase()}`} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-5 hover:bg-green-50 dark:hover:bg-green-900/10 transition-colors group block hover:shadow-md border border-transparent hover:border-green-100">
-                                            <h4 className="font-bold text-lg text-gray-800 dark:text-white mb-3 flex items-center justify-between">
+                                        <Link key={dIdx} to={`/district/${(district.nameEn || district.name || '').toLowerCase()}`} className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 hover:bg-green-50 dark:hover:bg-green-900/10 transition-colors group block hover:shadow-sm border border-transparent hover:border-green-100">
+                                            <h4 className="font-bold text-base text-gray-800 dark:text-white mb-2 flex items-center justify-between">
                                                 {district.nameEn || district.name}
-                                                <span className="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded text-gray-500 border border-gray-100 dark:border-gray-700">{spots.length} {t('spots')}</span>
+                                                <span className="text-[10px] bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-500 border border-gray-100 dark:border-gray-700">{spots.length} {t('spots')}</span>
                                             </h4>
                                             <div className="flex flex-wrap gap-2">
                                                 {spots.slice(0, 3).map((spot, sIdx) => (

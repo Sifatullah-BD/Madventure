@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home, ChevronDown } from 'lucide-react';
+import * as Sentry from '@sentry/react';
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -14,6 +15,11 @@ class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
         this.setState({ error, errorInfo });
         console.error("Uncaught error:", error, errorInfo);
+        try {
+            Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo?.componentStack } } });
+        } catch {
+            /* ignore — error reporting must never break error handling */
+        }
     }
 
     handleRetry = () => {
@@ -38,9 +44,14 @@ class ErrorBoundary extends React.Component {
                         <h1 className="text-2xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">
                             Oops! Something went wrong
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm leading-relaxed">
-                            We hit an unexpected bump in the road. Don't worry — your data is safe. Try refreshing the page.
+                        <p className="text-gray-500 dark:text-gray-400 mb-4 text-sm leading-relaxed">
+                            We hit an unexpected bump in the road. Possible causes:
                         </p>
+                        <ul className="text-xs text-gray-500 dark:text-gray-400 mb-6 space-y-1 text-left max-w-xs mx-auto">
+                            <li>• Connection problem</li>
+                            <li>• Server temporarily unavailable</li>
+                            <li>• Your session may have expired</li>
+                        </ul>
 
                         {/* Actions */}
                         <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">

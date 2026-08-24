@@ -134,7 +134,7 @@ const AgencyProfile = () => {
         <div ref={profileRef} className="min-h-screen bg-gray-50 font-sans">
 
             {/* Header / Banner Section */}
-            <div className="relative h-[300px] md:h-[400px]">
+            <div className="relative h-[250px] md:h-[300px]">
                 <img src={agency.banner} alt="Cover" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
@@ -334,9 +334,9 @@ const AgencyProfile = () => {
                         </div>
 
                         <div className="flex gap-2 justify-center mb-8">
-                            <a href="#" className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"><Facebook size={18} /></a>
-                            <a href="#" className="w-10 h-10 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors"><Instagram size={18} /></a>
-                            <a href="#" className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center hover:bg-sky-600 hover:text-white transition-colors"><Twitter size={18} /></a>
+                            {agency.facebook_url && <a href={agency.facebook_url} target="_blank" rel="noreferrer" aria-label="Facebook" className="w-10 h-10 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"><Facebook size={18} /></a>}
+                            {agency.instagram_url && <a href={agency.instagram_url} target="_blank" rel="noreferrer" aria-label="Instagram" className="w-10 h-10 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors"><Instagram size={18} /></a>}
+                            {agency.twitter_url && <a href={agency.twitter_url} target="_blank" rel="noreferrer" aria-label="Twitter" className="w-10 h-10 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center hover:bg-sky-600 hover:text-white transition-colors"><Twitter size={18} /></a>}
                         </div>
 
                         <button className="w-full bg-primary text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-100 flex items-center justify-center gap-2">
@@ -418,7 +418,7 @@ const AgencyProfile = () => {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-hidden relative bg-black h-[60vh]">
+                        <div className="flex-1 overflow-hidden relative bg-black h-[45vh] min-h-[300px]">
                             {screenshotImage && (
                                 <Cropper
                                     image={screenshotImage}

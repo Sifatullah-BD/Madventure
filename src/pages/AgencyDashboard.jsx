@@ -24,11 +24,6 @@ const AgencyDashboard = () => {
     // Mock Agency ID (In a real app, this would come from auth context)
     const AGENCY_ID = 'AG-001';
 
-    useEffect(() => {
-        fetchTours();
-        fetchBookings(1);
-    }, []);
-
     const fetchTours = async () => {
         try {
             const data = await supabaseService.getTours();
@@ -54,6 +49,11 @@ const AgencyDashboard = () => {
             setBookingsLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchTours();
+        fetchBookings(1);
+    }, []);
 
     // ... rest of the component
 

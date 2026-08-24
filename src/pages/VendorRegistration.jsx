@@ -6,6 +6,11 @@ const VENDOR_TYPES = [
   { id: 'guide', label: 'লোকাল গাইড', icon: '🧭', desc: 'ট্যুরিস্টদের গাইড করুন' },
   { id: 'transport', label: 'ট্রান্সপোর্ট', icon: '🚌', desc: 'যানবাহন ভাড়া দিন' },
   { id: 'food', label: 'খাবার', icon: '🍽️', desc: 'রেস্তোরাঁ বা ফুড সার্ভিস' },
+  { id: 'hotel', label: 'হোটেল / রিসোর্ট', icon: '🏨', desc: 'থাকার জায়গা তালিকাভুক্ত করুন' },
+  { id: 'rental', label: 'কার রেন্টাল', icon: '🚗', desc: 'গাড়ি ভাড়া দিন' },
+  { id: 'mechanic', label: 'ভেহিকেল হেল্প', icon: '🔧', desc: 'রাস্তায় গাড়ির সহায়তা দিন' },
+  { id: 'emergency', label: 'জরুরি সেবা', icon: '🆘', desc: 'ভ্রমণকারীদের জরুরি সহায়তা দিন' },
+  { id: 'other', label: 'অন্যান্য সেবা', icon: '➕', desc: 'নিজের সেবার ধরন যোগ করুন' },
 ];
 
 const VEHICLE_TYPES = ['CNG', 'Car', 'Microbus', 'Bus', 'Boat', 'Bike'];
@@ -43,6 +48,7 @@ export default function VendorRegistration() {
     // Food specific
     opening_hours: '',
     food_categories: '',
+    custom_vendor_type: '',
   });
 
   const update = (key, value) => setForm((f) => ({ ...f, [key]: value }));
@@ -57,6 +63,9 @@ export default function VendorRegistration() {
   };
 
   const handleSubmit = async () => {
+    if (form.vendor_type === 'other' && !form.custom_vendor_type.trim()) {
+      return;
+    }
     setLoading(true);
     try {
       const slug = form.business_name
@@ -67,7 +76,7 @@ export default function VendorRegistration() {
       const { data: vendor, error } = await supabase
         .from('vendors')
         .insert({
-          vendor_type: form.vendor_type,
+          vendor_type: form.vendor_type === 'other' ? form.custom_vendor_type.trim() : form.vendor_type,
           business_name: form.business_name,
           slug: `${slug}-${Date.now()}`,
           description: form.description,
@@ -191,6 +200,14 @@ export default function VendorRegistration() {
               >
                 পরের ধাপ →
               </button>
+              {form.vendor_type === 'other' && (
+                <input
+                  value={form.custom_vendor_type}
+                  onChange={(e) => update('custom_vendor_type', e.target.value)}
+                  placeholder="আপনার সেবার ধরন লিখুন"
+                  className="mt-3 w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-green-500"
+                />
+              )}
             </div>
           )}
 

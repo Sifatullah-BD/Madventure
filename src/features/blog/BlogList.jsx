@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CATEGORIES = ['All', 'Destination Guide', 'Budget Travel', 'Travel Tips', 'News'];
 
-const BlogList = () => {
+const BlogList = ({ user, onOpenLogin }) => {
     const navigate = useNavigate();
     const { i18n } = useTranslation();
     const currentLang = i18n.language === 'en' ? 'en' : 'bn';
@@ -60,7 +60,13 @@ const BlogList = () => {
                             ট্রাভেল ব্লগ ও গাইড
                         </h1>
                         <button 
-                            onClick={() => navigate('/blog/write')}
+                            onClick={() => {
+                                if (!user && onOpenLogin) {
+                                    onOpenLogin();
+                                } else {
+                                    navigate('/blog/write');
+                                }
+                            }}
                             className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1B5E20] text-white rounded-full font-bold shadow-lg shadow-[#1B5E20]/20 hover:bg-green-700 transition-all group"
                         >
                             <PenTool size={18} className="group-hover:rotate-12 transition-transform" />

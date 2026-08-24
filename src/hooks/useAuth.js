@@ -27,7 +27,8 @@ export const useAuth = () => {
             const data = await authService.signUp({ 
                 email, 
                 password, 
-                fullName: userData.name 
+                fullName: userData.name,
+                requestedRole: userData.accountType || 'traveler'
             });
 
             // Update profiles table if necessary
@@ -46,10 +47,14 @@ export const useAuth = () => {
     // Logout Function
     const logout = async () => {
         try {
-            await authService.signOut();
-            setUser(null);
+            if (isSupabaseConfigured) {
+                await authService.signOut();
+            }
         } catch (error) {
             console.error('Logout error:', error);
+        } finally {
+            localStorage.removeItem('madventure_user');
+            setUser(null);
         }
     };
 

@@ -8,12 +8,12 @@ export const authService = {
   /**
    * Sign up with email/password and create a profile row.
    */
-  async signUp({ email, password, fullName }) {
+  async signUp({ email, password, fullName, requestedRole = 'traveler' }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName, app_role: 'traveler' },
+        data: { full_name: fullName, app_role: 'traveler', requested_role: requestedRole },
       },
     });
     if (error) throw error;

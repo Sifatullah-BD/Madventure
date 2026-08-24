@@ -23,7 +23,7 @@ const Home = () => {
         if (destination) queryParams.append('q', destination);
         if (date) queryParams.append('date', date);
         if (budget) queryParams.append('budget', budget);
-        navigate(`/destinations?${queryParams.toString()}`);
+        navigate(`/explore?${queryParams.toString()}`);
     };
 
     const [trendingTours, setTrendingTours] = useState([]);
@@ -66,7 +66,7 @@ const Home = () => {
             />
 
             {/* 1. Hero Section */}
-            <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
+            <section className="relative h-[45vh] min-h-[350px] flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <img src="/images/home_hero_1778976642283.png" className="w-full h-full object-cover" alt="Bangladesh Landscape" />
                     <div className="absolute inset-0 bg-black/40"></div>
