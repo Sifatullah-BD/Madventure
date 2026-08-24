@@ -1,4 +1,4 @@
-import { Compass, Map, Tent, Users, ShoppingBag } from 'lucide-react';
+import { Compass, Map, Users, ShoppingBag, PlayCircle } from 'lucide-react';
 
 export const getMegaMenuData = (language) => [
     {
@@ -31,6 +31,15 @@ export const getMegaMenuData = (language) => [
                     { label: language === 'bn' ? 'ডেসটিনেশন ভিডিও' : 'Destination Videos', path: '/videos' },
                     { label: language === 'bn' ? 'ট্রাভেল রিলস' : 'Travel Reels', path: '/videos?type=reels' },
                     { label: language === 'bn' ? 'অ্যাডভেঞ্চার ভিডিও' : 'Adventure Videos', path: '/videos?type=adventure' },
+                ]
+            },
+            {
+                title: language === 'bn' ? 'অ্যাডভেঞ্চার' : 'Adventures',
+                items: [
+                    { label: language === 'bn' ? 'অ্যাডভেঞ্চার ট্রিপ' : 'Adventure Trips', path: '/adventures' },
+                    { label: language === 'bn' ? 'স্টুডেন্ট ট্যুর' : 'Student Tours', path: '/student-tours' },
+                    { label: language === 'bn' ? 'গ্রুপ ট্যুর' : 'Group Tours', path: '/adventures?type=group' },
+                    { label: language === 'bn' ? 'ক্যাম্পিং' : 'Camping', path: '/adventures?type=camping' },
                 ]
             }
         ]
@@ -67,26 +76,6 @@ export const getMegaMenuData = (language) => [
         ]
     },
     {
-        id: 'adventures',
-        title: language === 'bn' ? 'অ্যাডভেঞ্চার' : 'Adventures',
-        icon: Tent,
-        sections: [
-            {
-                title: language === 'bn' ? 'ক্যাটাগরি' : 'Categories',
-                items: [
-                    { label: language === 'bn' ? 'অ্যাডভেঞ্চার ট্রিপ' : 'Adventure Trips', path: '/adventures' },
-                    { label: language === 'bn' ? 'স্টুডেন্ট ট্যুর' : 'Student Tours', path: '/student-tours' },
-                    { label: language === 'bn' ? 'গ্রুপ ট্যুর' : 'Group Tours', path: '/adventures?type=group' },
-                    { label: language === 'bn' ? 'ফ্যামিলি ট্রিপ' : 'Family Trips', path: '/adventures?type=family' },
-                    { label: language === 'bn' ? 'ক্যাম্পিং' : 'Camping', path: '/adventures?type=camping' },
-                    { label: language === 'bn' ? 'হাইকিং এবং ট্রেকিং' : 'Hiking & Trekking', path: '/adventures?type=hiking' },
-                    { label: language === 'bn' ? 'ওয়াটার অ্যাডভেঞ্চার' : 'Water Adventures', path: '/adventures?type=water' },
-                    { label: language === 'bn' ? 'অভিজ্ঞতা (Experiences)' : 'Experiences', path: '/adventures?type=experience' },
-                ]
-            }
-        ]
-    },
-    {
         id: 'community',
         title: language === 'bn' ? 'কমিউনিটি' : 'Community',
         icon: Users,
@@ -107,8 +96,8 @@ export const getMegaMenuData = (language) => [
         ]
     },
     {
-        id: 'services',
-        title: language === 'bn' ? 'সার্ভিসেস' : 'Services',
+        id: 'marketplace',
+        title: language === 'bn' ? 'মার্কেটপ্লেস' : 'Marketplace',
         icon: ShoppingBag,
         sections: [
             {
@@ -128,6 +117,23 @@ export const getMegaMenuData = (language) => [
                 title: language === 'bn' ? 'বিজনেস' : 'Business',
                 items: [
                     { label: language === 'bn' ? 'পার্টনার হোন' : 'Partner with Us', path: '/partner' },
+                ]
+            }
+        ]
+    },
+    {
+        id: 'videos',
+        title: language === 'bn' ? 'ভিডিও' : 'Videos',
+        icon: PlayCircle,
+        sections: [
+            {
+                title: language === 'bn' ? 'ভিডিও দেখুন' : 'Watch videos',
+                items: [
+                    { label: language === 'bn' ? 'সব ভিডিও' : 'All Videos', path: '/videos' },
+                    { label: language === 'bn' ? 'ডেসটিনেশন ভিডিও' : 'Destination Videos', path: '/videos?type=destination' },
+                    { label: language === 'bn' ? 'ট্রাভেল রিলস' : 'Travel Reels', path: '/videos?type=reels' },
+                    { label: language === 'bn' ? 'অ্যাডভেঞ্চার ভিডিও' : 'Adventure Videos', path: '/videos?type=adventure' },
+                    { label: language === 'bn' ? 'কমিউনিটি ভিডিও' : 'Community Videos', path: '/community/videos' },
                 ]
             }
         ]
