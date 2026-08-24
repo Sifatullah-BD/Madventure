@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Sun, Moon, Search, Bell, LogIn, LogOut, LayoutDashboard, User as UserIcon } from 'lucide-react';
+import { Menu, X, Sun, Moon, Search, Bell, MessageSquare, LogIn, LogOut, LayoutDashboard, User as UserIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useNotifications } from '../context/NotificationContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -252,6 +252,17 @@ const Navbar = ({ user, onOpenLogin, onLogout, theme, setTheme }) => {
                                     </div>
                                 )}
                             </div>
+
+                            {user && (
+                                <button
+                                    onClick={() => navigate('/messages')}
+                                    className="p-2 rounded-full relative transition-colors text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800"
+                                    title="Inbox"
+                                    aria-label="Inbox"
+                                >
+                                    <MessageSquare size={19} />
+                                </button>
+                            )}
 
                             <div className="hidden sm:block">
                                 <LanguageSwitcher />

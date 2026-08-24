@@ -361,9 +361,13 @@ const Profile = ({ user, onLogout, onUpdateRole, onUpdateUser }) => {
                             )}
 
                             {/* --- Messages Group --- */}
-                            {activeTab === 'inbox' && renderPlaceholder(
-                                'Inbox', <Inbox size={40} />, 
-                                'Direct messages with guides, agencies, and other travelers.'
+                            {activeTab === 'inbox' && (
+                                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col items-center justify-center p-16 bg-[#0d1a11] rounded-[2.5rem] border border-white/5 shadow-xl text-center">
+                                    <Inbox size={40} className="text-forest-light mb-6" />
+                                    <h3 className="text-2xl font-black text-white mb-4">Inbox</h3>
+                                    <p className="text-gray-400 max-w-md mx-auto mb-6">Direct messages with guides, agencies, and other travelers.</p>
+                                    <button type="button" onClick={() => navigate('/messages')} className="rounded-xl bg-forest-light px-6 py-3 text-sm font-bold text-white hover:bg-green-600">Open Inbox</button>
+                                </motion.div>
                             )}
                             {activeTab === 'groups' && renderPlaceholder(
                                 'Group Chats', <Users size={40} />, 
