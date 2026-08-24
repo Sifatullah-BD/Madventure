@@ -1,13 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Download, FileText, Share2, ShieldCheck } from 'lucide-react';
+import { CheckCircle, Download, FileText, MessageCircle, Share2, ShieldCheck } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useAuth } from '../hooks/useAuth';
+import { useToast } from '../components/ui/Toast';
+import { getBookingById } from '../services/bookingService';
+import { unicornService } from '../services/unicornService';
 
 const BookingConfirmation = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const bookingId = searchParams.get('booking_id');
+    const { user } = useAuth();
+    const toast = useToast();
     const [printing, setPrinting] = useState(false);
+    const [agencyId, setAgencyId] = useState(null);
+    const [contacting, setContacting] = useState(false);
+
+    useEffect(() => {
+        if (!bookingId) return;
+        getBookingById(bookingId).then(booking => {
+            setAgencyId(booking?.tours?.agency_id || booking?.agency_id || null);
+        }).catch(() => {});
+    }, [bookingId]);
+
+    const contactAgency = async () => {
+        if (!user || !agencyId) {
+            toast.warning(agencyId ? 'Please log in to contact the agency.' : 'Agency contact is not available for this booking yet.');
+            return;
+        }
+        setContacting(true);
+        try {
+            const room = await unicornService.getOrCreateDirectChat(user.id, agencyId, `Booking ${bookingId || ''}`);
+            navigate(`/messages?room=${room.id}`);
+        } catch (error) { toast.error(error.message || 'Unable to open agency chat.'); }
+        finally { setContacting(false); }
+    };
 
     const handlePrint = () => {
         setPrinting(true);
@@ -55,6 +83,13 @@ const BookingConfirmation = () => {
                             <span>Status</span>
                             <span className="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded">PAID</span>
                         </div>
+                        <button
+                            onClick={contactAgency}
+                            disabled={contacting}
+                            className="w-full flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-green-50 py-3 font-bold text-primary hover:bg-green-100 disabled:opacity-50"
+                        >
+                            <MessageCircle size={18} /> {contacting ? 'Opening chat...' : 'Contact Agency'}
+                        </button>
                         <div className="flex justify-between">
                             <span>Payment Mode</span>
                             <span className="font-medium text-gray-800">SSLCommerz Digital Gateway</span>

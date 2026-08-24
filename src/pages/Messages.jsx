@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, Send, Loader2, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/ui/Toast';
 
 export default function Messages() {
     const { user } = useAuth();
+    const [searchParams] = useSearchParams();
     const toast = useToast();
     const [rooms, setRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
@@ -33,6 +35,13 @@ export default function Messages() {
         loadRooms();
         return () => { cancelled = true; };
     }, [user?.id, toast]);
+
+    useEffect(() => {
+        const roomId = searchParams.get('room');
+        if (roomId && rooms.length) {
+            setSelectedRoom(rooms.find(room => room.id === roomId) || null);
+        }
+    }, [rooms, searchParams]);
 
     useEffect(() => {
         if (!selectedRoom?.id || !user?.id) return;

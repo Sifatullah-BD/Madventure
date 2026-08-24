@@ -112,6 +112,31 @@ export const unicornService = {
         return data;
     },
 
+    async getOrCreateDirectChat(userId, otherUserId, title = 'Booking contact') {
+        if (!userId || !otherUserId || userId === otherUserId) throw new Error('A valid agency contact is required.');
+        const { data: existing, error: existingError } = await supabase
+            .from('chat_rooms')
+            .select('id, title, type, chat_participants!inner(user_id)')
+            .eq('type', 'direct')
+            .eq('chat_participants.user_id', userId);
+        if (existingError) throw existingError;
+        const room = (existing || []).find(item => item.chat_participants?.some(participant => participant.user_id === otherUserId));
+        if (room) return room;
+
+        const { data: created, error: roomError } = await supabase
+            .from('chat_rooms')
+            .insert({ type: 'direct', title })
+            .select('id, title, type')
+            .single();
+        if (roomError) throw roomError;
+        const { error: participantError } = await supabase.from('chat_participants').insert([
+            { room_id: created.id, user_id: userId },
+            { room_id: created.id, user_id: otherUserId },
+        ]);
+        if (participantError) throw participantError;
+        return created;
+    },
+
     // 5. Business Intelligence (BI) Analytics
     async getUserSegment(userId) {
         const { data, error } = await supabase
