@@ -248,6 +248,16 @@ class CommunityService {
         return { followers: followers.count || 0, following: following.count || 0 };
     }
 
+    async getPublicProfile(userId) {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('id, full_name, username, avatar_url, bio, district, division, role, xp, level')
+            .eq('id', userId)
+            .maybeSingle();
+        if (error) throw error;
+        return data;
+    }
+
     async getConnectionStatus(userId, otherUserId) {
         if (!userId || !otherUserId || userId === otherUserId) return 'self';
         const [block, connection, outgoing, incoming] = await Promise.all([
@@ -341,6 +351,7 @@ export const unfollowUser = (...args) => communityService.unfollowUser(...args);
 export const getConnectionStatus = (...args) => communityService.getConnectionStatus(...args);
 export const requestConnection = (...args) => communityService.requestConnection(...args);
 export const getFollowStats = (...args) => communityService.getFollowStats(...args);
+export const getPublicProfile = (...args) => communityService.getPublicProfile(...args);
 export const getReviews = (...args) => communityService.getReviews(...args);
 export const addReview = (...args) => communityService.addReview(...args);
 export const getUserAchievements = (...args) => communityService.getUserAchievements(...args);

@@ -32,6 +32,7 @@ const Terms = lazy(() => import('./pages/Terms'));
 const RefundPolicy = lazy(() => import('./pages/RefundPolicy'));
 const PartnerDashboard = lazy(() => import('./pages/PartnerDashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
+const PublicProfile = lazy(() => import('./pages/PublicProfile'));
 const Community = lazy(() => import('./pages/Community'));
 const LostFound = lazy(() => import('./pages/LostFound'));
 const Partner = lazy(() => import('./pages/Partner'));
@@ -302,6 +303,7 @@ const AppContent = () => {
                     <Route path="/guide" element={<OnSpotGuide />} />
                     <Route path="/dashboard" element={<ProtectedRoute><Dashboard user={user} /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile user={user} onLogout={handleLogout} onUpdateRole={handleUpdateRole} onUpdateUser={handleUpdateUser} /></ProtectedRoute>} />
+                    <Route path="/profile/:id" element={<PublicProfile />} />
                     <Route path="/planner" element={<SmartPlanner user={user} />} />
                     <Route path="/adventures" element={<Adventures />} />
                     <Route path="/tickets" element={<TicketBooking />} />
