@@ -121,8 +121,9 @@ export const NotificationProvider = ({ children }) => {
                     title: n.title,
                     body: n.body,
                     type: n.type || 'info',
+                    actionUrl: n.action_url || n.payload?.action_url || null,
                     time: new Date(n.created_at).toLocaleTimeString('bn-BD'),
-                    read: n.is_read ?? false
+                    read: n.read ?? false
                 }));
                 setNotifications(formatted);
                 setUnreadCount(formatted.filter(n => !n.read).length);
@@ -139,9 +140,9 @@ export const NotificationProvider = ({ children }) => {
         if (user) {
             await supabase
                 .from('notifications')
-                .update({ is_read: true })
+                .update({ read: true, read_at: new Date().toISOString() })
                 .eq('user_id', user.id)
-                .eq('is_read', false);
+                .eq('read', false);
         }
     };
 
@@ -153,7 +154,7 @@ export const NotificationProvider = ({ children }) => {
 
         await supabase
             .from('notifications')
-            .update({ is_read: true })
+            .update({ read: true, read_at: new Date().toISOString() })
             .eq('id', id);
     };
 
@@ -161,26 +162,12 @@ export const NotificationProvider = ({ children }) => {
         if (!user) return;
 
         let channel = null;
-        let fcmUnsub = null;
-
         // Initial fetch
         handleTokenSync(user);
         fetchNotifications(user.id);
 
         // Realtime subscribe
         channel = subscribeToRealTimeNotifications(user.id, setNotifications, setUnreadCount);
-
-        // Firebase foreground messages
-        const listenFCM = async () => {
-            try {
-                fcmUnsub = await onMessageListener();
-                if (fcmUnsub && typeof fcmUnsub === 'function') {
-                    // onMessageListener returns a promise; handle payload below
-                }
-            } catch (err) {
-                console.warn('FCM listener error:', err);
-            }
-        };
 
         onMessageListener()
             .then(payload => {

@@ -124,7 +124,7 @@ const Navbar = ({ user, onOpenLogin, onLogout, theme, setTheme }) => {
     const [activeMenu, setActiveMenu] = useState(null);
     const [activeAccordion, setActiveAccordion] = useState(null);
 
-    const { notifications, unreadCount, markAllRead } = useNotifications();
+    const { notifications, unreadCount, markAllRead, markOneRead } = useNotifications();
     const navigate = useNavigate();
     const { language, toggleLanguage } = useLanguage();
     const navRef = useRef(null);
@@ -242,10 +242,10 @@ const Navbar = ({ user, onOpenLogin, onLogout, theme, setTheme }) => {
                                                 <div className="px-4 py-8 text-center text-gray-400 text-sm">No new alerts</div>
                                             ) : (
                                                 notifications.map(n => (
-                                                    <div key={n.id} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 border-b border-gray-50 dark:border-slate-700 last:border-0 transition-colors">
+                                                    <button key={n.id} type="button" onClick={() => { markOneRead(n.id); if (n.actionUrl) navigate(n.actionUrl); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 border-b border-gray-50 dark:border-slate-700 last:border-0 transition-colors">
                                                         <p className="text-sm font-bold text-gray-800 dark:text-gray-200">{n.title}</p>
                                                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{n.body}</p>
-                                                    </div>
+                                                    </button>
                                                 ))
                                             )}
                                         </div>
